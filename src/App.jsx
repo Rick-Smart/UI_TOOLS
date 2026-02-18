@@ -36,10 +36,9 @@ function App() {
   return (
     <main className="page stack">
       <header className="stack header-block">
-        <span className="pill">React + GitHub Pages</span>
         <h1>AZDES UI Toolbox</h1>
         <p className="subtitle">
-          Multi-page React workspace for AZDES UI tools and shared links.
+          Multi-page workspace for AZDES UI tools and shared links.
         </p>
       </header>
 
