@@ -86,7 +86,7 @@ function WorkSearchLogPage() {
             ) : null}
           </div>
 
-          <div className="input-grid">
+          <div className="stack">
             <div>
               <label htmlFor={`date-${index}`}>Date of contact</label>
               <input
@@ -111,9 +111,8 @@ function WorkSearchLogPage() {
             </div>
             <div>
               <label htmlFor={`address-${index}`}>Employer address</label>
-              <input
+              <textarea
                 id={`address-${index}`}
-                type="text"
                 value={entry.employerAddress}
                 onChange={(event) =>
                   updateEntry(index, "employerAddress", event.target.value)
@@ -157,9 +156,8 @@ function WorkSearchLogPage() {
             </div>
             <div>
               <label htmlFor={`action-${index}`}>Action taken</label>
-              <input
+              <textarea
                 id={`action-${index}`}
-                type="text"
                 value={entry.actionTaken}
                 onChange={(event) =>
                   updateEntry(index, "actionTaken", event.target.value)
