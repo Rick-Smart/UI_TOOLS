@@ -19,6 +19,26 @@ const defaultLinks = [
     group: "UI",
   },
   {
+    name: "UI Forms & Pamphlets",
+    url: "https://des.az.gov/services/employment/unemployment-individual/forms-pamphlets",
+    group: "UI",
+  },
+  {
+    name: "DES Documents Center",
+    url: "https://des.az.gov/documents-center",
+    group: "UI",
+  },
+  {
+    name: "UI Eligibility",
+    url: "https://des.az.gov/services/employment/unemployment-individual/eligibility-unemployment-insurance-benefits",
+    group: "UI",
+  },
+  {
+    name: "UI How Do I & FAQs",
+    url: "https://des.az.gov/services/employment/unemployment-individual/how-do-i-and-frequently-asked-questions",
+    group: "UI",
+  },
+  {
     name: "Arizona Job Connection",
     url: "https://www.azjobconnection.gov/",
     group: "Employment",

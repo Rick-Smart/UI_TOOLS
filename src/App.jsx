@@ -13,6 +13,7 @@ import AgentResponseCardsPage from "./pages/AgentResponseCardsPage";
 import TermsGlossaryPage from "./pages/TermsGlossaryPage";
 import CallHandlingPage from "./pages/CallHandlingPage";
 import WrapUpRecommenderPage from "./pages/WrapUpRecommenderPage";
+import DocumentSearchPage from "./pages/DocumentSearchPage";
 import { documentReferences } from "./data/documentReferences";
 
 const navItems = [
@@ -28,6 +29,7 @@ const navItems = [
   { to: "/call-handling", label: "Call Handling" },
   { to: "/wrap-up", label: "Wrap-Up" },
   { to: "/terms", label: "Terms" },
+  { to: "/doc-search", label: "Doc Search" },
   { to: "/links", label: "Quick Links" },
   { to: "/date-helper", label: "Date Helper" },
 ];
@@ -73,6 +75,7 @@ function App() {
         <Route path="/call-handling" element={<CallHandlingPage />} />
         <Route path="/wrap-up" element={<WrapUpRecommenderPage />} />
         <Route path="/terms" element={<TermsGlossaryPage />} />
+        <Route path="/doc-search" element={<DocumentSearchPage />} />
         <Route path="/links" element={<LinksPage />} />
         <Route path="/date-helper" element={<DateHelperPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
@@ -95,6 +98,24 @@ function App() {
               </div>
               <h3>{doc.title}</h3>
               <p className="muted">{doc.notes}</p>
+              <div className="actions-row">
+                <a
+                  className="button-link"
+                  href={doc.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Open source
+                </a>
+                <a
+                  className="button-secondary button-link"
+                  href={doc.searchUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Search number
+                </a>
+              </div>
             </article>
           ))}
         </div>

@@ -68,6 +68,12 @@ const cards = [
     to: "/terms",
   },
   {
+    title: "Document Search",
+    description:
+      "Search AZDES by document number and open official source pages directly.",
+    to: "/doc-search",
+  },
+  {
     title: "Quick Links",
     description:
       "Keep frequently used AZDES UI links in one managed list saved in your browser.",
