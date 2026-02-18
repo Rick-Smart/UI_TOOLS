@@ -1,6 +1,9 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { copyText } from "../utils/copyText";
 
 function ProgramTriagePage() {
+  const [searchParams] = useSearchParams();
   const [answers, setAnswers] = useState({
     federalEmployee: false,
     exMilitaryOrNoaa: false,
@@ -12,6 +15,29 @@ function ProgramTriagePage() {
     disasterDeclared: false,
     tradeImpacted: false,
   });
+  const [copyStatus, setCopyStatus] = useState("");
+
+  useEffect(() => {
+    const preset = searchParams.get("preset");
+    if (!preset) {
+      return;
+    }
+
+    if (preset === "federal-military") {
+      setAnswers((current) => ({
+        ...current,
+        federalEmployee: true,
+        exMilitaryOrNoaa: true,
+      }));
+    }
+
+    if (preset === "disaster") {
+      setAnswers((current) => ({
+        ...current,
+        disasterDeclared: true,
+      }));
+    }
+  }, [searchParams]);
 
   function setAnswer(field, value) {
     setAnswers((current) => ({ ...current, [field]: value }));
@@ -54,6 +80,16 @@ function ProgramTriagePage() {
 
     return results;
   }, [answers]);
+
+  async function handleCopySummary() {
+    const summary = [
+      "Program Triage Summary",
+      ...recommendations.map((item) => `- ${item}`),
+    ].join("\n");
+
+    const copied = await copyText(summary);
+    setCopyStatus(copied ? "Summary copied." : "Copy unavailable.");
+  }
 
   return (
     <section className="card stack">
@@ -164,6 +200,16 @@ function ProgramTriagePage() {
             <li key={item}>{item}</li>
           ))}
         </ul>
+        <div className="actions-row">
+          <button
+            type="button"
+            className="button-secondary"
+            onClick={handleCopySummary}
+          >
+            Copy summary
+          </button>
+          {copyStatus ? <span className="muted">{copyStatus}</span> : null}
+        </div>
       </div>
     </section>
   );

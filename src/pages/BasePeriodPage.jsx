@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { copyText } from "../utils/copyText";
 import {
   formatRange,
   getQuarterCloseLagDays,
@@ -28,6 +29,7 @@ function QuarterCard({ info, tagText, tagClass, note = "" }) {
 function BasePeriodPage() {
   const todayIso = useMemo(() => toIsoLocalDate(new Date()), []);
   const [claimDate, setClaimDate] = useState(todayIso);
+  const [copyStatus, setCopyStatus] = useState("");
 
   const calculation = useMemo(() => {
     if (!claimDate) {
@@ -64,6 +66,28 @@ function BasePeriodPage() {
       lagNote,
     };
   }, [claimDate]);
+
+  async function handleCopySummary() {
+    if (!calculation) {
+      return;
+    }
+
+    const baseLines = calculation.basePeriod.map(
+      (item) =>
+        `- ${item.label} ${item.year} (${formatRange(item.start, item.end)})`,
+    );
+
+    const summary = [
+      `Claim filing date: ${claimDate}`,
+      `Lag quarter: ${calculation.latestQuarter.label} ${calculation.latestQuarter.year}`,
+      calculation.lagNote,
+      "Base period:",
+      ...baseLines,
+    ].join("\n");
+
+    const copied = await copyText(summary);
+    setCopyStatus(copied ? "Summary copied." : "Copy unavailable.");
+  }
 
   return (
     <section className="card stack">
@@ -157,6 +181,16 @@ function BasePeriodPage() {
 
           <div className="result" aria-live="polite">
             <h3>Last five completed quarters</h3>
+            <div className="actions-row">
+              <button
+                type="button"
+                className="button-secondary"
+                onClick={handleCopySummary}
+              >
+                Copy summary
+              </button>
+              {copyStatus ? <span className="muted">{copyStatus}</span> : null}
+            </div>
             <table className="table">
               <thead>
                 <tr>

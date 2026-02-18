@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { copyText } from "../utils/copyText";
 
 function createEntry() {
   return {
@@ -14,6 +15,7 @@ function createEntry() {
 
 function WorkSearchLogPage() {
   const [entries, setEntries] = useState([createEntry()]);
+  const [copyStatus, setCopyStatus] = useState("");
 
   const uniqueContactDays = useMemo(() => {
     const days = entries
@@ -48,6 +50,23 @@ function WorkSearchLogPage() {
 
   const meetsFourDayRule = uniqueContactDays >= 4;
 
+  async function handleCopySummary() {
+    const lines = [
+      "Work Search Weekly Summary",
+      `Completed contacts: ${completeEntries}`,
+      `Unique contact days: ${uniqueContactDays}`,
+      `Four-day minimum: ${meetsFourDayRule ? "Met" : "Not met"}`,
+      "",
+      ...entries.map(
+        (entry, index) =>
+          `#${index + 1} ${entry.contactDate || "No date"} | ${entry.employerName || "No employer"} | ${entry.method || "No method"}`,
+      ),
+    ];
+
+    const copied = await copyText(lines.join("\n"));
+    setCopyStatus(copied ? "Summary copied." : "Copy unavailable.");
+  }
+
   return (
     <section className="card stack">
       <div>
@@ -69,6 +88,16 @@ function WorkSearchLogPage() {
               : "Does not meet four-different-day minimum yet"}
           </strong>
         </p>
+        <div className="actions-row">
+          <button
+            type="button"
+            className="button-secondary"
+            onClick={handleCopySummary}
+          >
+            Copy summary
+          </button>
+          {copyStatus ? <span className="muted">{copyStatus}</span> : null}
+        </div>
       </div>
 
       {entries.map((entry, index) => (

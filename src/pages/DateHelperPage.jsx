@@ -1,27 +1,34 @@
-import { useMemo, useState } from 'react'
-import { dateFormatter } from '../utils/quarterUtils'
+import { useMemo, useState } from "react";
+import { copyText } from "../utils/copyText";
+import { dateFormatter } from "../utils/quarterUtils";
 
 function toIsoLocalDate(date) {
-  const offset = date.getTimezoneOffset()
-  return new Date(date.getTime() - offset * 60000).toISOString().split('T')[0]
+  const offset = date.getTimezoneOffset();
+  return new Date(date.getTime() - offset * 60000).toISOString().split("T")[0];
 }
 
 function DateHelperPage() {
-  const todayIso = useMemo(() => toIsoLocalDate(new Date()), [])
-  const [startDate, setStartDate] = useState(todayIso)
-  const [days, setDays] = useState(7)
+  const todayIso = useMemo(() => toIsoLocalDate(new Date()), []);
+  const [startDate, setStartDate] = useState(todayIso);
+  const [days, setDays] = useState(7);
+  const [copyStatus, setCopyStatus] = useState("");
 
   const resultText = useMemo(() => {
     if (!startDate || Number.isNaN(Number(days))) {
-      return 'Enter a start date and a valid day count.'
+      return "Enter a start date and a valid day count.";
     }
 
-    const start = new Date(`${startDate}T12:00:00`)
-    const result = new Date(start)
-    result.setDate(result.getDate() + Number(days))
+    const start = new Date(`${startDate}T12:00:00`);
+    const result = new Date(start);
+    result.setDate(result.getDate() + Number(days));
 
-    return `${dateFormatter.format(start)} + ${days} day(s) = ${dateFormatter.format(result)}`
-  }, [startDate, days])
+    return `${dateFormatter.format(start)} + ${days} day(s) = ${dateFormatter.format(result)}`;
+  }, [startDate, days]);
+
+  async function handleCopySummary() {
+    const copied = await copyText(resultText);
+    setCopyStatus(copied ? "Summary copied." : "Copy unavailable.");
+  }
 
   return (
     <section className="card stack">
@@ -56,8 +63,19 @@ function DateHelperPage() {
       <div className="result" aria-live="polite">
         {resultText}
       </div>
+
+      <div className="actions-row">
+        <button
+          type="button"
+          className="button-secondary"
+          onClick={handleCopySummary}
+        >
+          Copy summary
+        </button>
+        {copyStatus ? <span className="muted">{copyStatus}</span> : null}
+      </div>
     </section>
-  )
+  );
 }
 
-export default DateHelperPage
+export default DateHelperPage;

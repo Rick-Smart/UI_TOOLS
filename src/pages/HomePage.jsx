@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { topActions } from "../data/topActions";
 import { homeCards } from "../data/toolRegistry";
 
 function HomePage() {
@@ -10,6 +11,21 @@ function HomePage() {
           Choose a tool below. Use the Document references section to confirm
           source pamphlet/form numbers as additional guidance is added.
         </p>
+      </div>
+
+      <div className="result stack">
+        <h3>Today&apos;s Top Actions</h3>
+        <div className="tools-grid">
+          {topActions.map((item) => (
+            <article key={item.title} className="tool-card">
+              <h3>{item.title}</h3>
+              <p className="muted">{item.description}</p>
+              <Link className="button-link" to={item.to}>
+                Start action
+              </Link>
+            </article>
+          ))}
+        </div>
       </div>
 
       <div className="tools-grid">

@@ -371,8 +371,59 @@ input:focus-visible,
   background: #0f172a;
 }
 
+.guide-card {
+  padding: 14px 16px;
+}
+
+.search-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.print-friendly {
+  break-inside: avoid;
+}
+
 footer {
   margin-top: 4px;
   font-size: 13px;
   color: var(--muted);
+}
+
+@media print {
+  body {
+    background: #ffffff;
+    color: #000000;
+  }
+
+  .page {
+    max-width: none;
+    padding: 0;
+  }
+
+  .nav-row,
+  .header-block,
+  footer,
+  .button-link,
+  button {
+    display: none !important;
+  }
+
+  .card,
+  .result,
+  .tool-card,
+  .doc-card,
+  .link-card,
+  .quarter-item {
+    box-shadow: none;
+    border-color: #d1d5db;
+    background: #ffffff;
+    color: #000000;
+  }
+
+  .muted {
+    color: #374151;
+  }
 }

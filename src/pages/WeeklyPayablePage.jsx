@@ -1,8 +1,10 @@
 import { useMemo, useState } from "react";
+import { copyText } from "../utils/copyText";
 
 function WeeklyPayablePage() {
   const [weeklyBenefitAmount, setWeeklyBenefitAmount] = useState(320);
   const [weeklyEarnings, setWeeklyEarnings] = useState(0);
+  const [copyStatus, setCopyStatus] = useState("");
 
   const calculation = useMemo(() => {
     const wba = Number(weeklyBenefitAmount);
@@ -32,6 +34,23 @@ function WeeklyPayablePage() {
       noPayment: earnings >= wba,
     };
   }, [weeklyBenefitAmount, weeklyEarnings]);
+
+  async function handleCopySummary() {
+    if (!calculation) {
+      return;
+    }
+
+    const summary = [
+      "Weekly Payable Summary",
+      `WBA: $${calculation.wba.toFixed(2)}`,
+      `Weekly earnings: $${calculation.earnings.toFixed(2)}`,
+      `Reduction: $${calculation.reduction.toFixed(2)}`,
+      `Estimated payable: $${calculation.payable.toFixed(0)}`,
+    ].join("\n");
+
+    const copied = await copyText(summary);
+    setCopyStatus(copied ? "Summary copied." : "Copy unavailable.");
+  }
 
   return (
     <section className="card stack">
@@ -110,6 +129,16 @@ function WeeklyPayablePage() {
               is due for that week.
             </p>
           ) : null}
+          <div className="actions-row">
+            <button
+              type="button"
+              className="button-secondary"
+              onClick={handleCopySummary}
+            >
+              Copy summary
+            </button>
+            {copyStatus ? <span className="muted">{copyStatus}</span> : null}
+          </div>
         </div>
       )}
     </section>

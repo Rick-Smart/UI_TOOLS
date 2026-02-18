@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { copyText } from "../utils/copyText";
 import { dateFormatter } from "../utils/quarterUtils";
 
 const appealTypes = {
@@ -17,6 +18,7 @@ function AppealsHelperPage() {
   const [determinationDate, setDeterminationDate] = useState("");
   const [appealType, setAppealType] = useState("eligibility");
   const [filingMethod, setFilingMethod] = useState("other");
+  const [copyStatus, setCopyStatus] = useState("");
 
   const output = useMemo(() => {
     if (!determinationDate) {
@@ -35,6 +37,23 @@ function AppealsHelperPage() {
           : "If not mailed, received date is used.",
     };
   }, [determinationDate, appealType, filingMethod]);
+
+  async function handleCopySummary() {
+    if (!output) {
+      return;
+    }
+
+    const text = [
+      "Appeals Deadline Summary",
+      `Type: ${output.selected.label}`,
+      `Window: ${output.selected.days} days`,
+      `Estimated deadline: ${dateFormatter.format(output.deadline)}`,
+      output.methodNote,
+    ].join("\n");
+
+    const copied = await copyText(text);
+    setCopyStatus(copied ? "Summary copied." : "Copy unavailable.");
+  }
 
   return (
     <section className="card stack">
@@ -103,6 +122,16 @@ function AppealsHelperPage() {
           <p className="muted">
             If filing is late, include a written explanation for late filing.
           </p>
+          <div className="actions-row">
+            <button
+              type="button"
+              className="button-secondary"
+              onClick={handleCopySummary}
+            >
+              Copy summary
+            </button>
+            {copyStatus ? <span className="muted">{copyStatus}</span> : null}
+          </div>
         </div>
       )}
     </section>

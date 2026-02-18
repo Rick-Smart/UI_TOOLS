@@ -1,9 +1,105 @@
-import { NavLink, Navigate, Route, Routes } from "react-router-dom";
+import { useMemo, useState } from "react";
+import { Link, NavLink, Navigate, Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
+import { defaultLinks } from "./data/defaultLinks";
 import { documentReferences } from "./data/documentReferences";
+import { trendsTips } from "./data/trendsTips";
 import { navItems, toolRegistry } from "./data/toolRegistry";
 
+function ToolScreen({ tool }) {
+  const Component = tool.component;
+  const componentProps =
+    tool.path === "/quick-reference"
+      ? {
+          tools: toolRegistry.filter(
+            (item) => item.path !== "/quick-reference",
+          ),
+        }
+      : {};
+
+  return (
+    <>
+      <section className="card guide-card">
+        <h3>Quick guide</h3>
+        <p className="muted">{tool.microGuide || tool.description}</p>
+      </section>
+      <Component {...componentProps} />
+    </>
+  );
+}
+
 function App() {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const searchResults = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) {
+      return [];
+    }
+
+    const toolMatches = toolRegistry
+      .filter(
+        (tool) =>
+          tool.title.toLowerCase().includes(query) ||
+          tool.description.toLowerCase().includes(query) ||
+          tool.navLabel.toLowerCase().includes(query),
+      )
+      .map((tool) => ({
+        id: `tool-${tool.path}`,
+        type: "Tool",
+        title: tool.title,
+        detail: tool.description,
+        to: tool.path,
+      }));
+
+    const docMatches = documentReferences
+      .filter(
+        (doc) =>
+          doc.number.toLowerCase().includes(query) ||
+          doc.title.toLowerCase().includes(query),
+      )
+      .map((doc) => ({
+        id: `doc-${doc.number}`,
+        type: "Document",
+        title: `${doc.number} — ${doc.title}`,
+        detail: "Open official source",
+        href: doc.sourceUrl,
+      }));
+
+    const linkMatches = defaultLinks
+      .filter(
+        (link) =>
+          link.name.toLowerCase().includes(query) ||
+          link.group.toLowerCase().includes(query),
+      )
+      .map((link) => ({
+        id: `link-${link.name}`,
+        type: "Link",
+        title: link.name,
+        detail: link.group,
+        href: link.url,
+      }));
+
+    const tipMatches = trendsTips
+      .filter(
+        (item) =>
+          item.title.toLowerCase().includes(query) ||
+          item.message.toLowerCase().includes(query),
+      )
+      .map((item) => ({
+        id: item.id,
+        type: "Trend",
+        title: item.title,
+        detail: item.priority,
+        to: "/trends-tips",
+      }));
+
+    return [...toolMatches, ...docMatches, ...linkMatches, ...tipMatches].slice(
+      0,
+      12,
+    );
+  }, [searchQuery]);
+
   return (
     <main className="page stack">
       <header className="stack header-block">
@@ -11,6 +107,16 @@ function App() {
         <p className="subtitle">
           Multi-page workspace for AZDES UI tools and shared links.
         </p>
+        <div className="compact-grid">
+          <label htmlFor="global-search">Smart search</label>
+          <input
+            id="global-search"
+            type="text"
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder="Search tools, document numbers, links, or trends"
+          />
+        </div>
       </header>
 
       <nav className="card nav-row" aria-label="Primary navigation">
@@ -28,14 +134,60 @@ function App() {
         ))}
       </nav>
 
+      {searchQuery.trim() ? (
+        <section className="card stack" aria-live="polite">
+          <div className="title-row">
+            <h2>Search results</h2>
+            <span className="pill">{searchResults.length} matches</span>
+          </div>
+          {searchResults.length ? (
+            <div className="stack">
+              {searchResults.map((result) => (
+                <article key={result.id} className="result search-item">
+                  <div>
+                    <p>
+                      <strong>{result.title}</strong>
+                    </p>
+                    <p className="muted">
+                      {result.type} · {result.detail}
+                    </p>
+                  </div>
+                  {result.to ? (
+                    <Link
+                      className="button-link"
+                      to={result.to}
+                      onClick={() => setSearchQuery("")}
+                    >
+                      Open
+                    </Link>
+                  ) : (
+                    <a
+                      className="button-link"
+                      href={result.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Open
+                    </a>
+                  )}
+                </article>
+              ))}
+            </div>
+          ) : (
+            <p className="muted">No results found.</p>
+          )}
+        </section>
+      ) : null}
+
       <Routes>
         <Route path="/" element={<HomePage />} />
-        {toolRegistry.map((tool) => {
-          const Component = tool.component;
-          return (
-            <Route key={tool.path} path={tool.path} element={<Component />} />
-          );
-        })}
+        {toolRegistry.map((tool) => (
+          <Route
+            key={tool.path}
+            path={tool.path}
+            element={<ToolScreen tool={tool} />}
+          />
+        ))}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 

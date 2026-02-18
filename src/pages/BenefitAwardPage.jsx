@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { copyText } from "../utils/copyText";
 
 function BenefitAwardPage() {
   const [q1, setQ1] = useState(0);
@@ -6,6 +7,7 @@ function BenefitAwardPage() {
   const [q3, setQ3] = useState(0);
   const [q4, setQ4] = useState(0);
   const [highUnemploymentRate, setHighUnemploymentRate] = useState(false);
+  const [copyStatus, setCopyStatus] = useState("");
 
   const result = useMemo(() => {
     const wages = [q1, q2, q3, q4].map(Number);
@@ -31,6 +33,23 @@ function BenefitAwardPage() {
       maxAward,
     };
   }, [q1, q2, q3, q4, highUnemploymentRate]);
+
+  async function handleCopySummary() {
+    if (!result) {
+      return;
+    }
+
+    const text = [
+      "Benefit Award Estimate Summary",
+      `Estimated WBA: $${result.weeklyBenefitAmount.toFixed(2)}`,
+      `Estimated max award: $${result.maxAward.toFixed(2)}`,
+      `Cap mode: ${result.weekCapMultiplier}x`,
+      `Total wages: $${result.totalWages.toFixed(2)}`,
+    ].join("\n");
+
+    const copied = await copyText(text);
+    setCopyStatus(copied ? "Summary copied." : "Copy unavailable.");
+  }
 
   return (
     <section className="card stack">
@@ -126,6 +145,16 @@ function BenefitAwardPage() {
               </strong>
             </li>
           </ul>
+          <div className="actions-row">
+            <button
+              type="button"
+              className="button-secondary"
+              onClick={handleCopySummary}
+            >
+              Copy summary
+            </button>
+            {copyStatus ? <span className="muted">{copyStatus}</span> : null}
+          </div>
         </div>
       )}
     </section>

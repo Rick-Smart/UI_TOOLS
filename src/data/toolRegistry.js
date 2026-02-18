@@ -7,7 +7,9 @@ import DocumentSearchPage from "../pages/DocumentSearchPage";
 import LinksPage from "../pages/LinksPage";
 import MonetaryEligibilityPage from "../pages/MonetaryEligibilityPage";
 import ProgramTriagePage from "../pages/ProgramTriagePage";
+import QuickReferencePage from "../pages/QuickReferencePage";
 import TermsGlossaryPage from "../pages/TermsGlossaryPage";
+import TrendsTipsPage from "../pages/TrendsTipsPage";
 import WeeklyPayablePage from "../pages/WeeklyPayablePage";
 import WorkSearchLogPage from "../pages/WorkSearchLogPage";
 
@@ -18,6 +20,8 @@ export const toolRegistry = [
     title: "Base Period Calculator",
     description:
       "Calculate base and lag quarters using UIB-1240A calendar-quarter rules.",
+    microGuide:
+      "Enter filing date, then read the base period and lag quarter results in order.",
     component: BasePeriodPage,
   },
   {
@@ -26,6 +30,8 @@ export const toolRegistry = [
     title: "Weekly Payable Estimator",
     description:
       "Estimate weekly payable amount using the $160 earnings disregard and reduction rule.",
+    microGuide:
+      "Enter WBA and weekly earnings to get estimated payable amount for that week.",
     component: WeeklyPayablePage,
   },
   {
@@ -34,6 +40,8 @@ export const toolRegistry = [
     title: "Monetary Eligibility Screener",
     description:
       "Check both monetary qualification pathways using base-period wages.",
+    microGuide:
+      "Enter minimum wage and quarter wages to see pass/fail across both pathways.",
     component: MonetaryEligibilityPage,
   },
   {
@@ -42,6 +50,8 @@ export const toolRegistry = [
     title: "Benefit Award Estimator",
     description:
       "Estimate weekly benefit amount and max award with 24x/26x cap logic.",
+    microGuide:
+      "Enter quarter wages and unemployment-rate toggle to estimate WBA and max award.",
     component: BenefitAwardPage,
   },
   {
@@ -50,6 +60,8 @@ export const toolRegistry = [
     title: "Appeals Deadline Helper",
     description:
       "Calculate appeal windows and filing-date reminders by decision type.",
+    microGuide:
+      "Select decision type and date to calculate the estimated appeal deadline.",
     component: AppealsHelperPage,
   },
   {
@@ -58,6 +70,8 @@ export const toolRegistry = [
     title: "Work Search Compliance Log",
     description:
       "Capture required work-search contact fields and 4-day minimum status.",
+    microGuide:
+      "Add one entry per contact and verify four unique contact days before filing.",
     component: WorkSearchLogPage,
   },
   {
@@ -66,6 +80,8 @@ export const toolRegistry = [
     title: "Program Triage Wizard",
     description:
       "Route calls across UI, UCFE, UCX, Combined Wages, Shared Work, DUA, TRA, and ABP.",
+    microGuide:
+      "Check all applicable conditions and review the suggested program path list.",
     component: ProgramTriagePage,
   },
   {
@@ -74,6 +90,8 @@ export const toolRegistry = [
     title: "Agent Response Cards",
     description:
       "Use plain-language, policy-aligned answers for frequent claimant questions.",
+    microGuide:
+      "Search by topic and use the matching card language for consistent communication.",
     component: AgentResponseCardsPage,
   },
   {
@@ -82,6 +100,8 @@ export const toolRegistry = [
     title: "UI Terms & Acronyms",
     description:
       "Search common terms and approved shorthand used during UI claimant support.",
+    microGuide:
+      "Search by term or abbreviation to quickly confirm definitions.",
     component: TermsGlossaryPage,
   },
   {
@@ -90,6 +110,8 @@ export const toolRegistry = [
     title: "Document Search",
     description:
       "Search AZDES by document number and open official source pages directly.",
+    microGuide:
+      "Enter document number, then use source/search links to open official references.",
     component: DocumentSearchPage,
   },
   {
@@ -98,6 +120,8 @@ export const toolRegistry = [
     title: "Quick Links",
     description:
       "Keep frequently used AZDES UI links in one managed list saved in your browser.",
+    microGuide:
+      "Use defaults or add your own links; updates are saved in local browser storage.",
     component: LinksPage,
   },
   {
@@ -106,7 +130,28 @@ export const toolRegistry = [
     title: "Date Offset Helper",
     description:
       "Add or subtract days to quickly find follow-up and deadline dates.",
+    microGuide:
+      "Enter start date and offset days to calculate a target date instantly.",
     component: DateHelperPage,
+  },
+  {
+    path: "/trends-tips",
+    navLabel: "Trends Tips",
+    title: "Trends, Tips & Suggestions",
+    description:
+      "Leader-updated campaign trends and operational suggestions for current call patterns.",
+    microGuide:
+      "Review active guidance items sorted by priority and effective date.",
+    component: TrendsTipsPage,
+  },
+  {
+    path: "/quick-reference",
+    navLabel: "Quick Ref",
+    title: "Printable Quick Reference",
+    description:
+      "Print-ready summary of top actions, tools, document references, and active tips.",
+    microGuide: "Use print view for supervisor huddles and team floor support.",
+    component: QuickReferencePage,
   },
 ];
 
