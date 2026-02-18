@@ -11,8 +11,6 @@ import WorkSearchLogPage from "./pages/WorkSearchLogPage";
 import ProgramTriagePage from "./pages/ProgramTriagePage";
 import AgentResponseCardsPage from "./pages/AgentResponseCardsPage";
 import TermsGlossaryPage from "./pages/TermsGlossaryPage";
-import CallHandlingPage from "./pages/CallHandlingPage";
-import WrapUpRecommenderPage from "./pages/WrapUpRecommenderPage";
 import DocumentSearchPage from "./pages/DocumentSearchPage";
 import { documentReferences } from "./data/documentReferences";
 
@@ -26,8 +24,6 @@ const navItems = [
   { to: "/work-search-log", label: "Work Search Log" },
   { to: "/program-triage", label: "Program Triage" },
   { to: "/agent-cards", label: "Agent Cards" },
-  { to: "/call-handling", label: "Call Handling" },
-  { to: "/wrap-up", label: "Wrap-Up" },
   { to: "/terms", label: "Terms" },
   { to: "/doc-search", label: "Doc Search" },
   { to: "/links", label: "Quick Links" },
@@ -72,8 +68,6 @@ function App() {
         <Route path="/work-search-log" element={<WorkSearchLogPage />} />
         <Route path="/program-triage" element={<ProgramTriagePage />} />
         <Route path="/agent-cards" element={<AgentResponseCardsPage />} />
-        <Route path="/call-handling" element={<CallHandlingPage />} />
-        <Route path="/wrap-up" element={<WrapUpRecommenderPage />} />
         <Route path="/terms" element={<TermsGlossaryPage />} />
         <Route path="/doc-search" element={<DocumentSearchPage />} />
         <Route path="/links" element={<LinksPage />} />
@@ -85,7 +79,7 @@ function App() {
         <div>
           <h2 id="doc-reference-heading">Document references</h2>
           <p className="muted section-copy">
-            Agent-facing tools on this site should align to the source materials
+            Tools on this site should align to the public source materials
             listed here. Add all future document numbers to this registry.
           </p>
         </div>

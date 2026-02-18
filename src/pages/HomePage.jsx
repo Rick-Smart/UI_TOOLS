@@ -50,18 +50,6 @@ const cards = [
     to: "/agent-cards",
   },
   {
-    title: "Call Handling Helper",
-    description:
-      "Follow end-to-end call workflow with scripts, verification, wrap-up codes, and notes.",
-    to: "/call-handling",
-  },
-  {
-    title: "Wrap-Up Recommender",
-    description:
-      "Choose call context and get a likely wrap-up code suggestion before close.",
-    to: "/wrap-up",
-  },
-  {
     title: "UI Terms & Acronyms",
     description:
       "Search common terms and approved shorthand used during UI claimant support.",
