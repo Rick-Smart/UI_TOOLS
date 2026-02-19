@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import Tooltip from "../components/Tooltip";
 
 const cards = [
   {
@@ -66,11 +67,15 @@ function AgentResponseCardsPage() {
         <p className="muted section-copy">
           Quick, policy-aligned talking points for high-frequency claimant
           questions.
+          <Tooltip text="Use these as consistent base language, then tailor to the caller’s exact situation." />
         </p>
       </div>
 
       <div className="compact-grid">
-        <label htmlFor="card-search">Search response cards</label>
+        <label htmlFor="card-search">
+          Search response cards
+          <Tooltip text="Search by claimant question topic (for example: appeal, earnings, waiting week, overpayment)." />
+        </label>
         <input
           id="card-search"
           type="text"
@@ -83,7 +88,10 @@ function AgentResponseCardsPage() {
       <div className="tools-grid" aria-live="polite">
         {filtered.map((card) => (
           <article key={card.title} className="tool-card">
-            <h3>{card.title}</h3>
+            <h3>
+              {card.title}
+              <Tooltip text="Deliver this message clearly, then confirm understanding and next step." />
+            </h3>
             <p className="muted">{card.response}</p>
           </article>
         ))}

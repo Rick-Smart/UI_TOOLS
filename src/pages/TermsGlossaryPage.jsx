@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import Tooltip from "../components/Tooltip";
 import { uiTerms } from "../data/uiTerms";
 
 function TermsGlossaryPage() {
@@ -25,11 +26,15 @@ function TermsGlossaryPage() {
         <p className="muted section-copy">
           Search common UI terms and approved shorthand to support clear
           claimant communication.
+          <Tooltip text="Use this glossary to standardize language across agents and reduce conflicting explanations." />
         </p>
       </div>
 
       <div className="compact-grid">
-        <label htmlFor="term-search">Search terms</label>
+        <label htmlFor="term-search">
+          Search terms
+          <Tooltip text="Search by full term, abbreviation, or a keyword from the definition." />
+        </label>
         <input
           id="term-search"
           type="text"
@@ -47,9 +52,18 @@ function TermsGlossaryPage() {
         <table className="table">
           <thead>
             <tr>
-              <th>Term</th>
-              <th>Short</th>
-              <th>Definition</th>
+              <th>
+                Term
+                <Tooltip text="Full UI concept name as used in communication and policy materials." />
+              </th>
+              <th>
+                Short
+                <Tooltip text="Approved shorthand/acronym. Avoid inventing new abbreviations in notes." />
+              </th>
+              <th>
+                Definition
+                <Tooltip text="Use this plain-language meaning when explaining terms to claimants." />
+              </th>
             </tr>
           </thead>
           <tbody>
