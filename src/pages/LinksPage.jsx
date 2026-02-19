@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import Tooltip from "../components/Tooltip";
 import { defaultLinks, linksStorageKey } from "../data/defaultLinks";
 
 function readStoredLinks() {
@@ -74,6 +75,7 @@ function LinksPage() {
           <h2>Quick Links</h2>
           <p className="muted section-copy">
             Save frequently used links in your local browser storage.
+            <Tooltip text="Saved links are browser-local on this device; they are not synced across users or devices." />
           </p>
         </div>
         <span className="pill">
@@ -103,7 +105,10 @@ function LinksPage() {
           />
         </div>
         <div>
-          <label htmlFor="link-group">Group</label>
+          <label htmlFor="link-group">
+            Group
+            <Tooltip text="Use groups like UI, Employment, Phone, or Team to organize links for faster scanning." />
+          </label>
           <input
             id="link-group"
             value={group}

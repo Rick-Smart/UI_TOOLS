@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import Tooltip from "../components/Tooltip";
 import { copyText } from "../utils/copyText";
 import { dateFormatter } from "../utils/quarterUtils";
 
@@ -68,6 +69,7 @@ function AppealsHelperPage() {
         <div>
           <label htmlFor="determination-date">
             Determination/decision date
+            <Tooltip text="Use the date shown on the determination/decision notice." />
           </label>
           <input
             id="determination-date"
@@ -91,7 +93,10 @@ function AppealsHelperPage() {
           </select>
         </div>
         <div>
-          <label htmlFor="filing-method">Submission method</label>
+          <label htmlFor="filing-method">
+            Submission method
+            <Tooltip text="Mail uses postmark date. Non-mail channels use received date." />
+          </label>
           <select
             id="filing-method"
             value={filingMethod}
@@ -121,6 +126,7 @@ function AppealsHelperPage() {
           <p className="muted">{output.methodNote}</p>
           <p className="muted">
             If filing is late, include a written explanation for late filing.
+            <Tooltip text="Late appeals can be rejected without sufficient written cause, so include details." />
           </p>
           <div className="actions-row">
             <button

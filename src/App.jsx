@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link, NavLink, Navigate, Route, Routes } from "react-router-dom";
+import Tooltip from "./components/Tooltip";
 import HomePage from "./pages/HomePage";
 import { defaultLinks } from "./data/defaultLinks";
 import { documentReferences } from "./data/documentReferences";
@@ -108,7 +109,10 @@ function App() {
           Multi-page workspace for AZDES UI tools and shared links.
         </p>
         <div className="compact-grid">
-          <label htmlFor="global-search">Smart search</label>
+          <label htmlFor="global-search">
+            Smart search
+            <Tooltip text="Searches tool names, document references, default links, and active trends. Results are capped for speed." />
+          </label>
           <input
             id="global-search"
             type="text"

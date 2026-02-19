@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import Tooltip from "../components/Tooltip";
 import { copyText } from "../utils/copyText";
 
 function MonetaryEligibilityPage() {
@@ -75,7 +76,10 @@ function MonetaryEligibilityPage() {
 
       <div className="input-grid">
         <div>
-          <label htmlFor="min-wage">Arizona minimum wage</label>
+          <label htmlFor="min-wage">
+            Arizona minimum wage
+            <Tooltip text="Pathway A threshold uses 390 × this value, so keep it current." />
+          </label>
           <input
             id="min-wage"
             type="number"
@@ -144,6 +148,7 @@ function MonetaryEligibilityPage() {
                 ? "Potentially monetarily eligible"
                 : "Not monetarily eligible by entered values"}
             </strong>
+            <Tooltip text="Potentially eligible means input values meet formula checks; final determination still follows official review." />
           </p>
           <ul className="list">
             <li>Total base-period wages: ${summary.total.toFixed(2)}</li>
@@ -154,9 +159,13 @@ function MonetaryEligibilityPage() {
             <li>
               Pathway A threshold (390 × min wage): $
               {summary.pathwayAThreshold.toFixed(2)}
+              <Tooltip text="Pathway A also requires the other three quarters total at least half of highest-quarter wages." />
             </li>
             <li>Pathway A status: {summary.pathwayA ? "Pass" : "Fail"}</li>
-            <li>Pathway B status: {summary.pathwayB ? "Pass" : "Fail"}</li>
+            <li>
+              Pathway B status: {summary.pathwayB ? "Pass" : "Fail"}
+              <Tooltip text="Pathway B requires all three: total wages ≥ 8000, wages in at least 2 quarters, and highest quarter ≥ 7987.5." />
+            </li>
           </ul>
           <div className="actions-row">
             <button

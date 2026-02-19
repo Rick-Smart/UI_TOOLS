@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import Tooltip from "../components/Tooltip";
 import { copyText } from "../utils/copyText";
 import {
   formatRange,
@@ -114,7 +115,10 @@ function BasePeriodPage() {
 
       <div className="grid grid-2">
         <div>
-          <span className="pill">Quick rules</span>
+          <span className="pill">
+            Quick rules
+            <Tooltip text="Use completed quarters only. The newest completed quarter is lag; the prior four are base period." />
+          </span>
           <ul className="list">
             <li>
               Quarter changes begin on the first <strong>Sunday</strong> of Jan
@@ -133,7 +137,10 @@ function BasePeriodPage() {
           </ul>
         </div>
         <div>
-          <span className="pill">Quarter definitions</span>
+          <span className="pill">
+            Quarter definitions
+            <Tooltip text="Lag days can appear around quarter boundaries when month-end is before Saturday." />
+          </span>
           <ul className="list">
             <li>Q1 months: Jan–Mar</li>
             <li>Q2 months: Apr–Jun</li>
@@ -167,7 +174,10 @@ function BasePeriodPage() {
             </div>
 
             <div className="result" aria-live="polite">
-              <h3>Lag quarter (most recent completed quarter)</h3>
+              <h3>
+                Lag quarter (most recent completed quarter)
+                <Tooltip text="Lag quarter is not included in base-period wages; it sits between base period and current filing quarter." />
+              </h3>
               <div className="quarters">
                 <QuarterCard
                   info={calculation.latestQuarter}

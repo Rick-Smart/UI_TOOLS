@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import Tooltip from "../components/Tooltip";
 import { copyText } from "../utils/copyText";
 
 function BenefitAwardPage() {
@@ -117,6 +118,7 @@ function BenefitAwardPage() {
         />
         <span>
           Average unemployment rate in prior quarter is 5% or more (26x cap)
+          <Tooltip text="Unchecked = 24x cap. Checked = 26x cap. This only affects the cap side of max award." />
         </span>
       </label>
 
@@ -133,6 +135,7 @@ function BenefitAwardPage() {
             <li>
               Weekly benefit amount estimate (4% high quarter, max $320): $
               {result.weeklyBenefitAmount.toFixed(2)}
+              <Tooltip text="WBA estimate is 4% of highest quarter wages, limited to $320 maximum." />
             </li>
             <li>One-third wage cap: ${result.oneThirdCap.toFixed(2)}</li>
             <li>
@@ -143,6 +146,7 @@ function BenefitAwardPage() {
               <strong>
                 Estimated max benefit award: ${result.maxAward.toFixed(2)}
               </strong>
+              <Tooltip text="Max award uses the lower of one-third of total wages or the 24x/26x weekly benefit cap." />
             </li>
           </ul>
           <div className="actions-row">

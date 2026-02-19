@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import Tooltip from "../components/Tooltip";
 import { documentReferences } from "../data/documentReferences";
 
 function normalizeDocNumber(value) {
@@ -38,6 +39,7 @@ function DocumentSearchPage() {
           <p className="muted section-copy">
             Search AZDES by document number and quickly open known document
             pages.
+            <Tooltip text="Use document number format (UIB-xxxx or UB-xxx) for fastest results." />
           </p>
         </div>
         <span className="pill">{matchingDocs.length} matches</span>
@@ -103,6 +105,9 @@ function DocumentSearchPage() {
               >
                 Search by number
               </a>
+              <span className="muted">
+                <Tooltip text="Open source goes to the known official page. Search by number helps when direct source pages move or change." />
+              </span>
             </div>
           </article>
         ))}
