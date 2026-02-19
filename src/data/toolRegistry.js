@@ -60,9 +60,9 @@ export const toolRegistry = [
     navLabel: "Call Handling",
     title: "Call Handling Guide",
     description:
-      "Scripts, verification flow, RFC prompts, case notation, customer service reminders, contacts, and wrap-up codes.",
+      "Scripts, verification flow, RFC prompts, case notation, customer service reminders, contacts, and ordered checklist support.",
     microGuide:
-      "Use this page during live calls for scripts, note standards, and wrap-up code selection.",
+      "Use this page during live calls for scripts, note standards, and step-by-step checklist completion.",
     component: CallHandlingPage,
   },
   {

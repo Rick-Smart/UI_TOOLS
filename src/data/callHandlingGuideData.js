@@ -14,6 +14,27 @@ export const managingCallSteps = [
   "Close the call",
 ];
 
+export const orderedCallChecklist = [
+  "Confirm On Queue status and systems ready.",
+  "Deliver correct greeting (Inbound or Callback).",
+  "Verify caller identity (PIN flow, 5-point no-PIN flow, or employer flow).",
+  "Confirm callback number.",
+  "Capture and paraphrase reason for calling (RFC).",
+  "Set hold expectation and complete general claim review.",
+  "Provide status update and next steps in plain language.",
+  "Remind claimant to continue weekly certifications.",
+  "Add complete case note fields.",
+  "Close call with closing script and transfer to survey.",
+];
+
+export const unableToVerifyProtocol = [
+  "If claimant fails 5-point verification, stop case-specific discussion.",
+  "Provide only general UI program information.",
+  "Do not disclose claim-specific status, determinations, balances, or documents.",
+  "Advise claimant to call back with required verification information.",
+  "Document in notes that verification was not completed and general information only was provided.",
+];
+
 export const prepareChecklist = [
   "Set status to On Queue.",
   "Have all required systems/screens ready before taking calls.",
@@ -192,102 +213,3 @@ export const contactInfo = {
   ],
   website: "https://azui.gov",
 };
-
-export const wrapUpCodes = [
-  { code: "UIB-1099-G Request/Issue", use: "1099 assistance/issue call." },
-  {
-    code: "UIB-1272 Review",
-    use: "Manual review request for submitted UIB-1272 paper weekly certs.",
-  },
-  { code: "UIB-Appeal CLMT", use: "Claimant appeal assistance/direction." },
-  { code: "UIB-Appeal ER", use: "Employer appeal assistance/direction." },
-  {
-    code: "UIB-Banking Info",
-    use: "Direct deposit or Way2Go card assistance/issue.",
-  },
-  {
-    code: "UIB-Callback: Busy Tone",
-    use: "Genesys callback reached busy tone.",
-  },
-  {
-    code: "UIB-Callback: No Answer",
-    use: "Genesys callback had no answer.",
-  },
-  {
-    code: "UIB-CLMT BE",
-    use: "Claimant asks about extension near benefits exhausted.",
-  },
-  {
-    code: "UIB-CLMT Docs",
-    use: "Caller advises requested docs were submitted.",
-  },
-  { code: "UIB-CLMT No active Issue", use: "Claimant with no active issue." },
-  {
-    code: "UIB-CLMT Timely Claim",
-    use: "Active issue age 21 days or less.",
-  },
-  {
-    code: "UIB-CLMT Untimely Claim",
-    use: "Active issue exists and is untimely.",
-  },
-  {
-    code: "UIB-CWC Request",
-    use: "Current established MI claim requesting wage combination support.",
-  },
-  {
-    code: "UIB-Dropped Call",
-    use: "Call dropped during active deputy interaction.",
-  },
-  { code: "UIB-ER Call", use: "Inbound employer call." },
-  {
-    code: "UIB-Error/Technical Issue",
-    use: "Department-wide system issue context only.",
-  },
-  {
-    code: "UIB-Gen Claim Info",
-    use: "General claim filing questions before online filing.",
-  },
-  {
-    code: "UIB-Ghost Call",
-    use: "No response after required ghost scripting.",
-  },
-  { code: "UIB-IDme", use: "ID.me issue with guidance request." },
-  { code: "UIB-MI Claim", use: "Monetarily Ineligible claim support." },
-  { code: "UIB-MI DD Claim", use: "Monetarily Ineligible-DD claim support." },
-  {
-    code: "UIB-Missing Pymt",
-    use: "Claim review request due to missing payment.",
-  },
-  {
-    code: "UIB-NL CB CLMT",
-    use: "Claimant returning non-lobby deputy voicemail with no response.",
-  },
-  {
-    code: "UIB-NL CB ER",
-    use: "Employer returning non-lobby deputy voicemail with no response.",
-  },
-  {
-    code: "UIB-Password / Login Issue",
-    use: "UI portal password/login support only.",
-  },
-  {
-    code: "UIB-PreFiling Questions",
-    use: "Pre-filing questions before online claim/UB-105 upload.",
-  },
-  {
-    code: "UIB-PUA Overpayment Notice",
-    use: "Call related to PUA overpayment notice.",
-  },
-  {
-    code: "UIB-Redetermination CLMT",
-    use: "Assistance applying completed appellate determination.",
-  },
-  {
-    code: "UIB-Revise Information",
-    use: "Direction for demographic update process.",
-  },
-  {
-    code: "UIB-UI OP",
-    use: "Claim review for OP balance discrepancy after BPC contact.",
-  },
-];

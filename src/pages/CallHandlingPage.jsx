@@ -10,31 +10,32 @@ import {
   managingCallSteps,
   noteDoNotInclude,
   noteRequirements,
+  orderedCallChecklist,
   prepareChecklist,
   rfcPrompts,
   supportResources,
+  unableToVerifyProtocol,
   verificationGuides,
   voicemailScripts,
-  wrapUpCodes,
 } from "../data/callHandlingGuideData";
 import { copyText } from "../utils/copyText";
 
 function CallHandlingPage() {
-  const [wrapQuery, setWrapQuery] = useState("");
   const [copyStatus, setCopyStatus] = useState("");
+  const [checkState, setCheckState] = useState(
+    orderedCallChecklist.map(() => false),
+  );
 
-  const filteredCodes = useMemo(() => {
-    const query = wrapQuery.trim().toLowerCase();
-    if (!query) {
-      return wrapUpCodes;
-    }
+  const completedCount = useMemo(
+    () => checkState.filter(Boolean).length,
+    [checkState],
+  );
 
-    return wrapUpCodes.filter(
-      (item) =>
-        item.code.toLowerCase().includes(query) ||
-        item.use.toLowerCase().includes(query),
+  function toggleChecklist(index, checked) {
+    setCheckState((current) =>
+      current.map((item, itemIndex) => (itemIndex === index ? checked : item)),
     );
-  }, [wrapQuery]);
+  }
 
   async function handleCopyCloseScript() {
     const copied = await copyText(closeScript);
@@ -71,6 +72,35 @@ function CallHandlingPage() {
               <li key={step}>{step}</li>
             ))}
           </ul>
+        </div>
+      </div>
+
+      <div className="result stack" aria-live="polite">
+        <div className="title-row">
+          <h3>In-order call checklist</h3>
+          <span className="pill">
+            {completedCount}/{orderedCallChecklist.length} complete
+          </span>
+        </div>
+        <p className="muted">
+          Complete each step in order to confirm required actions were handled
+          before close.
+        </p>
+        <div className="stack">
+          {orderedCallChecklist.map((item, index) => (
+            <label key={item} className="checkbox-row">
+              <input
+                type="checkbox"
+                checked={checkState[index]}
+                onChange={(event) =>
+                  toggleChecklist(index, event.target.checked)
+                }
+              />
+              <span>
+                <strong>Step {index + 1}:</strong> {item}
+              </span>
+            </label>
+          ))}
         </div>
       </div>
 
@@ -117,6 +147,12 @@ function CallHandlingPage() {
           <h3>Employer verification</h3>
           <ul className="list">
             {verificationGuides.employer.map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>
+          <h3>If claimant cannot be verified</h3>
+          <ul className="list">
+            {unableToVerifyProtocol.map((line) => (
               <li key={line}>{line}</li>
             ))}
           </ul>
@@ -284,36 +320,6 @@ function CallHandlingPage() {
               </li>
             ))}
           </ul>
-        </div>
-      </div>
-
-      <div className="result stack">
-        <h3>Wrap-up codes</h3>
-        <label htmlFor="wrap-search">Search by code or use</label>
-        <input
-          id="wrap-search"
-          type="text"
-          value={wrapQuery}
-          onChange={(event) => setWrapQuery(event.target.value)}
-          placeholder="UIB-CLMT Docs, missing payment, appeal..."
-        />
-        <div className="table-wrap">
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Code</th>
-                <th>Use</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredCodes.map((item) => (
-                <tr key={item.code}>
-                  <td>{item.code}</td>
-                  <td>{item.use}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
         </div>
       </div>
     </section>
