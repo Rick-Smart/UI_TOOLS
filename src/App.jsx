@@ -7,6 +7,16 @@ import { documentReferences } from "./data/documentReferences";
 import { trendsTips } from "./data/trendsTips";
 import { navItems, toolRegistry } from "./data/toolRegistry";
 
+const TOOLTIP_LEGEND_DISMISSED_KEY = "azdes.tooltipLegendDismissed";
+
+function getTooltipLegendDismissed() {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  return window.localStorage.getItem(TOOLTIP_LEGEND_DISMISSED_KEY) === "true";
+}
+
 function ToolScreen({ tool }) {
   const Component = tool.component;
   const componentProps =
@@ -31,6 +41,16 @@ function ToolScreen({ tool }) {
 
 function App() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [isTooltipLegendDismissed, setIsTooltipLegendDismissed] = useState(
+    getTooltipLegendDismissed,
+  );
+
+  const handleDismissTooltipLegend = () => {
+    setIsTooltipLegendDismissed(true);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(TOOLTIP_LEGEND_DISMISSED_KEY, "true");
+    }
+  };
 
   const searchResults = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -121,17 +141,27 @@ function App() {
             placeholder="Search tools, document numbers, links, or trends"
           />
         </div>
-        <div
-          className="tooltip-legend muted"
-          role="note"
-          aria-label="Tooltip help legend"
-        >
-          <span className="tooltip-badge" aria-hidden="true">
-            ?
-          </span>
-          Select any <strong>?</strong> icon for quick field guidance. Press
-          <strong> Esc</strong> to close open tips.
-        </div>
+        {isTooltipLegendDismissed ? null : (
+          <div
+            className="tooltip-legend muted"
+            role="note"
+            aria-label="Tooltip help legend"
+          >
+            <span className="tooltip-badge" aria-hidden="true">
+              ?
+            </span>
+            Select any <strong>?</strong> icon for quick field guidance. Press
+            <strong> Esc</strong> to close open tips.
+            <button
+              type="button"
+              className="tooltip-legend-close"
+              onClick={handleDismissTooltipLegend}
+              aria-label="Dismiss tooltip help legend"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
       </header>
 
       <nav className="card nav-row" aria-label="Primary navigation">

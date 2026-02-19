@@ -436,6 +436,7 @@ input:focus-visible,
   align-items: center;
   gap: 8px;
   font-size: 13px;
+  flex-wrap: wrap;
 }
 
 .tooltip-badge {
@@ -450,6 +451,21 @@ input:focus-visible,
   justify-content: center;
   font-weight: 700;
   font-size: 11px;
+}
+
+.tooltip-legend-close {
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.tooltip-legend-close:hover {
+  color: var(--text);
 }
 
 .print-friendly {
