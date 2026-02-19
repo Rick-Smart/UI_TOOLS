@@ -375,6 +375,21 @@ function CallHandlingPage() {
     setScriptEditStatus("Custom script removed.");
   }
 
+  function handleResetCustomScriptsForType() {
+    setCustomScriptsByType((current) => ({
+      ...current,
+      [selectedScriptType]: [],
+    }));
+    setScriptIndex(0);
+    setScriptEditStatus("Custom scripts cleared for this script type.");
+  }
+
+  function handleResetAllCustomScripts() {
+    setCustomScriptsByType({});
+    setScriptIndex(0);
+    setScriptEditStatus("All custom scripts cleared.");
+  }
+
   function renderSelectedStepContent() {
     switch (selectedStep) {
       case 0:
@@ -754,6 +769,22 @@ function CallHandlingPage() {
                   ? `${scriptIndex + 1} of ${activeScriptOptions.length}`
                   : "No scripts available"}
               </span>
+            </div>
+            <div className="actions-row">
+              <button
+                type="button"
+                className="button-secondary"
+                onClick={handleResetCustomScriptsForType}
+              >
+                Reset this type
+              </button>
+              <button
+                type="button"
+                className="button-secondary"
+                onClick={handleResetAllCustomScripts}
+              >
+                Reset all custom
+              </button>
             </div>
             <p className="muted">
               Source: <strong>{activeScript?.source || "n/a"}</strong>
