@@ -44,16 +44,16 @@ export const prepareChecklist = [
 
 export const greetingScripts = {
   inbound:
-    "Thank you for calling Arizona Unemployment. My name is [First Name], Agent number [Deputy #]. Who am I speaking with today? How may I help you?",
+    "Thank you for calling Arizona Unemployment. My name is [First Name]. Who am I speaking with today? How may I help you?",
   callback:
-    "Hello, I’m with Arizona Unemployment returning your call. My name is [First Name], deputy number [Deputy #]. Who am I speaking with today? How may I help you?",
+    "Hello, I’m with Arizona Unemployment returning your call. My name is [First Name]. Who am I speaking with today? How may I help you?",
   proxy:
     "If the claimant gives permission to speak with a proxy, obtain verbal approval and add a case note that permission applies to this interaction only.",
 };
 
 export const voicemailScripts = {
   voicemail:
-    "Thank you for calling Arizona Unemployment. My name is [First Name], deputy number [Deputy #]. A party at this number requested a callback from Unemployment. We’re sorry we missed you. Please call us back when available. If you have an established claim, please have your SSN and PIN ready. Toll-free: 1-877-600-2722. Hours: Monday-Friday, 8:00 a.m. to 4:00 p.m. Thank you.",
+    "Thank you for calling Arizona Unemployment. My name is [First Name]. A party at this number requested a callback from Unemployment. We’re sorry we missed you. Please call us back when available. If you have an established claim, please have your SSN and PIN ready. Toll-free: 1-877-600-2722. Hours: Monday-Friday, 8:00 a.m. to 4:00 p.m. Thank you.",
   ghost:
     "Hello, [claimant name]? (wait 3 seconds) Hello, [claimant name]? (wait 3 seconds) [Claimant name], I cannot hear you. Please call us back when you are available, and we will be happy to assist you. If you have an established claim, please have your SSN and PIN ready. Toll-free: 1-877-600-2722. Hours: Monday-Friday, 8:00 a.m. to 4:00 p.m. Thank you.",
 };
