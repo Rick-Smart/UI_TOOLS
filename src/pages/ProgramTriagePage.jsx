@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import Tooltip from "../components/Tooltip";
 import { copyText } from "../utils/copyText";
 
 function ProgramTriagePage() {
@@ -98,6 +99,10 @@ function ProgramTriagePage() {
         <p className="muted section-copy">
           Quick routing helper for the Arizona UI programs listed in UIB-1240A.
         </p>
+        <p className="muted">
+          Select all conditions that apply for the current caller.
+          <Tooltip text="This is a routing helper. It does not replace policy determinations." />
+        </p>
       </div>
 
       <div className="input-grid">
@@ -109,7 +114,10 @@ function ProgramTriagePage() {
               setAnswer("federalEmployee", event.target.checked)
             }
           />
-          <span>Claimant last worked in federal civilian employment</span>
+          <span>
+            Claimant last worked in federal civilian employment
+            <Tooltip text="Select for former federal civilian workers (UCFE screening)." />
+          </span>
         </label>
         <label className="checkbox-row">
           <input
@@ -119,7 +127,10 @@ function ProgramTriagePage() {
               setAnswer("exMilitaryOrNoaa", event.target.checked)
             }
           />
-          <span>Claimant separated from military service or NOAA</span>
+          <span>
+            Claimant separated from military service or NOAA
+            <Tooltip text="Select for former service member/NOAA separation (UCX screening)." />
+          </span>
         </label>
         <label className="checkbox-row">
           <input
@@ -129,7 +140,10 @@ function ProgramTriagePage() {
               setAnswer("multiStateWages", event.target.checked)
             }
           />
-          <span>Wages earned in multiple states</span>
+          <span>
+            Wages earned in multiple states
+            <Tooltip text="Select when claimant indicates wages in Arizona and at least one other state." />
+          </span>
         </label>
         <label className="checkbox-row">
           <input
@@ -179,7 +193,10 @@ function ProgramTriagePage() {
               setAnswer("disasterDeclared", event.target.checked)
             }
           />
-          <span>Claim connected to federally declared disaster</span>
+          <span>
+            Claim connected to federally declared disaster
+            <Tooltip text="Use only when the unemployment reason is linked to a declared disaster event." />
+          </span>
         </label>
         <label className="checkbox-row">
           <input

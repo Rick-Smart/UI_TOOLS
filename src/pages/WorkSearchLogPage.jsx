@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import Tooltip from "../components/Tooltip";
 import { copyText } from "../utils/copyText";
 
 function createEntry() {
@@ -78,7 +79,10 @@ function WorkSearchLogPage() {
       </div>
 
       <div className="result stack" aria-live="polite">
-        <h3>Weekly status</h3>
+        <h3>
+          Weekly status
+          <Tooltip text="Track completed contacts and unique contact days to confirm readiness before filing." />
+        </h3>
         <p>Completed contacts: {completeEntries}</p>
         <p>Unique contact days: {uniqueContactDays}</p>
         <p>
@@ -117,7 +121,10 @@ function WorkSearchLogPage() {
 
           <div className="stack">
             <div>
-              <label htmlFor={`date-${index}`}>Date of contact</label>
+              <label htmlFor={`date-${index}`}>
+                Date of contact
+                <Tooltip text="Use the date the contact attempt occurred, not when notes were entered." />
+              </label>
               <input
                 id={`date-${index}`}
                 type="date"
@@ -151,6 +158,7 @@ function WorkSearchLogPage() {
             <div>
               <label htmlFor={`contact-${index}`}>
                 Contact person or website
+                <Tooltip text="Enter recruiter/contact name or specific website where application was submitted." />
               </label>
               <input
                 id={`contact-${index}`}
@@ -162,7 +170,10 @@ function WorkSearchLogPage() {
               />
             </div>
             <div>
-              <label htmlFor={`method-${index}`}>Method of contact</label>
+              <label htmlFor={`method-${index}`}>
+                Method of contact
+                <Tooltip text="Examples: online application, email, in-person, phone call." />
+              </label>
               <input
                 id={`method-${index}`}
                 type="text"
@@ -184,7 +195,10 @@ function WorkSearchLogPage() {
               />
             </div>
             <div>
-              <label htmlFor={`action-${index}`}>Action taken</label>
+              <label htmlFor={`action-${index}`}>
+                Action taken
+                <Tooltip text="Capture what happened: applied, left voicemail, interview scheduled, follow-up requested, etc." />
+              </label>
               <textarea
                 id={`action-${index}`}
                 value={entry.actionTaken}

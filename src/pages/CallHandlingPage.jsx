@@ -18,6 +18,7 @@ import {
   verificationGuides,
   voicemailScripts,
 } from "../data/callHandlingGuideData";
+import Tooltip from "../components/Tooltip";
 import { copyText } from "../utils/copyText";
 
 function CallHandlingPage() {
@@ -77,7 +78,10 @@ function CallHandlingPage() {
 
       <div className="result stack" aria-live="polite">
         <div className="title-row">
-          <h3>In-order call checklist</h3>
+          <h3>
+            In-order call checklist
+            <Tooltip text="Use this checklist in sequence while on the call. Complete each step before moving to close." />
+          </h3>
           <span className="pill">
             {completedCount}/{orderedCallChecklist.length} complete
           </span>
@@ -138,7 +142,10 @@ function CallHandlingPage() {
         </div>
 
         <div className="result stack">
-          <h3>Verification (No PIN)</h3>
+          <h3>
+            Verification (No PIN)
+            <Tooltip text="Use 5-point verification when caller did not verify with PIN. If verification fails, provide only general UI information." />
+          </h3>
           <ul className="list">
             {verificationGuides.noPin.map((line) => (
               <li key={line}>{line}</li>
@@ -150,7 +157,10 @@ function CallHandlingPage() {
               <li key={line}>{line}</li>
             ))}
           </ul>
-          <h3>If claimant cannot be verified</h3>
+          <h3>
+            If claimant cannot be verified
+            <Tooltip text="Do not discuss claim-specific details. Document non-verification and direct caller to return with required information." />
+          </h3>
           <ul className="list">
             {unableToVerifyProtocol.map((line) => (
               <li key={line}>{line}</li>
