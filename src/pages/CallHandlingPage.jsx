@@ -367,61 +367,11 @@ function CallHandlingPage() {
         <span className="pill">Guide access restored</span>
       </div>
 
-      <div className="result stack" aria-live="polite">
-        <h3>
-          Fillable case note template
-          <Tooltip text="Template includes required note fields and can pull copied summaries from other tools used during this interaction." />
-        </h3>
-        <p className="muted">
-          Use Copy summary on tools during the call, then select Refresh
-          template to pull those details here.
-        </p>
-        <p className="muted">
-          Captured tool summaries: <strong>{interactionMemory.length}</strong>
-        </p>
-        <div className="actions-row">
-          <button
-            type="button"
-            className="button-secondary"
-            onClick={handleRefreshCaseTemplate}
-          >
-            Refresh template
-          </button>
-          <button
-            type="button"
-            className="button-secondary"
-            onClick={handleCopyCaseNoteTemplate}
-          >
-            Copy case note
-          </button>
-          <button
-            type="button"
-            className="button-secondary"
-            onClick={handleClearCapturedDetails}
-          >
-            Clear captured details
-          </button>
-          {noteCopyStatus ? (
-            <span className="muted">{noteCopyStatus}</span>
-          ) : null}
-        </div>
-        <div>
-          <label htmlFor="case-note-template">
-            Case note draft
-            <Tooltip text="Spellcheck is enabled in this field. Review for policy accuracy before finalizing in system notes." />
-          </label>
-          <textarea
-            id="case-note-template"
-            className="note-output"
-            spellCheck
-            value={caseNoteDraft}
-            onChange={(event) => setCaseNoteDraft(event.target.value)}
-          />
-        </div>
-      </div>
-
       <section className="call-workspace">
-        <div className="result stack call-checklist-panel" aria-live="polite">
+        <div
+          className="result stack call-col call-col-left call-checklist-panel"
+          aria-live="polite"
+        >
           <div className="title-row">
             <h3>
               In-order call checklist
@@ -457,7 +407,63 @@ function CallHandlingPage() {
           </div>
         </div>
 
-        <div className="stack">
+        <div
+          className="result call-col call-col-middle call-template-panel"
+          aria-live="polite"
+        >
+          <h3>
+            Fillable case note template
+            <Tooltip text="Template includes required note fields and can pull copied summaries from other tools used during this interaction." />
+          </h3>
+          <p className="muted">
+            Use Copy summary on tools during the call, then select Refresh
+            template to pull those details here.
+          </p>
+          <p className="muted">
+            Captured tool summaries: <strong>{interactionMemory.length}</strong>
+          </p>
+          <div className="actions-row">
+            <button
+              type="button"
+              className="button-secondary"
+              onClick={handleRefreshCaseTemplate}
+            >
+              Refresh template
+            </button>
+            <button
+              type="button"
+              className="button-secondary"
+              onClick={handleCopyCaseNoteTemplate}
+            >
+              Copy case note
+            </button>
+            <button
+              type="button"
+              className="button-secondary"
+              onClick={handleClearCapturedDetails}
+            >
+              Clear captured details
+            </button>
+            {noteCopyStatus ? (
+              <span className="muted">{noteCopyStatus}</span>
+            ) : null}
+          </div>
+          <div className="call-note-editor">
+            <label htmlFor="case-note-template">
+              Case note draft
+              <Tooltip text="Spellcheck is enabled in this field. Review for policy accuracy before finalizing in system notes." />
+            </label>
+            <textarea
+              id="case-note-template"
+              className="note-output call-note-output"
+              spellCheck
+              value={caseNoteDraft}
+              onChange={(event) => setCaseNoteDraft(event.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="stack call-col call-col-right">
           <div className="result stack" aria-live="polite">
             <h3>
               Current step guidance

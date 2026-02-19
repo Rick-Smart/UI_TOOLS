@@ -1,5 +1,12 @@
 import { useMemo, useState } from "react";
-import { Link, NavLink, Navigate, Route, Routes } from "react-router-dom";
+import {
+  Link,
+  NavLink,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom";
 import Tooltip from "./components/Tooltip";
 import HomePage from "./pages/HomePage";
 import { defaultLinks } from "./data/defaultLinks";
@@ -40,10 +47,12 @@ function ToolScreen({ tool }) {
 }
 
 function App() {
+  const location = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [isTooltipLegendDismissed, setIsTooltipLegendDismissed] = useState(
     getTooltipLegendDismissed,
   );
+  const isCallHandlingView = location.pathname === "/call-handling";
 
   const handleDismissTooltipLegend = () => {
     setIsTooltipLegendDismissed(true);
@@ -129,7 +138,9 @@ function App() {
   }, [searchQuery]);
 
   return (
-    <main className="page stack">
+    <main
+      className={`page stack ${isCallHandlingView ? "page-call-handling" : ""}`}
+    >
       <header className="stack header-block">
         <h1>AZDES UI Toolbox</h1>
         <p className="subtitle">
