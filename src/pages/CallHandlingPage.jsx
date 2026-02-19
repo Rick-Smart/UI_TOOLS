@@ -82,6 +82,7 @@ function CallHandlingPage() {
   const [copyStatus, setCopyStatus] = useState("");
   const [noteCopyStatus, setNoteCopyStatus] = useState("");
   const [interactionMemory, setInteractionMemory] = useState([]);
+  const [selectedStep, setSelectedStep] = useState(0);
   const [caseNoteDraft, setCaseNoteDraft] = useState(() => {
     const saved = getSavedCaseNoteDraft();
     return saved || buildCaseNoteTemplate("");
@@ -158,6 +159,201 @@ function CallHandlingPage() {
     );
   }
 
+  function renderSelectedStepContent() {
+    switch (selectedStep) {
+      case 0:
+        return (
+          <>
+            <p>
+              <strong>Managing a call flow:</strong>
+            </p>
+            <ul className="list">
+              {managingCallSteps.map((step) => (
+                <li key={step}>{step}</li>
+              ))}
+            </ul>
+            <p>
+              <strong>Prepare checklist:</strong>
+            </p>
+            <ul className="list">
+              {prepareChecklist.map((step) => (
+                <li key={step}>{step}</li>
+              ))}
+            </ul>
+          </>
+        );
+      case 1:
+        return (
+          <>
+            <p>
+              <strong>Inbound:</strong> {greetingScripts.inbound}
+            </p>
+            <p>
+              <strong>Callback:</strong> {greetingScripts.callback}
+            </p>
+            <p className="muted">{greetingScripts.proxy}</p>
+          </>
+        );
+      case 2:
+        return (
+          <>
+            <p>
+              <strong>Verification (PIN verified)</strong>
+            </p>
+            <ul className="list">
+              {verificationGuides.pinVerified.map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+            <p>
+              <strong>Verification (No PIN)</strong>
+            </p>
+            <ul className="list">
+              {verificationGuides.noPin.map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+            <p>
+              <strong>Employer verification</strong>
+            </p>
+            <ul className="list">
+              {verificationGuides.employer.map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+          </>
+        );
+      case 3:
+        return (
+          <>
+            <p>
+              Confirm callback number immediately after verification in case the
+              call drops.
+            </p>
+            <p className="muted">
+              Include callback attempts in actions taken if disconnection
+              occurs.
+            </p>
+          </>
+        );
+      case 4:
+        return (
+          <>
+            <p>
+              <strong>Openers:</strong>
+            </p>
+            <ul className="list">
+              {rfcPrompts.openers.map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+            <p>
+              <strong>Follow-up examples:</strong>
+            </p>
+            <ul className="list">
+              {rfcPrompts.followUps.map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+            <p>
+              <strong>Paraphrase RFC:</strong> {rfcPrompts.paraphrase}
+            </p>
+          </>
+        );
+      case 5:
+        return (
+          <>
+            <p>
+              <strong>Initial hold:</strong> {rfcPrompts.holdInitial}
+            </p>
+            <p>
+              <strong>Hold check-in:</strong> {rfcPrompts.holdCheckIn}
+            </p>
+            <p>
+              <strong>General claim review</strong>
+            </p>
+            <ul className="list">
+              {generalReviewChecklist.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </>
+        );
+      case 6:
+        return (
+          <>
+            <p>
+              Provide status update and next steps in plain language before
+              moving to close.
+            </p>
+            <ul className="list">
+              {customerServiceHighlights.slice(0, 4).map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </>
+        );
+      case 7:
+        return (
+          <>
+            <p>
+              Reinforce weekly certification requirement when claim remains
+              active.
+            </p>
+            <ul className="list">
+              <li>
+                If No Valid Certifications, advise claimant that weekly
+                certifications are required.
+              </li>
+              <li>
+                Paper weekly claims should be escalated through supervisor
+                support to add certifications in system.
+              </li>
+            </ul>
+          </>
+        );
+      case 8:
+        return (
+          <>
+            <p>
+              <strong>Case note required fields</strong>
+            </p>
+            <ul className="list">
+              {noteRequirements.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+            <p>
+              <strong>Do not include in notes</strong>
+            </p>
+            <ul className="list">
+              {noteDoNotInclude.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </>
+        );
+      case 9:
+        return (
+          <>
+            <p>{closeScript}</p>
+            <div className="actions-row">
+              <button
+                type="button"
+                className="button-secondary"
+                onClick={handleCopyCloseScript}
+              >
+                Copy closing script
+              </button>
+              {copyStatus ? <span className="muted">{copyStatus}</span> : null}
+            </div>
+          </>
+        );
+      default:
+        return null;
+    }
+  }
+
   return (
     <section className="card stack">
       <div className="title-row">
@@ -169,177 +365,6 @@ function CallHandlingPage() {
           </p>
         </div>
         <span className="pill">Guide access restored</span>
-      </div>
-
-      <div className="grid grid-2">
-        <div className="result stack">
-          <h3>Managing a call</h3>
-          <ul className="list">
-            {managingCallSteps.map((step) => (
-              <li key={step}>{step}</li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="result stack">
-          <h3>Prepare checklist</h3>
-          <ul className="list">
-            {prepareChecklist.map((step) => (
-              <li key={step}>{step}</li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      <div className="result stack" aria-live="polite">
-        <div className="title-row">
-          <h3>
-            In-order call checklist
-            <Tooltip text="Use this checklist in sequence while on the call. Complete each step before moving to close." />
-          </h3>
-          <span className="pill">
-            {completedCount}/{orderedCallChecklist.length} complete
-          </span>
-        </div>
-        <p className="muted">
-          Complete each step in order to confirm required actions were handled
-          before close.
-        </p>
-        <div className="stack">
-          {orderedCallChecklist.map((item, index) => (
-            <label key={item} className="checkbox-row">
-              <input
-                type="checkbox"
-                checked={checkState[index]}
-                onChange={(event) =>
-                  toggleChecklist(index, event.target.checked)
-                }
-              />
-              <span>
-                <strong>Step {index + 1}:</strong> {item}
-              </span>
-            </label>
-          ))}
-        </div>
-      </div>
-
-      <div className="grid grid-2">
-        <div className="result stack">
-          <h3>Greeting scripts</h3>
-          <p>
-            <strong>Inbound:</strong> {greetingScripts.inbound}
-          </p>
-          <p>
-            <strong>Callback:</strong> {greetingScripts.callback}
-          </p>
-          <p className="muted">{greetingScripts.proxy}</p>
-        </div>
-
-        <div className="result stack">
-          <h3>Voicemail / Ghost call</h3>
-          <p>
-            <strong>Voicemail:</strong> {voicemailScripts.voicemail}
-          </p>
-          <p>
-            <strong>Ghost call:</strong> {voicemailScripts.ghost}
-          </p>
-        </div>
-      </div>
-
-      <div className="grid grid-2">
-        <div className="result stack">
-          <h3>Verification (PIN verified)</h3>
-          <ul className="list">
-            {verificationGuides.pinVerified.map((line) => (
-              <li key={line}>{line}</li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="result stack">
-          <h3>
-            Verification (No PIN)
-            <Tooltip text="Use 5-point verification when caller did not verify with PIN. If verification fails, provide only general UI information." />
-          </h3>
-          <ul className="list">
-            {verificationGuides.noPin.map((line) => (
-              <li key={line}>{line}</li>
-            ))}
-          </ul>
-          <h3>Employer verification</h3>
-          <ul className="list">
-            {verificationGuides.employer.map((line) => (
-              <li key={line}>{line}</li>
-            ))}
-          </ul>
-          <h3>
-            If claimant cannot be verified
-            <Tooltip text="Do not discuss claim-specific details. Document non-verification and direct caller to return with required information." />
-          </h3>
-          <ul className="list">
-            {unableToVerifyProtocol.map((line) => (
-              <li key={line}>{line}</li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      <div className="result stack">
-        <h3>Identify RFC + hold language</h3>
-        <p>
-          <strong>Openers:</strong>
-        </p>
-        <ul className="list">
-          {rfcPrompts.openers.map((line) => (
-            <li key={line}>{line}</li>
-          ))}
-        </ul>
-        <p>
-          <strong>Follow-up examples:</strong>
-        </p>
-        <ul className="list">
-          {rfcPrompts.followUps.map((line) => (
-            <li key={line}>{line}</li>
-          ))}
-        </ul>
-        <p>
-          <strong>Paraphrase RFC:</strong> {rfcPrompts.paraphrase}
-        </p>
-        <p>
-          <strong>Initial hold:</strong> {rfcPrompts.holdInitial}
-        </p>
-        <p>
-          <strong>Hold check-in:</strong> {rfcPrompts.holdCheckIn}
-        </p>
-      </div>
-
-      <div className="result stack">
-        <h3>General claim review</h3>
-        <ul className="list">
-          {generalReviewChecklist.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
-      </div>
-
-      <div className="grid grid-2">
-        <div className="result stack">
-          <h3>Case note required fields</h3>
-          <ul className="list">
-            {noteRequirements.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="result stack">
-          <h3>Do not include in notes</h3>
-          <ul className="list">
-            {noteDoNotInclude.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        </div>
       </div>
 
       <div className="result stack" aria-live="polite">
@@ -395,111 +420,128 @@ function CallHandlingPage() {
         </div>
       </div>
 
-      <div className="grid grid-2">
-        <div className="result stack">
-          <h3>Closing script</h3>
-          <p>{closeScript}</p>
-          <div className="actions-row">
-            <button
-              type="button"
-              className="button-secondary"
-              onClick={handleCopyCloseScript}
-            >
-              Copy closing script
-            </button>
-            {copyStatus ? <span className="muted">{copyStatus}</span> : null}
+      <section className="call-workspace">
+        <div className="result stack call-checklist-panel" aria-live="polite">
+          <div className="title-row">
+            <h3>
+              In-order call checklist
+              <Tooltip text="Use this checklist in sequence while on the call. Select a step to view scripts and guidance." />
+            </h3>
+            <span className="pill">
+              {completedCount}/{orderedCallChecklist.length} complete
+            </span>
+          </div>
+          <div className="stack">
+            {orderedCallChecklist.map((item, index) => (
+              <div
+                key={item}
+                className={`call-step-row ${selectedStep === index ? "call-step-active" : ""}`}
+              >
+                <input
+                  type="checkbox"
+                  checked={checkState[index]}
+                  onChange={(event) =>
+                    toggleChecklist(index, event.target.checked)
+                  }
+                  aria-label={`Mark step ${index + 1} complete`}
+                />
+                <button
+                  type="button"
+                  className="call-step-button"
+                  onClick={() => setSelectedStep(index)}
+                >
+                  <strong>Step {index + 1}:</strong> {item}
+                </button>
+              </div>
+            ))}
           </div>
         </div>
 
-        <div className="result stack">
-          <h3>Difficult caller protocol</h3>
-          <p>
-            <strong>Warning 1:</strong> {difficultCallerScripts.warning1}
-          </p>
-          <p>
-            <strong>Warning 2:</strong> {difficultCallerScripts.warning2}
-          </p>
-          <p>
-            <strong>Final:</strong> {difficultCallerScripts.final}
-          </p>
-          <p className="muted">
-            Note suffix: {difficultCallerScripts.noteSuffix}
-          </p>
+        <div className="stack">
+          <div className="result stack" aria-live="polite">
+            <h3>
+              Current step guidance
+              <Tooltip text="Scripts and guidance change based on the selected checklist step." />
+            </h3>
+            <p className="muted">
+              <strong>Step {selectedStep + 1}:</strong>{" "}
+              {orderedCallChecklist[selectedStep]}
+            </p>
+            {renderSelectedStepContent()}
+          </div>
+
+          <div className="result stack">
+            <h3>At-a-glance resources</h3>
+            <p>
+              <strong>Voicemail:</strong> {voicemailScripts.voicemail}
+            </p>
+            <p>
+              <strong>Ghost call:</strong> {voicemailScripts.ghost}
+            </p>
+            <p>
+              <strong>Difficult caller warning 1:</strong>{" "}
+              {difficultCallerScripts.warning1}
+            </p>
+            <p>
+              <strong>Difficult caller warning 2:</strong>{" "}
+              {difficultCallerScripts.warning2}
+            </p>
+            <p>
+              <strong>Difficult caller final:</strong>{" "}
+              {difficultCallerScripts.final}
+            </p>
+            <p className="muted">
+              Note suffix: {difficultCallerScripts.noteSuffix}
+            </p>
+
+            <p>
+              <strong>If claimant cannot be verified</strong>
+            </p>
+            <ul className="list">
+              {unableToVerifyProtocol.map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+
+            <p>
+              <strong>Unemployment phones</strong>
+            </p>
+            <ul className="list">
+              {contactInfo.unemploymentPhones.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+
+            <p>
+              <strong>Internal transfers</strong>
+            </p>
+            <ul className="list">
+              {contactInfo.internalTransfers.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+
+            <p>
+              <strong>Email:</strong> {contactInfo.emails.join(", ")}
+            </p>
+            <p>
+              <strong>Website:</strong> {contactInfo.website}
+            </p>
+
+            <p>
+              <strong>UI Assist services</strong>
+            </p>
+            <ul className="list">
+              {supportResources.map((item) => (
+                <li key={item.name}>
+                  <strong>{item.name}</strong>
+                  {item.phone ? ` · ${item.phone}` : ""}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
-      </div>
-
-      <div className="result stack">
-        <h3>Customer service reminders</h3>
-        <ul className="list">
-          {customerServiceHighlights.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
-      </div>
-
-      <div className="grid grid-2">
-        <div className="result stack">
-          <h3>Contact information</h3>
-          <p>
-            <strong>Unemployment phones</strong>
-          </p>
-          <ul className="list">
-            {contactInfo.unemploymentPhones.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-
-          <p>
-            <strong>Automated system</strong>
-          </p>
-          <ul className="list">
-            {contactInfo.automatedSystem.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-
-          <p>
-            <strong>Internal transfers</strong>
-          </p>
-          <ul className="list">
-            {contactInfo.internalTransfers.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-
-          <p>
-            <strong>Email:</strong> {contactInfo.emails.join(", ")}
-          </p>
-          <p>
-            <strong>Website:</strong> {contactInfo.website}
-          </p>
-        </div>
-
-        <div className="result stack">
-          <h3>UI Assist services</h3>
-          <ul className="list">
-            {supportResources.map((item) => (
-              <li key={item.name}>
-                <strong>{item.name}</strong>
-                {item.phone ? ` · ${item.phone}` : ""}
-                {item.url ? (
-                  <>
-                    {" "}
-                    ·{" "}
-                    <a
-                      href={item.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {item.url}
-                    </a>
-                  </>
-                ) : null}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
+      </section>
     </section>
   );
 }
