@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { copyText } from "../utils/copyText";
+import { addInteractionMemory } from "../utils/interactionMemory";
 
 function WeeklyPayablePage() {
   const [weeklyBenefitAmount, setWeeklyBenefitAmount] = useState(320);
@@ -49,6 +50,9 @@ function WeeklyPayablePage() {
     ].join("\n");
 
     const copied = await copyText(summary);
+    if (copied) {
+      addInteractionMemory("Weekly Payable Estimator", summary);
+    }
     setCopyStatus(copied ? "Summary copied." : "Copy unavailable.");
   }
 

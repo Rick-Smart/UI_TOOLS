@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import Tooltip from "../components/Tooltip";
 import { copyText } from "../utils/copyText";
+import { addInteractionMemory } from "../utils/interactionMemory";
 
 function createEntry() {
   return {
@@ -65,6 +66,9 @@ function WorkSearchLogPage() {
     ];
 
     const copied = await copyText(lines.join("\n"));
+    if (copied) {
+      addInteractionMemory("Work Search Compliance Log", lines.join("\n"));
+    }
     setCopyStatus(copied ? "Summary copied." : "Copy unavailable.");
   }
 

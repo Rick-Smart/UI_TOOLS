@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import Tooltip from "../components/Tooltip";
 import { copyText } from "../utils/copyText";
+import { addInteractionMemory } from "../utils/interactionMemory";
 
 function BenefitAwardPage() {
   const [q1, setQ1] = useState(0);
@@ -49,6 +50,9 @@ function BenefitAwardPage() {
     ].join("\n");
 
     const copied = await copyText(text);
+    if (copied) {
+      addInteractionMemory("Benefit Award Estimator", text);
+    }
     setCopyStatus(copied ? "Summary copied." : "Copy unavailable.");
   }
 

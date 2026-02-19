@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import Tooltip from "../components/Tooltip";
 import { copyText } from "../utils/copyText";
+import { addInteractionMemory } from "../utils/interactionMemory";
 import { dateFormatter } from "../utils/quarterUtils";
 
 const appealTypes = {
@@ -53,6 +54,9 @@ function AppealsHelperPage() {
     ].join("\n");
 
     const copied = await copyText(text);
+    if (copied) {
+      addInteractionMemory("Appeals Deadline Helper", text);
+    }
     setCopyStatus(copied ? "Summary copied." : "Copy unavailable.");
   }
 

@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import Tooltip from "../components/Tooltip";
 import { copyText } from "../utils/copyText";
+import { addInteractionMemory } from "../utils/interactionMemory";
 import {
   formatRange,
   getQuarterCloseLagDays,
@@ -87,6 +88,9 @@ function BasePeriodPage() {
     ].join("\n");
 
     const copied = await copyText(summary);
+    if (copied) {
+      addInteractionMemory("Base Period Calculator", summary);
+    }
     setCopyStatus(copied ? "Summary copied." : "Copy unavailable.");
   }
 

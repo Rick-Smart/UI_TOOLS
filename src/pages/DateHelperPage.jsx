@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { copyText } from "../utils/copyText";
+import { addInteractionMemory } from "../utils/interactionMemory";
 import { dateFormatter } from "../utils/quarterUtils";
 
 function toIsoLocalDate(date) {
@@ -27,6 +28,9 @@ function DateHelperPage() {
 
   async function handleCopySummary() {
     const copied = await copyText(resultText);
+    if (copied) {
+      addInteractionMemory("Date Offset Helper", resultText);
+    }
     setCopyStatus(copied ? "Summary copied." : "Copy unavailable.");
   }
 

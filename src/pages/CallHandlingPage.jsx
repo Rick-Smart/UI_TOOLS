@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   callGuideMeta,
   closeScript,
@@ -20,12 +20,47 @@ import {
 } from "../data/callHandlingGuideData";
 import Tooltip from "../components/Tooltip";
 import { copyText } from "../utils/copyText";
+import {
+  clearInteractionMemory,
+  formatInteractionMemory,
+  getInteractionMemory,
+} from "../utils/interactionMemory";
+
+function getDefaultTimeOfCall() {
+  return new Date().toLocaleString();
+}
+
+function buildCaseNoteTemplate(toolDetailText) {
+  return [
+    "VALOR_Agent ID - [FirstName_LastInitial]",
+    `Time of call: ${getDefaultTimeOfCall()}`,
+    "Reason for call: [Enter reason for call]",
+    "Actions taken (including dropped-call callback attempts): [Enter actions taken]",
+    "Important information for next deputy: [Enter key information]",
+    "Next steps: [Enter next steps]",
+    "Approved abbreviations used: [Enter abbreviations used]",
+    "",
+    "Tool details pulled from this interaction:",
+    toolDetailText,
+  ].join("\n");
+}
 
 function CallHandlingPage() {
   const [copyStatus, setCopyStatus] = useState("");
+  const [noteCopyStatus, setNoteCopyStatus] = useState("");
+  const [interactionMemory, setInteractionMemory] = useState([]);
+  const [caseNoteDraft, setCaseNoteDraft] = useState(() =>
+    buildCaseNoteTemplate(formatInteractionMemory([])),
+  );
   const [checkState, setCheckState] = useState(
     orderedCallChecklist.map(() => false),
   );
+
+  useEffect(() => {
+    const memory = getInteractionMemory();
+    setInteractionMemory(memory);
+    setCaseNoteDraft(buildCaseNoteTemplate(formatInteractionMemory(memory)));
+  }, []);
 
   const completedCount = useMemo(
     () => checkState.filter(Boolean).length,
@@ -41,6 +76,31 @@ function CallHandlingPage() {
   async function handleCopyCloseScript() {
     const copied = await copyText(closeScript);
     setCopyStatus(copied ? "Closing script copied." : "Copy unavailable.");
+  }
+
+  function handleRefreshCaseTemplate() {
+    const memory = getInteractionMemory();
+    setInteractionMemory(memory);
+    setCaseNoteDraft(buildCaseNoteTemplate(formatInteractionMemory(memory)));
+    setNoteCopyStatus(
+      memory.length
+        ? "Template refreshed with latest tool details."
+        : "Template refreshed. No tool summaries captured yet.",
+    );
+  }
+
+  function handleClearCapturedDetails() {
+    clearInteractionMemory();
+    setInteractionMemory([]);
+    setCaseNoteDraft(buildCaseNoteTemplate(formatInteractionMemory([])));
+    setNoteCopyStatus("Captured tool details cleared.");
+  }
+
+  async function handleCopyCaseNoteTemplate() {
+    const copied = await copyText(caseNoteDraft);
+    setNoteCopyStatus(
+      copied ? "Case note template copied." : "Copy unavailable.",
+    );
   }
 
   return (
@@ -224,6 +284,59 @@ function CallHandlingPage() {
               <li key={item}>{item}</li>
             ))}
           </ul>
+        </div>
+      </div>
+
+      <div className="result stack" aria-live="polite">
+        <h3>
+          Fillable case note template
+          <Tooltip text="Template includes required note fields and can pull copied summaries from other tools used during this interaction." />
+        </h3>
+        <p className="muted">
+          Use Copy summary on tools during the call, then select Refresh
+          template to pull those details here.
+        </p>
+        <p className="muted">
+          Captured tool summaries: <strong>{interactionMemory.length}</strong>
+        </p>
+        <div className="actions-row">
+          <button
+            type="button"
+            className="button-secondary"
+            onClick={handleRefreshCaseTemplate}
+          >
+            Refresh template
+          </button>
+          <button
+            type="button"
+            className="button-secondary"
+            onClick={handleCopyCaseNoteTemplate}
+          >
+            Copy case note
+          </button>
+          <button
+            type="button"
+            className="button-secondary"
+            onClick={handleClearCapturedDetails}
+          >
+            Clear captured details
+          </button>
+          {noteCopyStatus ? (
+            <span className="muted">{noteCopyStatus}</span>
+          ) : null}
+        </div>
+        <div>
+          <label htmlFor="case-note-template">
+            Case note draft
+            <Tooltip text="Spellcheck is enabled in this field. Review for policy accuracy before finalizing in system notes." />
+          </label>
+          <textarea
+            id="case-note-template"
+            className="note-output"
+            spellCheck
+            value={caseNoteDraft}
+            onChange={(event) => setCaseNoteDraft(event.target.value)}
+          />
         </div>
       </div>
 

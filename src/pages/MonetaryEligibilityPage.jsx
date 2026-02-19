@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import Tooltip from "../components/Tooltip";
 import { copyText } from "../utils/copyText";
+import { addInteractionMemory } from "../utils/interactionMemory";
 
 function MonetaryEligibilityPage() {
   const [minimumWage, setMinimumWage] = useState(0);
@@ -61,6 +62,9 @@ function MonetaryEligibilityPage() {
     ].join("\n");
 
     const copied = await copyText(text);
+    if (copied) {
+      addInteractionMemory("Monetary Eligibility", text);
+    }
     setCopyStatus(copied ? "Summary copied." : "Copy unavailable.");
   }
 

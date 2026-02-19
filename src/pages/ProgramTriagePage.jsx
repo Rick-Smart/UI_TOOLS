@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import Tooltip from "../components/Tooltip";
 import { copyText } from "../utils/copyText";
+import { addInteractionMemory } from "../utils/interactionMemory";
 
 function ProgramTriagePage() {
   const [searchParams] = useSearchParams();
@@ -89,6 +90,9 @@ function ProgramTriagePage() {
     ].join("\n");
 
     const copied = await copyText(summary);
+    if (copied) {
+      addInteractionMemory("Program Triage", summary);
+    }
     setCopyStatus(copied ? "Summary copied." : "Copy unavailable.");
   }
 
