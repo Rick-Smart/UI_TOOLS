@@ -15,7 +15,7 @@ function HomePage() {
 
       <div className="result stack">
         <h3>Today&apos;s Top Actions</h3>
-        <div className="tools-grid">
+        <div className="tools-grid home-top-actions-grid">
           {topActions.map((item) => (
             <article key={item.title} className="tool-card">
               <h3>{item.title}</h3>
@@ -28,7 +28,12 @@ function HomePage() {
         </div>
       </div>
 
-      <div className="tools-grid">
+      <div className="title-row">
+        <h3>All tools</h3>
+        <span className="pill">{homeCards.length} cards</span>
+      </div>
+
+      <div className="tools-grid home-tools-grid">
         {homeCards.map((card) => (
           <article key={card.to} className="tool-card">
             <h3>{card.title}</h3>

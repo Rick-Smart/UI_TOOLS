@@ -144,6 +144,14 @@ h3 {
   gap: 10px;
 }
 
+.home-top-actions-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.home-tools-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
 .docs-grid {
   display: grid;
   gap: 12px;
