@@ -663,7 +663,12 @@ function CallHandlingPage() {
                   className="call-step-button"
                   onClick={() => setSelectedStep(index)}
                 >
-                  <strong>Step {index + 1}:</strong> {item}
+                  <span className="call-step-text">
+                    <strong className="call-step-label">
+                      Step {index + 1}:
+                    </strong>{" "}
+                    <span>{item}</span>
+                  </span>
                 </button>
               </div>
             ))}
