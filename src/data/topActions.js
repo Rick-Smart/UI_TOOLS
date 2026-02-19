@@ -16,4 +16,10 @@ export const topActions = [
     description: "Open Weekly Payable Estimator for fast WBA/earnings math.",
     to: "/weekly-payable",
   },
+  {
+    title: "Run call handling workflow",
+    description:
+      "Open scripts, verification, RFC prompts, and wrap-up code search for active calls.",
+    to: "/call-handling",
+  },
 ];

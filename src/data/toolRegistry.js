@@ -2,6 +2,7 @@ import AgentResponseCardsPage from "../pages/AgentResponseCardsPage";
 import AppealsHelperPage from "../pages/AppealsHelperPage";
 import BasePeriodPage from "../pages/BasePeriodPage";
 import BenefitAwardPage from "../pages/BenefitAwardPage";
+import CallHandlingPage from "../pages/CallHandlingPage";
 import DateHelperPage from "../pages/DateHelperPage";
 import DocumentSearchPage from "../pages/DocumentSearchPage";
 import LinksPage from "../pages/LinksPage";
@@ -53,6 +54,16 @@ export const toolRegistry = [
     microGuide:
       "Enter quarter wages and unemployment-rate toggle to estimate WBA and max award.",
     component: BenefitAwardPage,
+  },
+  {
+    path: "/call-handling",
+    navLabel: "Call Handling",
+    title: "Call Handling Guide",
+    description:
+      "Scripts, verification flow, RFC prompts, case notation, customer service reminders, contacts, and wrap-up codes.",
+    microGuide:
+      "Use this page during live calls for scripts, note standards, and wrap-up code selection.",
+    component: CallHandlingPage,
   },
   {
     path: "/appeals-helper",
