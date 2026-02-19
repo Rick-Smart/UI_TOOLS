@@ -385,6 +385,15 @@ function CallHandlingPage() {
   }
 
   function handleResetAllCustomScripts() {
+    if (typeof window !== "undefined") {
+      const confirmed = window.confirm(
+        "Clear all custom scripts for every script type? This cannot be undone.",
+      );
+      if (!confirmed) {
+        return;
+      }
+    }
+
     setCustomScriptsByType({});
     setScriptIndex(0);
     setScriptEditStatus("All custom scripts cleared.");
