@@ -38,6 +38,8 @@ const scriptTypeOptions = [
   { key: "closing", label: "Closing" },
 ];
 
+const scriptTypeKeys = scriptTypeOptions.map((item) => item.key);
+
 const stepScriptTypeMap = {
   1: "inboundGreeting",
   9: "closing",
@@ -129,7 +131,13 @@ function getSavedCustomScripts() {
       return {};
     }
 
-    return parsed;
+    return scriptTypeKeys.reduce((accumulator, key) => {
+      const value = parsed[key];
+      accumulator[key] = Array.isArray(value)
+        ? value.filter((item) => typeof item === "string")
+        : [];
+      return accumulator;
+    }, {});
   } catch {
     return {};
   }
@@ -203,10 +211,13 @@ function CallHandlingPage() {
           source: "suggested",
           text,
         })),
-        ...((customScriptsByType.inboundGreeting || []).map((text) => ({
-          source: "custom",
-          text,
-        })) || []),
+        ...(customScriptsByType.inboundGreeting || []).map(
+          (text, customIndex) => ({
+            source: "custom",
+            text,
+            customIndex,
+          }),
+        ),
       ],
       callbackGreeting: [
         { source: "approved", text: greetingScripts.callback },
@@ -214,10 +225,13 @@ function CallHandlingPage() {
           source: "suggested",
           text,
         })),
-        ...((customScriptsByType.callbackGreeting || []).map((text) => ({
-          source: "custom",
-          text,
-        })) || []),
+        ...(customScriptsByType.callbackGreeting || []).map(
+          (text, customIndex) => ({
+            source: "custom",
+            text,
+            customIndex,
+          }),
+        ),
       ],
       voicemail: [
         { source: "approved", text: voicemailScripts.voicemail },
@@ -225,10 +239,11 @@ function CallHandlingPage() {
           source: "suggested",
           text,
         })),
-        ...((customScriptsByType.voicemail || []).map((text) => ({
+        ...(customScriptsByType.voicemail || []).map((text, customIndex) => ({
           source: "custom",
           text,
-        })) || []),
+          customIndex,
+        })),
       ],
       ghostCall: [
         { source: "approved", text: voicemailScripts.ghost },
@@ -236,10 +251,11 @@ function CallHandlingPage() {
           source: "suggested",
           text,
         })),
-        ...((customScriptsByType.ghostCall || []).map((text) => ({
+        ...(customScriptsByType.ghostCall || []).map((text, customIndex) => ({
           source: "custom",
           text,
-        })) || []),
+          customIndex,
+        })),
       ],
       closing: [
         { source: "approved", text: closeScript },
@@ -247,10 +263,11 @@ function CallHandlingPage() {
           source: "suggested",
           text,
         })),
-        ...((customScriptsByType.closing || []).map((text) => ({
+        ...(customScriptsByType.closing || []).map((text, customIndex) => ({
           source: "custom",
           text,
-        })) || []),
+          customIndex,
+        })),
       ],
     }),
     [customScriptsByType],
@@ -359,13 +376,19 @@ function CallHandlingPage() {
   }
 
   function handleRemoveCurrentCustomScript() {
-    if (!activeScript || activeScript.source !== "custom") {
+    if (
+      !activeScript ||
+      activeScript.source !== "custom" ||
+      typeof activeScript.customIndex !== "number"
+    ) {
       return;
     }
 
     setCustomScriptsByType((current) => {
       const currentList = current[selectedScriptType] || [];
-      const nextList = currentList.filter((text) => text !== activeScript.text);
+      const nextList = currentList.filter(
+        (_, index) => index !== activeScript.customIndex,
+      );
       return {
         ...current,
         [selectedScriptType]: nextList,
@@ -895,7 +918,21 @@ function CallHandlingPage() {
               {supportResources.map((item) => (
                 <li key={item.name}>
                   <strong>{item.name}</strong>
-                  {item.phone ? ` · ${item.phone}` : ""}
+                  {item.phone ? ` · ${item.phone}` : " · Phone not listed"}
+                  {item.url ? (
+                    <>
+                      {" "}
+                      ·{" "}
+                      <a
+                        href={item.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-break"
+                      >
+                        Website
+                      </a>
+                    </>
+                  ) : null}
                 </li>
               ))}
             </ul>
