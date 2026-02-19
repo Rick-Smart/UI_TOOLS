@@ -18,7 +18,9 @@ import {
   verificationGuides,
   voicemailScripts,
 } from "../data/callHandlingGuideData";
-import Tooltip from "../components/Tooltip";
+import CallChecklistPanel from "../components/callHandling/CallChecklistPanel";
+import CaseNoteTemplatePanel from "../components/callHandling/CaseNoteTemplatePanel";
+import CallRightRail from "../components/callHandling/CallRightRail";
 import { copyText } from "../utils/copyText";
 import {
   clearInteractionMemory,
@@ -631,318 +633,54 @@ function CallHandlingPage() {
       </div>
 
       <section className="call-workspace">
-        <div
-          className="result stack call-col call-col-left call-checklist-panel"
-          aria-live="polite"
-        >
-          <div className="title-row">
-            <h3>
-              In-order call checklist
-              <Tooltip text="Use this checklist in sequence while on the call. Select a step to view scripts and guidance." />
-            </h3>
-            <span className="pill">
-              {completedCount}/{orderedCallChecklist.length} complete
-            </span>
-          </div>
-          <div className="stack">
-            {orderedCallChecklist.map((item, index) => (
-              <div
-                key={item}
-                className={`call-step-row ${selectedStep === index ? "call-step-active" : ""}`}
-              >
-                <input
-                  type="checkbox"
-                  checked={checkState[index]}
-                  onChange={(event) =>
-                    toggleChecklist(index, event.target.checked)
-                  }
-                  aria-label={`Mark step ${index + 1} complete`}
-                />
-                <button
-                  type="button"
-                  className="call-step-button"
-                  onClick={() => setSelectedStep(index)}
-                >
-                  <span className="call-step-text">
-                    <strong className="call-step-label">
-                      Step {index + 1}:
-                    </strong>{" "}
-                    <span>{item}</span>
-                  </span>
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
+        <CallChecklistPanel
+          orderedCallChecklist={orderedCallChecklist}
+          completedCount={completedCount}
+          selectedStep={selectedStep}
+          checkState={checkState}
+          toggleChecklist={toggleChecklist}
+          setSelectedStep={setSelectedStep}
+        />
 
-        <div
-          className="result call-col call-col-middle call-template-panel"
-          aria-live="polite"
-        >
-          <h3>
-            Fillable case note template
-            <Tooltip text="Template includes required note fields and can pull copied summaries from other tools used during this interaction." />
-          </h3>
-          <p className="muted">
-            Use Copy summary on tools during the call, then select Refresh
-            template to pull those details here.
-          </p>
-          <p className="muted">
-            Captured tool summaries: <strong>{interactionMemory.length}</strong>
-          </p>
-          <div className="actions-row">
-            <button
-              type="button"
-              className="button-secondary"
-              onClick={handleRefreshCaseTemplate}
-            >
-              Refresh template
-            </button>
-            <button
-              type="button"
-              className="button-secondary"
-              onClick={handleCopyCaseNoteTemplate}
-            >
-              Copy case note
-            </button>
-            <button
-              type="button"
-              className="button-secondary"
-              onClick={handleClearCapturedDetails}
-            >
-              Clear captured details
-            </button>
-            {noteCopyStatus ? (
-              <span className="muted">{noteCopyStatus}</span>
-            ) : null}
-          </div>
-          <div className="call-note-editor">
-            <label htmlFor="case-note-template">
-              Case note draft
-              <Tooltip text="Spellcheck is enabled in this field. Review for policy accuracy before finalizing in system notes." />
-            </label>
-            <textarea
-              id="case-note-template"
-              className="note-output call-note-output"
-              spellCheck
-              value={caseNoteDraft}
-              onChange={(event) => setCaseNoteDraft(event.target.value)}
-            />
-          </div>
-        </div>
+        <CaseNoteTemplatePanel
+          interactionMemoryLength={interactionMemory.length}
+          handleRefreshCaseTemplate={handleRefreshCaseTemplate}
+          handleCopyCaseNoteTemplate={handleCopyCaseNoteTemplate}
+          handleClearCapturedDetails={handleClearCapturedDetails}
+          noteCopyStatus={noteCopyStatus}
+          caseNoteDraft={caseNoteDraft}
+          setCaseNoteDraft={setCaseNoteDraft}
+        />
 
-        <div className="stack call-col call-col-right">
-          <div className="result stack" aria-live="polite">
-            <h3>
-              Current step guidance
-              <Tooltip text="Scripts and guidance change based on the selected checklist step." />
-            </h3>
-            <p className="muted">
-              <strong>Step {selectedStep + 1}:</strong>{" "}
-              {orderedCallChecklist[selectedStep]}
-            </p>
-            {renderSelectedStepContent()}
-          </div>
-
-          <div className="result stack" aria-live="polite">
-            <h3>
-              Script options
-              <Tooltip text="Approved script is always included. Use Prev/Next to cycle approved, suggested, and your saved custom scripts." />
-            </h3>
-            <div className="input-grid compact-grid">
-              <div>
-                <label htmlFor="script-type-select">Script type</label>
-                <select
-                  id="script-type-select"
-                  value={selectedScriptType}
-                  onChange={(event) => {
-                    setSelectedScriptType(event.target.value);
-                    setScriptIndex(0);
-                    setScriptEditStatus("");
-                    setScriptCopyStatus("");
-                  }}
-                >
-                  {scriptTypeOptions.map((item) => (
-                    <option key={item.key} value={item.key}>
-                      {item.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div className="actions-row">
-              <button
-                type="button"
-                className="button-secondary"
-                onClick={() => handleCycleScript(-1)}
-              >
-                Prev
-              </button>
-              <button
-                type="button"
-                className="button-secondary"
-                onClick={() => handleCycleScript(1)}
-              >
-                Next
-              </button>
-              <button
-                type="button"
-                className="button-secondary"
-                onClick={handleCopyActiveScript}
-              >
-                Copy script
-              </button>
-              {activeScript?.source === "custom" ? (
-                <button
-                  type="button"
-                  className="button-secondary"
-                  onClick={handleRemoveCurrentCustomScript}
-                >
-                  Remove custom
-                </button>
-              ) : null}
-              <span className="muted">
-                {activeScriptOptions.length
-                  ? `${scriptIndex + 1} of ${activeScriptOptions.length}`
-                  : "No scripts available"}
-              </span>
-            </div>
-            <div className="actions-row">
-              <button
-                type="button"
-                className="button-secondary"
-                onClick={handleResetCustomScriptsForType}
-              >
-                Reset this type
-              </button>
-              <button
-                type="button"
-                className="button-secondary"
-                onClick={handleResetAllCustomScripts}
-              >
-                Reset all custom
-              </button>
-            </div>
-            <p className="muted">
-              Source: <strong>{activeScript?.source || "n/a"}</strong>
-            </p>
-            <textarea
-              className="note-field-large"
-              readOnly
-              value={activeScript?.text || ""}
-            />
-            {scriptCopyStatus ? (
-              <p className="muted">{scriptCopyStatus}</p>
-            ) : null}
-            <div>
-              <label htmlFor="custom-script-input">Add custom script</label>
-              <textarea
-                id="custom-script-input"
-                className="note-field-large"
-                value={newCustomScript}
-                onChange={(event) => setNewCustomScript(event.target.value)}
-                placeholder="Add your preferred script wording for this script type"
-              />
-              <div className="actions-row">
-                <button
-                  type="button"
-                  className="button-secondary"
-                  onClick={handleSaveCustomScript}
-                >
-                  Save custom script
-                </button>
-                {scriptEditStatus ? (
-                  <span className="muted">{scriptEditStatus}</span>
-                ) : null}
-              </div>
-            </div>
-          </div>
-
-          <div className="result stack">
-            <h3>At-a-glance resources</h3>
-            <p>
-              <strong>Voicemail:</strong> {voicemailScripts.voicemail}
-            </p>
-            <p>
-              <strong>Ghost call:</strong> {voicemailScripts.ghost}
-            </p>
-            <p>
-              <strong>Difficult caller warning 1:</strong>{" "}
-              {difficultCallerScripts.warning1}
-            </p>
-            <p>
-              <strong>Difficult caller warning 2:</strong>{" "}
-              {difficultCallerScripts.warning2}
-            </p>
-            <p>
-              <strong>Difficult caller final:</strong>{" "}
-              {difficultCallerScripts.final}
-            </p>
-            <p className="muted">
-              Note suffix: {difficultCallerScripts.noteSuffix}
-            </p>
-
-            <p>
-              <strong>If claimant cannot be verified</strong>
-            </p>
-            <ul className="list">
-              {unableToVerifyProtocol.map((line) => (
-                <li key={line}>{line}</li>
-              ))}
-            </ul>
-
-            <p>
-              <strong>Unemployment phones</strong>
-            </p>
-            <ul className="list">
-              {contactInfo.unemploymentPhones.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-
-            <p>
-              <strong>Internal transfers</strong>
-            </p>
-            <ul className="list">
-              {contactInfo.internalTransfers.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-
-            <p>
-              <strong>Email:</strong> {contactInfo.emails.join(", ")}
-            </p>
-            <p>
-              <strong>Website:</strong> {contactInfo.website}
-            </p>
-
-            <p>
-              <strong>UI Assist services</strong>
-            </p>
-            <ul className="list">
-              {supportResources.map((item) => (
-                <li key={item.name}>
-                  <strong>{item.name}</strong>
-                  {item.phone ? ` · ${item.phone}` : " · Phone not listed"}
-                  {item.url ? (
-                    <>
-                      {" "}
-                      ·{" "}
-                      <a
-                        href={item.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-break"
-                      >
-                        Website
-                      </a>
-                    </>
-                  ) : null}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
+        <CallRightRail
+          selectedStep={selectedStep}
+          orderedCallChecklist={orderedCallChecklist}
+          renderSelectedStepContent={renderSelectedStepContent}
+          selectedScriptType={selectedScriptType}
+          setSelectedScriptType={setSelectedScriptType}
+          setScriptIndex={setScriptIndex}
+          setScriptEditStatus={setScriptEditStatus}
+          setScriptCopyStatus={setScriptCopyStatus}
+          scriptTypeOptions={scriptTypeOptions}
+          handleCycleScript={handleCycleScript}
+          handleCopyActiveScript={handleCopyActiveScript}
+          activeScript={activeScript}
+          handleRemoveCurrentCustomScript={handleRemoveCurrentCustomScript}
+          activeScriptOptions={activeScriptOptions}
+          scriptIndex={scriptIndex}
+          handleResetCustomScriptsForType={handleResetCustomScriptsForType}
+          handleResetAllCustomScripts={handleResetAllCustomScripts}
+          newCustomScript={newCustomScript}
+          setNewCustomScript={setNewCustomScript}
+          handleSaveCustomScript={handleSaveCustomScript}
+          scriptEditStatus={scriptEditStatus}
+          scriptCopyStatus={scriptCopyStatus}
+          voicemailScripts={voicemailScripts}
+          difficultCallerScripts={difficultCallerScripts}
+          unableToVerifyProtocol={unableToVerifyProtocol}
+          contactInfo={contactInfo}
+          supportResources={supportResources}
+        />
       </section>
     </section>
   );
