@@ -26,12 +26,15 @@ import {
   getInteractionMemory,
 } from "../utils/interactionMemory";
 
+const CASE_NOTE_DRAFT_KEY = "azdes.callHandling.caseNoteDraft";
+const TOOL_DETAILS_HEADER = "Tool details pulled from this interaction:";
+
 function getDefaultTimeOfCall() {
   return new Date().toLocaleString();
 }
 
 function buildCaseNoteTemplate(toolDetailText) {
-  return [
+  const baseTemplate = [
     "VALOR_Agent ID - [FirstName_LastInitial]",
     `Time of call: ${getDefaultTimeOfCall()}`,
     "Reason for call: [Enter reason for call]",
@@ -39,19 +42,50 @@ function buildCaseNoteTemplate(toolDetailText) {
     "Important information for next deputy: [Enter key information]",
     "Next steps: [Enter next steps]",
     "Approved abbreviations used: [Enter abbreviations used]",
-    "",
-    "Tool details pulled from this interaction:",
-    toolDetailText,
-  ].join("\n");
+  ];
+
+  if (!toolDetailText || !toolDetailText.trim()) {
+    return baseTemplate.join("\n");
+  }
+
+  return [...baseTemplate, "", TOOL_DETAILS_HEADER, toolDetailText].join("\n");
+}
+
+function stripToolDetailsSection(noteText) {
+  const headerIndex = noteText.indexOf(TOOL_DETAILS_HEADER);
+  if (headerIndex === -1) {
+    return noteText.trimEnd();
+  }
+
+  return noteText.slice(0, headerIndex).trimEnd();
+}
+
+function applyToolDetailsToDraft(noteText, toolDetailText) {
+  const base = stripToolDetailsSection(noteText);
+  if (!toolDetailText || !toolDetailText.trim()) {
+    return base;
+  }
+
+  return [base, "", TOOL_DETAILS_HEADER, toolDetailText].join("\n");
+}
+
+function getSavedCaseNoteDraft() {
+  if (typeof window === "undefined") {
+    return "";
+  }
+
+  const saved = window.localStorage.getItem(CASE_NOTE_DRAFT_KEY);
+  return saved || "";
 }
 
 function CallHandlingPage() {
   const [copyStatus, setCopyStatus] = useState("");
   const [noteCopyStatus, setNoteCopyStatus] = useState("");
   const [interactionMemory, setInteractionMemory] = useState([]);
-  const [caseNoteDraft, setCaseNoteDraft] = useState(() =>
-    buildCaseNoteTemplate(formatInteractionMemory([])),
-  );
+  const [caseNoteDraft, setCaseNoteDraft] = useState(() => {
+    const saved = getSavedCaseNoteDraft();
+    return saved || buildCaseNoteTemplate("");
+  });
   const [checkState, setCheckState] = useState(
     orderedCallChecklist.map(() => false),
   );
@@ -59,8 +93,24 @@ function CallHandlingPage() {
   useEffect(() => {
     const memory = getInteractionMemory();
     setInteractionMemory(memory);
-    setCaseNoteDraft(buildCaseNoteTemplate(formatInteractionMemory(memory)));
+
+    setCaseNoteDraft((current) => {
+      const existing =
+        current || getSavedCaseNoteDraft() || buildCaseNoteTemplate("");
+      return applyToolDetailsToDraft(
+        existing,
+        memory.length ? formatInteractionMemory(memory) : "",
+      );
+    });
   }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    window.localStorage.setItem(CASE_NOTE_DRAFT_KEY, caseNoteDraft);
+  }, [caseNoteDraft]);
 
   const completedCount = useMemo(
     () => checkState.filter(Boolean).length,
@@ -81,7 +131,12 @@ function CallHandlingPage() {
   function handleRefreshCaseTemplate() {
     const memory = getInteractionMemory();
     setInteractionMemory(memory);
-    setCaseNoteDraft(buildCaseNoteTemplate(formatInteractionMemory(memory)));
+    setCaseNoteDraft((current) =>
+      applyToolDetailsToDraft(
+        current,
+        memory.length ? formatInteractionMemory(memory) : "",
+      ),
+    );
     setNoteCopyStatus(
       memory.length
         ? "Template refreshed with latest tool details."
@@ -92,7 +147,7 @@ function CallHandlingPage() {
   function handleClearCapturedDetails() {
     clearInteractionMemory();
     setInteractionMemory([]);
-    setCaseNoteDraft(buildCaseNoteTemplate(formatInteractionMemory([])));
+    setCaseNoteDraft((current) => stripToolDetailsSection(current));
     setNoteCopyStatus("Captured tool details cleared.");
   }
 
