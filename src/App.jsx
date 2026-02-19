@@ -121,6 +121,17 @@ function App() {
             placeholder="Search tools, document numbers, links, or trends"
           />
         </div>
+        <div
+          className="tooltip-legend muted"
+          role="note"
+          aria-label="Tooltip help legend"
+        >
+          <span className="tooltip-badge" aria-hidden="true">
+            ?
+          </span>
+          Select any <strong>?</strong> icon for quick field guidance. Press
+          <strong> Esc</strong> to close open tips.
+        </div>
       </header>
 
       <nav className="card nav-row" aria-label="Primary navigation">
