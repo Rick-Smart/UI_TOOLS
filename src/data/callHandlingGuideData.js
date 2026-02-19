@@ -111,17 +111,17 @@ export const generalReviewChecklist = [
 ];
 
 export const noteRequirements = [
-  "VALOR_Agent ID - FirstName_LastInitial",
+  "Agent name - FirstName_LastInitial",
   "Time of call",
   "Reason for call",
   "Actions taken (including dropped-call callback attempts)",
-  "Important information for next deputy",
+  "Important information for next team member",
   "Next steps",
   "Use approved abbreviations only",
 ];
 
 export const noteDoNotInclude = [
-  "Another deputy name",
+  "Another team member name",
   "Personal comments/characterizations of claimant demeanor unless threat/safety concern exists",
 ];
 
@@ -136,7 +136,7 @@ export const difficultCallerScripts = {
   final:
     "I’m sorry Mr/Ms [Name], but I’m going to disconnect the call now due to repeated bad language/yelling/screaming. Please call back when you are able to discuss the matter calmly.",
   noteSuffix:
-    "CLMT being unprofessional. Deputy followed protocol. Advsd CLMT to call back when calm. Call ended by deputy.",
+    "CLMT being unprofessional. Agent followed protocol. Advsd CLMT to call back when calm. Call ended by agent.",
 };
 
 export const customerServiceHighlights = [

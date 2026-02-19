@@ -19,7 +19,7 @@ export const topActions = [
   {
     title: "Run call handling workflow",
     description:
-      "Open scripts, verification, RFC prompts, and wrap-up code search for active calls.",
+      "Open scripts, verification, RFC prompts, and call workflow tools for active calls.",
     to: "/call-handling",
   },
 ];

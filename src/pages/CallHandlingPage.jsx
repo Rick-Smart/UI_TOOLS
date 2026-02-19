@@ -72,11 +72,11 @@ function getDefaultTimeOfCall() {
 
 function buildCaseNoteTemplate(toolDetailText) {
   const baseTemplate = [
-    "VALOR_Agent ID - [FirstName_LastInitial]",
+    "Agent name - [FirstName_LastInitial]",
     `Time of call: ${getDefaultTimeOfCall()}`,
     "Reason for call: [Enter reason for call]",
     "Actions taken (including dropped-call callback attempts): [Enter actions taken]",
-    "Important information for next deputy: [Enter key information]",
+    "Important information for next team member: [Enter key information]",
     "Next steps: [Enter next steps]",
     "Approved abbreviations used: [Enter abbreviations used]",
   ];
