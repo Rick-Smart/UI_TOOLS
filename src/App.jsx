@@ -52,6 +52,13 @@ function App() {
     }
   };
 
+  const handleShowTooltipLegend = () => {
+    setIsTooltipLegendDismissed(false);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(TOOLTIP_LEGEND_DISMISSED_KEY, "false");
+    }
+  };
+
   const searchResults = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
     if (!query) {
@@ -141,7 +148,15 @@ function App() {
             placeholder="Search tools, document numbers, links, or trends"
           />
         </div>
-        {isTooltipLegendDismissed ? null : (
+        {isTooltipLegendDismissed ? (
+          <button
+            type="button"
+            className="tooltip-legend-restore"
+            onClick={handleShowTooltipLegend}
+          >
+            Show tooltip help
+          </button>
+        ) : (
           <div
             className="tooltip-legend muted"
             role="note"

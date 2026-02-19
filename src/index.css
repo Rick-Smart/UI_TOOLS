@@ -468,6 +468,21 @@ input:focus-visible,
   color: var(--text);
 }
 
+.tooltip-legend-restore {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.tooltip-legend-restore:hover {
+  color: var(--text);
+}
+
 .print-friendly {
   break-inside: avoid;
 }
