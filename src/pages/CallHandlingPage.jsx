@@ -28,6 +28,41 @@ import {
 
 const CASE_NOTE_DRAFT_KEY = "azdes.callHandling.caseNoteDraft";
 const TOOL_DETAILS_HEADER = "Tool details pulled from this interaction:";
+const CUSTOM_SCRIPTS_KEY = "azdes.callHandling.customScripts";
+
+const scriptTypeOptions = [
+  { key: "inboundGreeting", label: "Greeting (Inbound)" },
+  { key: "callbackGreeting", label: "Greeting (Callback)" },
+  { key: "voicemail", label: "Voicemail" },
+  { key: "ghostCall", label: "Ghost Call" },
+  { key: "closing", label: "Closing" },
+];
+
+const stepScriptTypeMap = {
+  1: "inboundGreeting",
+  9: "closing",
+};
+
+const suggestedScripts = {
+  inboundGreeting: [
+    "Thank you for calling Arizona Unemployment. This is [First Name]. Who am I speaking with today, and how can I help?",
+    "You’ve reached Arizona Unemployment. My name is [First Name]. Who am I speaking with, and what can I help with today?",
+  ],
+  callbackGreeting: [
+    "Hello, this is Arizona Unemployment returning your callback request. My name is [First Name]. Who am I speaking with, and how can I assist?",
+    "Hi, this is [First Name] with Arizona Unemployment returning your call. Who am I speaking with, and how may I help today?",
+  ],
+  voicemail: [
+    "Thank you for calling Arizona Unemployment. This is [First Name]. We’re sorry we missed you. Please call us back when available. If you have an established claim, please have your SSN and PIN ready. Toll-free: 1-877-600-2722. Hours: Monday-Friday, 8:00 a.m. to 4:00 p.m. Thank you.",
+  ],
+  ghostCall: [
+    "Hello, [claimant name]? (pause) Hello, [claimant name]? I cannot hear you. Please call us back when available, and we will be happy to assist you. If you have an established claim, please have your SSN and PIN ready. Toll-free: 1-877-600-2722. Hours: Monday-Friday, 8:00 a.m. to 4:00 p.m. Thank you.",
+  ],
+  closing: [
+    "Before we end the call, do you have any other questions? Thank you for calling Arizona Unemployment. I will transfer you to the survey now.",
+    "Is there anything else I can help with today? Thank you for calling, and I will transfer you to the survey now.",
+  ],
+};
 
 function getDefaultTimeOfCall() {
   return new Date().toLocaleString();
@@ -78,11 +113,42 @@ function getSavedCaseNoteDraft() {
   return saved || "";
 }
 
+function getSavedCustomScripts() {
+  if (typeof window === "undefined") {
+    return {};
+  }
+
+  try {
+    const stored = window.localStorage.getItem(CUSTOM_SCRIPTS_KEY);
+    if (!stored) {
+      return {};
+    }
+
+    const parsed = JSON.parse(stored);
+    if (!parsed || typeof parsed !== "object") {
+      return {};
+    }
+
+    return parsed;
+  } catch {
+    return {};
+  }
+}
+
 function CallHandlingPage() {
   const [copyStatus, setCopyStatus] = useState("");
   const [noteCopyStatus, setNoteCopyStatus] = useState("");
   const [interactionMemory, setInteractionMemory] = useState([]);
   const [selectedStep, setSelectedStep] = useState(0);
+  const [selectedScriptType, setSelectedScriptType] =
+    useState("inboundGreeting");
+  const [scriptIndex, setScriptIndex] = useState(0);
+  const [scriptCopyStatus, setScriptCopyStatus] = useState("");
+  const [scriptEditStatus, setScriptEditStatus] = useState("");
+  const [newCustomScript, setNewCustomScript] = useState("");
+  const [customScriptsByType, setCustomScriptsByType] = useState(
+    getSavedCustomScripts,
+  );
   const [caseNoteDraft, setCaseNoteDraft] = useState(() => {
     const saved = getSavedCaseNoteDraft();
     return saved || buildCaseNoteTemplate("");
@@ -113,10 +179,100 @@ function CallHandlingPage() {
     window.localStorage.setItem(CASE_NOTE_DRAFT_KEY, caseNoteDraft);
   }, [caseNoteDraft]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    window.localStorage.setItem(
+      CUSTOM_SCRIPTS_KEY,
+      JSON.stringify(customScriptsByType),
+    );
+  }, [customScriptsByType]);
+
   const completedCount = useMemo(
     () => checkState.filter(Boolean).length,
     [checkState],
   );
+
+  const scriptCatalog = useMemo(
+    () => ({
+      inboundGreeting: [
+        { source: "approved", text: greetingScripts.inbound },
+        ...(suggestedScripts.inboundGreeting || []).map((text) => ({
+          source: "suggested",
+          text,
+        })),
+        ...((customScriptsByType.inboundGreeting || []).map((text) => ({
+          source: "custom",
+          text,
+        })) || []),
+      ],
+      callbackGreeting: [
+        { source: "approved", text: greetingScripts.callback },
+        ...(suggestedScripts.callbackGreeting || []).map((text) => ({
+          source: "suggested",
+          text,
+        })),
+        ...((customScriptsByType.callbackGreeting || []).map((text) => ({
+          source: "custom",
+          text,
+        })) || []),
+      ],
+      voicemail: [
+        { source: "approved", text: voicemailScripts.voicemail },
+        ...(suggestedScripts.voicemail || []).map((text) => ({
+          source: "suggested",
+          text,
+        })),
+        ...((customScriptsByType.voicemail || []).map((text) => ({
+          source: "custom",
+          text,
+        })) || []),
+      ],
+      ghostCall: [
+        { source: "approved", text: voicemailScripts.ghost },
+        ...(suggestedScripts.ghostCall || []).map((text) => ({
+          source: "suggested",
+          text,
+        })),
+        ...((customScriptsByType.ghostCall || []).map((text) => ({
+          source: "custom",
+          text,
+        })) || []),
+      ],
+      closing: [
+        { source: "approved", text: closeScript },
+        ...(suggestedScripts.closing || []).map((text) => ({
+          source: "suggested",
+          text,
+        })),
+        ...((customScriptsByType.closing || []).map((text) => ({
+          source: "custom",
+          text,
+        })) || []),
+      ],
+    }),
+    [customScriptsByType],
+  );
+
+  const activeScriptOptions = scriptCatalog[selectedScriptType] || [];
+  const activeScript =
+    activeScriptOptions[scriptIndex] || activeScriptOptions[0] || null;
+
+  useEffect(() => {
+    if (scriptIndex >= activeScriptOptions.length) {
+      setScriptIndex(0);
+    }
+  }, [activeScriptOptions.length, scriptIndex]);
+
+  useEffect(() => {
+    const suggestedType = stepScriptTypeMap[selectedStep];
+    if (suggestedType && suggestedType !== selectedScriptType) {
+      setSelectedScriptType(suggestedType);
+      setScriptIndex(0);
+    }
+  }, [selectedStep, selectedScriptType]);
 
   function toggleChecklist(index, checked) {
     setCheckState((current) =>
@@ -157,6 +313,66 @@ function CallHandlingPage() {
     setNoteCopyStatus(
       copied ? "Case note template copied." : "Copy unavailable.",
     );
+  }
+
+  function handleCycleScript(direction) {
+    if (!activeScriptOptions.length) {
+      return;
+    }
+
+    setScriptIndex((current) => {
+      const next = current + direction;
+      if (next < 0) {
+        return activeScriptOptions.length - 1;
+      }
+      if (next >= activeScriptOptions.length) {
+        return 0;
+      }
+      return next;
+    });
+    setScriptCopyStatus("");
+  }
+
+  async function handleCopyActiveScript() {
+    if (!activeScript?.text) {
+      return;
+    }
+
+    const copied = await copyText(activeScript.text);
+    setScriptCopyStatus(copied ? "Script copied." : "Copy unavailable.");
+  }
+
+  function handleSaveCustomScript() {
+    const value = newCustomScript.trim();
+    if (!value) {
+      setScriptEditStatus("Enter a script before saving.");
+      return;
+    }
+
+    setCustomScriptsByType((current) => ({
+      ...current,
+      [selectedScriptType]: [...(current[selectedScriptType] || []), value],
+    }));
+    setNewCustomScript("");
+    setScriptEditStatus("Custom script saved for this script type.");
+    setScriptIndex(activeScriptOptions.length);
+  }
+
+  function handleRemoveCurrentCustomScript() {
+    if (!activeScript || activeScript.source !== "custom") {
+      return;
+    }
+
+    setCustomScriptsByType((current) => {
+      const currentList = current[selectedScriptType] || [];
+      const nextList = currentList.filter((text) => text !== activeScript.text);
+      return {
+        ...current,
+        [selectedScriptType]: nextList,
+      };
+    });
+    setScriptIndex(0);
+    setScriptEditStatus("Custom script removed.");
   }
 
   function renderSelectedStepContent() {
@@ -474,6 +690,104 @@ function CallHandlingPage() {
               {orderedCallChecklist[selectedStep]}
             </p>
             {renderSelectedStepContent()}
+          </div>
+
+          <div className="result stack" aria-live="polite">
+            <h3>
+              Script options
+              <Tooltip text="Approved script is always included. Use Prev/Next to cycle approved, suggested, and your saved custom scripts." />
+            </h3>
+            <div className="input-grid compact-grid">
+              <div>
+                <label htmlFor="script-type-select">Script type</label>
+                <select
+                  id="script-type-select"
+                  value={selectedScriptType}
+                  onChange={(event) => {
+                    setSelectedScriptType(event.target.value);
+                    setScriptIndex(0);
+                    setScriptEditStatus("");
+                    setScriptCopyStatus("");
+                  }}
+                >
+                  {scriptTypeOptions.map((item) => (
+                    <option key={item.key} value={item.key}>
+                      {item.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="actions-row">
+              <button
+                type="button"
+                className="button-secondary"
+                onClick={() => handleCycleScript(-1)}
+              >
+                Prev
+              </button>
+              <button
+                type="button"
+                className="button-secondary"
+                onClick={() => handleCycleScript(1)}
+              >
+                Next
+              </button>
+              <button
+                type="button"
+                className="button-secondary"
+                onClick={handleCopyActiveScript}
+              >
+                Copy script
+              </button>
+              {activeScript?.source === "custom" ? (
+                <button
+                  type="button"
+                  className="button-secondary"
+                  onClick={handleRemoveCurrentCustomScript}
+                >
+                  Remove custom
+                </button>
+              ) : null}
+              <span className="muted">
+                {activeScriptOptions.length
+                  ? `${scriptIndex + 1} of ${activeScriptOptions.length}`
+                  : "No scripts available"}
+              </span>
+            </div>
+            <p className="muted">
+              Source: <strong>{activeScript?.source || "n/a"}</strong>
+            </p>
+            <textarea
+              className="note-field-large"
+              readOnly
+              value={activeScript?.text || ""}
+            />
+            {scriptCopyStatus ? (
+              <p className="muted">{scriptCopyStatus}</p>
+            ) : null}
+            <div>
+              <label htmlFor="custom-script-input">Add custom script</label>
+              <textarea
+                id="custom-script-input"
+                className="note-field-large"
+                value={newCustomScript}
+                onChange={(event) => setNewCustomScript(event.target.value)}
+                placeholder="Add your preferred script wording for this script type"
+              />
+              <div className="actions-row">
+                <button
+                  type="button"
+                  className="button-secondary"
+                  onClick={handleSaveCustomScript}
+                >
+                  Save custom script
+                </button>
+                {scriptEditStatus ? (
+                  <span className="muted">{scriptEditStatus}</span>
+                ) : null}
+              </div>
+            </div>
           </div>
 
           <div className="result stack">
