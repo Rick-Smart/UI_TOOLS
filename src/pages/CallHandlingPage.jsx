@@ -307,6 +307,8 @@ function CallHandlingPage() {
   function handleRefreshCaseTemplate() {
     const memory = getInteractionMemory();
     setInteractionMemory(memory);
+    setCheckState(orderedCallChecklist.map(() => false));
+    setSelectedStep(0);
     setCaseNoteDraft((current) =>
       applyToolDetailsToDraft(
         current,
