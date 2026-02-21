@@ -77,7 +77,7 @@ function buildCaseNoteTemplate(agentName = "") {
     `Agent name - ${trimmedAgentName}`,
     `Time of call: ${getDefaultTimeOfCall()}`,
     "Reason for call: ",
-    "Actions taken (including dropped-call callback attempts):",
+    "Actions taken:",
     "Important information for next team member:",
     "Next steps: ",
   ];
@@ -189,6 +189,17 @@ function CallHandlingPage() {
   const completedCount = useMemo(
     () => checkState.filter(Boolean).length,
     [checkState],
+  );
+
+  const currentStepScripts = useMemo(
+    () => ({
+      inbound:
+        customScriptsByType.inboundGreeting?.[0] || greetingScripts.inbound,
+      callback:
+        customScriptsByType.callbackGreeting?.[0] || greetingScripts.callback,
+      closing: customScriptsByType.closing?.[0] || closeScript,
+    }),
+    [customScriptsByType],
   );
 
   const scriptCatalog = useMemo(
@@ -346,13 +357,18 @@ function CallHandlingPage() {
       return;
     }
 
+    const baseScriptCount =
+      1 + (suggestedScripts[selectedScriptType]?.length || 0);
+
     setCustomScriptsByType((current) => ({
       ...current,
-      [selectedScriptType]: [...(current[selectedScriptType] || []), value],
+      [selectedScriptType]: [value],
     }));
     setNewCustomScript("");
-    setScriptEditStatus("Custom script saved for this script type.");
-    setScriptIndex(activeScriptOptions.length);
+    setScriptEditStatus(
+      "Custom script saved and applied for this script type.",
+    );
+    setScriptIndex(baseScriptCount);
   }
 
   function handleRemoveCurrentCustomScript() {
@@ -429,10 +445,10 @@ function CallHandlingPage() {
         return (
           <>
             <p>
-              <strong>Inbound:</strong> {greetingScripts.inbound}
+              <strong>Inbound:</strong> {currentStepScripts.inbound}
             </p>
             <p>
-              <strong>Callback:</strong> {greetingScripts.callback}
+              <strong>Callback:</strong> {currentStepScripts.callback}
             </p>
             <p className="muted">{greetingScripts.proxy}</p>
           </>
@@ -579,7 +595,7 @@ function CallHandlingPage() {
       case 9:
         return (
           <>
-            <p>{closeScript}</p>
+            <p>{currentStepScripts.closing}</p>
             <div className="actions-row">
               <button
                 type="button"
