@@ -284,11 +284,15 @@ function CallHandlingPage() {
 
   useEffect(() => {
     const suggestedType = stepScriptTypeMap[selectedStep];
-    if (suggestedType && suggestedType !== selectedScriptType) {
-      setSelectedScriptType(suggestedType);
-      setScriptIndex(0);
+    if (!suggestedType) {
+      return;
     }
-  }, [selectedStep, selectedScriptType]);
+
+    setSelectedScriptType((current) =>
+      current === suggestedType ? current : suggestedType,
+    );
+    setScriptIndex(0);
+  }, [selectedStep]);
 
   function toggleChecklist(index, checked) {
     setCheckState((current) =>
@@ -595,7 +599,9 @@ function CallHandlingPage() {
       case 9:
         return (
           <>
-            <p>{currentStepScripts.closing}</p>
+            <p>
+              <strong>Closing:</strong> {currentStepScripts.closing}
+            </p>
             <div className="actions-row">
               <button
                 type="button"
