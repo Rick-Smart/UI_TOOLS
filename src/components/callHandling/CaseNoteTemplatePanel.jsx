@@ -1,14 +1,27 @@
 import Tooltip from "../Tooltip";
 
+function applySentenceCase(value) {
+  return value.replace(/(^|[.!?]\s+)([a-z])/g, (match, prefix, letter) => {
+    return `${prefix}${letter.toUpperCase()}`;
+  });
+}
+
 function CaseNoteTemplatePanel({
   interactionMemoryLength,
   handleRefreshCaseTemplate,
   handleCopyCaseNoteTemplate,
   handleClearCapturedDetails,
   noteCopyStatus,
+  agentName,
+  setAgentName,
   caseNoteDraft,
   setCaseNoteDraft,
 }) {
+  function handleCaseNoteChange(event) {
+    const nextValue = event.target.value;
+    setCaseNoteDraft(applySentenceCase(nextValue));
+  }
+
   return (
     <div
       className="result call-col call-col-middle call-template-panel"
@@ -25,6 +38,25 @@ function CaseNoteTemplatePanel({
       <p className="muted">
         Captured tool summaries: <strong>{interactionMemoryLength}</strong>
       </p>
+      <p className="muted">
+        Tip: If spellcheck is not underlining typos, in Chrome open
+        chrome://settings/languages, turn on Spell check, enable English (United
+        States), then right-click inside the case note field and confirm
+        spellcheck is enabled.
+      </p>
+      <div className="compact-grid">
+        <label htmlFor="agent-name-input">
+          Agent name
+          <Tooltip text="Saved in your browser on this device and reused when you refresh the template." />
+        </label>
+        <input
+          id="agent-name-input"
+          type="text"
+          value={agentName}
+          onChange={(event) => setAgentName(event.target.value)}
+          placeholder="FirstName_LastInitial"
+        />
+      </div>
       <div className="actions-row">
         <button
           type="button"
@@ -59,9 +91,12 @@ function CaseNoteTemplatePanel({
         <textarea
           id="case-note-template"
           className="note-output call-note-output"
-          spellCheck
+          spellCheck={true}
+          lang="en-US"
+          autoCorrect="on"
+          autoCapitalize="sentences"
           value={caseNoteDraft}
-          onChange={(event) => setCaseNoteDraft(event.target.value)}
+          onChange={handleCaseNoteChange}
         />
       </div>
     </div>

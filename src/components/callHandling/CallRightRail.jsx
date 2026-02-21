@@ -133,6 +133,9 @@ function CallRightRail({
         {scriptCopyStatus ? <p className="muted">{scriptCopyStatus}</p> : null}
         <div>
           <label htmlFor="custom-script-input">Add custom script</label>
+          <p className="muted">
+            Custom scripts must be approved by leadership before use.
+          </p>
           <textarea
             id="custom-script-input"
             className="note-field-large"

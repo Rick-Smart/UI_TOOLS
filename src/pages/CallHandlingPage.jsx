@@ -24,13 +24,12 @@ import CallRightRail from "../components/callHandling/CallRightRail";
 import { copyText } from "../utils/copyText";
 import {
   clearInteractionMemory,
-  formatInteractionMemory,
   getInteractionMemory,
 } from "../utils/interactionMemory";
 
 const CASE_NOTE_DRAFT_KEY = "azdes.callHandling.caseNoteDraft";
-const TOOL_DETAILS_HEADER = "Tool details pulled from this interaction:";
 const CUSTOM_SCRIPTS_KEY = "azdes.callHandling.customScripts";
+const AGENT_NAME_KEY = "azdes.callHandling.agentName";
 
 const scriptTypeOptions = [
   { key: "inboundGreeting", label: "Greeting (Inbound)" },
@@ -72,40 +71,18 @@ function getDefaultTimeOfCall() {
   return new Date().toLocaleString();
 }
 
-function buildCaseNoteTemplate(toolDetailText) {
+function buildCaseNoteTemplate(agentName = "") {
+  const trimmedAgentName = agentName.trim();
   const baseTemplate = [
-    "Agent name - [FirstName_LastInitial]",
+    `Agent name - ${trimmedAgentName}`,
     `Time of call: ${getDefaultTimeOfCall()}`,
-    "Reason for call: [Enter reason for call]",
-    "Actions taken (including dropped-call callback attempts): [Enter actions taken]",
-    "Important information for next team member: [Enter key information]",
-    "Next steps: [Enter next steps]",
-    "Approved abbreviations used: [Enter abbreviations used]",
+    "Reason for call: ",
+    "Actions taken (including dropped-call callback attempts):",
+    "Important information for next team member:",
+    "Next steps: ",
   ];
 
-  if (!toolDetailText || !toolDetailText.trim()) {
-    return baseTemplate.join("\n");
-  }
-
-  return [...baseTemplate, "", TOOL_DETAILS_HEADER, toolDetailText].join("\n");
-}
-
-function stripToolDetailsSection(noteText) {
-  const headerIndex = noteText.indexOf(TOOL_DETAILS_HEADER);
-  if (headerIndex === -1) {
-    return noteText.trimEnd();
-  }
-
-  return noteText.slice(0, headerIndex).trimEnd();
-}
-
-function applyToolDetailsToDraft(noteText, toolDetailText) {
-  const base = stripToolDetailsSection(noteText);
-  if (!toolDetailText || !toolDetailText.trim()) {
-    return base;
-  }
-
-  return [base, "", TOOL_DETAILS_HEADER, toolDetailText].join("\n");
+  return baseTemplate.join("\n");
 }
 
 function getSavedCaseNoteDraft() {
@@ -114,6 +91,15 @@ function getSavedCaseNoteDraft() {
   }
 
   const saved = window.localStorage.getItem(CASE_NOTE_DRAFT_KEY);
+  return saved || "";
+}
+
+function getSavedAgentName() {
+  if (typeof window === "undefined") {
+    return "";
+  }
+
+  const saved = window.localStorage.getItem(AGENT_NAME_KEY);
   return saved || "";
 }
 
@@ -159,9 +145,10 @@ function CallHandlingPage() {
   const [customScriptsByType, setCustomScriptsByType] = useState(
     getSavedCustomScripts,
   );
+  const [agentName, setAgentName] = useState(getSavedAgentName);
   const [caseNoteDraft, setCaseNoteDraft] = useState(() => {
     const saved = getSavedCaseNoteDraft();
-    return saved || buildCaseNoteTemplate("");
+    return saved || buildCaseNoteTemplate(getSavedAgentName());
   });
   const [checkState, setCheckState] = useState(
     orderedCallChecklist.map(() => false),
@@ -170,15 +157,6 @@ function CallHandlingPage() {
   useEffect(() => {
     const memory = getInteractionMemory();
     setInteractionMemory(memory);
-
-    setCaseNoteDraft((current) => {
-      const existing =
-        current || getSavedCaseNoteDraft() || buildCaseNoteTemplate("");
-      return applyToolDetailsToDraft(
-        existing,
-        memory.length ? formatInteractionMemory(memory) : "",
-      );
-    });
   }, []);
 
   useEffect(() => {
@@ -199,6 +177,14 @@ function CallHandlingPage() {
       JSON.stringify(customScriptsByType),
     );
   }, [customScriptsByType]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    window.localStorage.setItem(AGENT_NAME_KEY, agentName);
+  }, [agentName]);
 
   const completedCount = useMemo(
     () => checkState.filter(Boolean).length,
@@ -309,22 +295,13 @@ function CallHandlingPage() {
     setInteractionMemory(memory);
     setCheckState(orderedCallChecklist.map(() => false));
     setSelectedStep(0);
-    setCaseNoteDraft(
-      buildCaseNoteTemplate(
-        memory.length ? formatInteractionMemory(memory) : "",
-      ),
-    );
-    setNoteCopyStatus(
-      memory.length
-        ? "Template refreshed with latest tool details."
-        : "Template refreshed. No tool summaries captured yet.",
-    );
+    setCaseNoteDraft(buildCaseNoteTemplate(agentName));
+    setNoteCopyStatus("Template refreshed.");
   }
 
   function handleClearCapturedDetails() {
     clearInteractionMemory();
     setInteractionMemory([]);
-    setCaseNoteDraft((current) => stripToolDetailsSection(current));
     setNoteCopyStatus("Captured tool details cleared.");
   }
 
@@ -649,6 +626,8 @@ function CallHandlingPage() {
           handleCopyCaseNoteTemplate={handleCopyCaseNoteTemplate}
           handleClearCapturedDetails={handleClearCapturedDetails}
           noteCopyStatus={noteCopyStatus}
+          agentName={agentName}
+          setAgentName={setAgentName}
           caseNoteDraft={caseNoteDraft}
           setCaseNoteDraft={setCaseNoteDraft}
         />
