@@ -309,9 +309,8 @@ function CallHandlingPage() {
     setInteractionMemory(memory);
     setCheckState(orderedCallChecklist.map(() => false));
     setSelectedStep(0);
-    setCaseNoteDraft((current) =>
-      applyToolDetailsToDraft(
-        current,
+    setCaseNoteDraft(
+      buildCaseNoteTemplate(
         memory.length ? formatInteractionMemory(memory) : "",
       ),
     );
