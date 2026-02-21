@@ -76,6 +76,7 @@ function buildCaseNoteTemplate(agentName = "") {
   const baseTemplate = [
     `Agent name - ${trimmedAgentName}`,
     `Time of call: ${getDefaultTimeOfCall()}`,
+    "Claimant: ",
     "Reason for call: ",
     "Actions taken:",
     "Important information for next team member:",
