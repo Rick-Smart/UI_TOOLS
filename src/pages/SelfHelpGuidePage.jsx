@@ -19,6 +19,9 @@ const troubleshootingNotes = [
   "If account access still fails, escalate through approved internal support path.",
 ];
 
+const loginScreenshotSrc = `${import.meta.env.BASE_URL}media/AZDES%20LOGIN.png`;
+const einScreenshotSrc = `${import.meta.env.BASE_URL}media/EIN%20path.jpg`;
+
 function SelfHelpGuidePage() {
   return (
     <section className="card stack">
@@ -55,7 +58,7 @@ function SelfHelpGuidePage() {
         <figure className="guide-image-block">
           <img
             className="guide-image"
-            src="/media/AZDES LOGIN.png"
+            src={loginScreenshotSrc}
             alt="AZDES self-help login screen with username, password, and AZDESGOV environment selector"
           />
           <figcaption className="muted">Login screen reference.</figcaption>
@@ -76,7 +79,7 @@ function SelfHelpGuidePage() {
         <figure className="guide-image-block">
           <img
             className="guide-image"
-            src="/media/EIN path.jpg"
+            src={einScreenshotSrc}
             alt="AZDES profile screen showing where to find EIN in the Attributes section"
           />
           <figcaption className="muted">Profile/EIN reference.</figcaption>
