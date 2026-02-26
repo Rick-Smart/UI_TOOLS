@@ -170,6 +170,20 @@ h3 {
   gap: 8px;
 }
 
+.guide-image-block {
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.guide-image {
+  width: 100%;
+  max-width: 960px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #0b1220;
+}
+
 .input-row {
   display: grid;
   grid-template-columns: 1fr;

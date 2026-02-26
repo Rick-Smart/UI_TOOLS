@@ -9,6 +9,7 @@ import LinksPage from "../pages/LinksPage";
 import MonetaryEligibilityPage from "../pages/MonetaryEligibilityPage";
 import ProgramTriagePage from "../pages/ProgramTriagePage";
 import QuickReferencePage from "../pages/QuickReferencePage";
+import SelfHelpGuidePage from "../pages/SelfHelpGuidePage";
 import TermsGlossaryPage from "../pages/TermsGlossaryPage";
 import TrendsTipsPage from "../pages/TrendsTipsPage";
 import WeeklyPayablePage from "../pages/WeeklyPayablePage";
@@ -104,6 +105,16 @@ export const toolRegistry = [
     microGuide:
       "Search by topic and use the matching card language for consistent communication.",
     component: AgentResponseCardsPage,
+  },
+  {
+    path: "/self-help",
+    navLabel: "Self Help",
+    title: "AZDES Self-Help Guide",
+    description:
+      "Step-by-step login and profile guidance, including EIN lookup location and troubleshooting notes.",
+    microGuide:
+      "Follow login steps, use profile navigation guidance, and reference the EIN location screenshots.",
+    component: SelfHelpGuidePage,
   },
   {
     path: "/terms",
