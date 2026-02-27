@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { documentReferences } from "../data/documentReferences";
-import { defaultLinks } from "../data/defaultLinks";
 import { topActions } from "../data/topActions";
 import { trendsTips } from "../data/trendsTips";
+import { readManagedLinks, subscribeManagedLinks } from "../utils/linksStore";
 import { copyText } from "../utils/copyText";
 import { addInteractionMemory } from "../utils/interactionMemory";
 
@@ -17,13 +17,18 @@ function isActive(item) {
 
 function QuickReferencePage({ tools = [] }) {
   const [copyStatus, setCopyStatus] = useState("");
+  const [managedLinks, setManagedLinks] = useState(readManagedLinks);
+
+  useEffect(() => {
+    return subscribeManagedLinks(setManagedLinks);
+  }, []);
 
   async function handleCopySummary() {
     const summary = [
       `Top actions: ${topActions.length}`,
       `Tool directory entries: ${tools.length}`,
       `Document references: ${documentReferences.length}`,
-      `Key links: ${defaultLinks.length}`,
+      `Key links: ${managedLinks.length}`,
       `Active trends/tips: ${trendsTips.filter(isActive).length}`,
       "",
       "Quick reference snapshot generated.",
@@ -95,7 +100,7 @@ function QuickReferencePage({ tools = [] }) {
       <div className="result stack">
         <h3>Key Links</h3>
         <ul className="list">
-          {defaultLinks.map((link) => (
+          {managedLinks.map((link) => (
             <li key={link.url}>
               <strong>{link.name}:</strong> {link.url}
             </li>

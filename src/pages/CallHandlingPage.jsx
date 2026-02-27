@@ -473,7 +473,7 @@ function CallHandlingPage() {
     }
 
     setNoteCopyStatus(
-      "Template refreshed and captured tool details cleared. Complete Claimant, Reason, Actions, Important information, and Next steps before refresh to save a daily synopsis.",
+      "Template refreshed and captured tool details cleared. No synopsis was saved because all synopsis fields were blank.",
     );
   }
 
@@ -522,7 +522,7 @@ function CallHandlingPage() {
     }
 
     setNoteCopyStatus(
-      "Case note copied. Complete Claimant, Reason, Actions, Important information, and Next steps to capture synopsis.",
+      "Case note copied. No synopsis was saved because all synopsis fields were blank.",
     );
   }
 
@@ -842,12 +842,12 @@ function CallHandlingPage() {
         />
 
         <CaseNoteTemplatePanel
-          interactionMemoryLength={interactionMemory.length}
           handleRefreshCaseTemplate={handleRefreshCaseTemplate}
           handleCopyCaseNoteTemplate={handleCopyCaseNoteTemplate}
           handleAppendCapturedDetails={handleAppendCapturedDetails}
           handleClearCapturedDetails={handleClearCapturedDetails}
           noteCopyStatus={noteCopyStatus}
+          capturedDetailsCount={interactionMemory.length}
           agentName={agentName}
           setAgentName={setAgentName}
           caseNoteDraft={caseNoteDraft}

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Link,
   NavLink,
@@ -10,7 +10,6 @@ import {
 import DocumentReferencesPanel from "./components/DocumentReferencesPanel";
 import Tooltip from "./components/Tooltip";
 import HomePage from "./pages/HomePage";
-import { defaultLinks } from "./data/defaultLinks";
 import { documentReferences } from "./data/documentReferences";
 import {
   callGuideMeta,
@@ -29,6 +28,7 @@ import {
   buildFocusedDocuments,
   buildSearchResults,
 } from "./utils/smartSearch";
+import { readManagedLinks, subscribeManagedLinks } from "./utils/linksStore";
 import kbArticlesData from "../kb/data/articles.json";
 
 const TOOLTIP_LEGEND_DISMISSED_KEY = "azdes.tooltipLegendDismissed";
@@ -68,11 +68,16 @@ function ToolScreen({ tool }) {
 function App() {
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
+  const [managedLinks, setManagedLinks] = useState(readManagedLinks);
   const [isTooltipLegendDismissed, setIsTooltipLegendDismissed] = useState(
     getTooltipLegendDismissed,
   );
 
   const kbEntries = kbArticlesData?.entries || [];
+
+  useEffect(() => {
+    return subscribeManagedLinks(setManagedLinks);
+  }, []);
 
   const handleDismissTooltipLegend = () => {
     setIsTooltipLegendDismissed(true);
@@ -94,7 +99,7 @@ function App() {
       maxResults: 24,
       toolRegistry,
       documentReferences,
-      defaultLinks,
+      defaultLinks: managedLinks,
       trendsTips,
       uiTerms,
       topActions,
@@ -107,7 +112,7 @@ function App() {
       supportResources,
       contactInfo,
     });
-  }, [kbEntries, searchQuery]);
+  }, [kbEntries, managedLinks, searchQuery]);
 
   const focusedDocuments = useMemo(() => {
     return buildFocusedDocuments({

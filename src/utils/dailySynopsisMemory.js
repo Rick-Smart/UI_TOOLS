@@ -15,6 +15,27 @@ function normalizeComparison(value) {
     .toLowerCase();
 }
 
+function hasAnySynopsisContent(entry) {
+  return Boolean(
+    String(entry?.firstName || "").trim() ||
+    String(entry?.reasonForCall || "").trim() ||
+    String(entry?.actionsTaken || "").trim() ||
+    String(entry?.importantInformation || "").trim() ||
+    String(entry?.nextSteps || "").trim(),
+  );
+}
+
+function pruneBlankSynopsisEntries(entries) {
+  return entries.filter((entry) => hasAnySynopsisContent(entry));
+}
+
+function setEntries(nextEntries) {
+  dailySynopsisEntries = pruneBlankSynopsisEntries(nextEntries).slice(
+    0,
+    MAX_SYNOPSIS_ITEMS,
+  );
+}
+
 function parseCaseNoteFields(caseNoteDraft) {
   const fieldMap = {
     claimant: "",
@@ -118,6 +139,7 @@ function calculateStepRating(completedSteps, totalSteps) {
 }
 
 export function getDailySynopsisEntries() {
+  setEntries(dailySynopsisEntries);
   return [...dailySynopsisEntries];
 }
 
@@ -129,7 +151,7 @@ export function subscribeDailySynopsis(listener) {
 }
 
 export function clearDailySynopsis() {
-  dailySynopsisEntries = [];
+  setEntries([]);
   emitChange();
 }
 
@@ -149,13 +171,15 @@ export function addDailySynopsisEntry(entry) {
   );
 
   if (
-    !firstName ||
-    !reasonForCall ||
-    !actionsTaken ||
-    !importantInformation ||
-    !nextSteps
+    !hasAnySynopsisContent({
+      firstName,
+      reasonForCall,
+      actionsTaken,
+      importantInformation,
+      nextSteps,
+    })
   ) {
-    return { added: false, reason: "incomplete" };
+    return { added: false, reason: "blank" };
   }
 
   const latest = dailySynopsisEntries[0];
@@ -188,10 +212,7 @@ export function addDailySynopsisEntry(entry) {
     stepRating,
   };
 
-  dailySynopsisEntries = [nextEntry, ...dailySynopsisEntries].slice(
-    0,
-    MAX_SYNOPSIS_ITEMS,
-  );
+  setEntries([nextEntry, ...dailySynopsisEntries]);
   emitChange();
   return { added: true, reason: "ok", entry: nextEntry };
 }

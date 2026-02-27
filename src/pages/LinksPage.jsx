@@ -1,31 +1,21 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Tooltip from "../components/Tooltip";
-import { defaultLinks, linksStorageKey } from "../data/defaultLinks";
-
-function readStoredLinks() {
-  try {
-    const stored = localStorage.getItem(linksStorageKey);
-    if (!stored) {
-      return defaultLinks;
-    }
-
-    const parsed = JSON.parse(stored);
-    if (!Array.isArray(parsed)) {
-      return defaultLinks;
-    }
-
-    const filtered = parsed.filter((item) => item?.name && item?.url);
-    return filtered.length ? filtered : defaultLinks;
-  } catch {
-    return defaultLinks;
-  }
-}
+import {
+  readManagedLinks,
+  resetManagedLinks,
+  subscribeManagedLinks,
+  writeManagedLinks,
+} from "../utils/linksStore";
 
 function LinksPage() {
-  const [links, setLinks] = useState(readStoredLinks);
+  const [links, setLinks] = useState(readManagedLinks);
   const [name, setName] = useState("");
   const [url, setUrl] = useState("");
   const [group, setGroup] = useState("");
+
+  useEffect(() => {
+    return subscribeManagedLinks(setLinks);
+  }, []);
 
   const groupedCount = useMemo(() => {
     const unique = new Set(links.map((item) => item.group || "General"));
@@ -33,8 +23,8 @@ function LinksPage() {
   }, [links]);
 
   function persist(nextLinks) {
-    setLinks(nextLinks);
-    localStorage.setItem(linksStorageKey, JSON.stringify(nextLinks));
+    const saved = writeManagedLinks(nextLinks);
+    setLinks(saved);
   }
 
   function addLink() {
@@ -59,13 +49,21 @@ function LinksPage() {
     setGroup("");
   }
 
-  function removeLink(index) {
-    const next = links.filter((_, itemIndex) => itemIndex !== index);
+  function removeLink(targetLink) {
+    const next = links.filter(
+      (item) =>
+        !(
+          item.name === targetLink.name &&
+          item.url === targetLink.url &&
+          (item.group || "General") === (targetLink.group || "General")
+        ),
+    );
     persist(next);
   }
 
   function resetLinks() {
-    persist(defaultLinks);
+    const reset = resetManagedLinks();
+    setLinks(reset);
   }
 
   return (
@@ -129,8 +127,8 @@ function LinksPage() {
       </div>
 
       <div className="links-grid" aria-live="polite">
-        {links.map((link, index) => (
-          <article key={`${link.url}-${index}`} className="link-card">
+        {links.map((link) => (
+          <article key={`${link.name}-${link.url}`} className="link-card">
             <div>
               <h3>{link.name}</h3>
               <div className="link-meta">
@@ -140,7 +138,7 @@ function LinksPage() {
             </div>
             <div className="link-actions">
               <a
-                className="button-link"
+                className="button-link link-action-button"
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -149,8 +147,8 @@ function LinksPage() {
               </a>
               <button
                 type="button"
-                className="button-secondary"
-                onClick={() => removeLink(index)}
+                className="button-secondary link-action-button"
+                onClick={() => removeLink(link)}
               >
                 Remove
               </button>

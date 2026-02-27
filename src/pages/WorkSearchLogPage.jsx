@@ -12,6 +12,11 @@ function renderStars(rating) {
   return "★".repeat(safeRating) + "☆".repeat(5 - safeRating);
 }
 
+function displayValue(value, fallback = "Not provided") {
+  const normalized = String(value || "").trim();
+  return normalized || fallback;
+}
+
 function WorkSearchLogPage() {
   const [entries, setEntries] = useState(getDailySynopsisEntries);
   const [copyStatus, setCopyStatus] = useState("");
@@ -98,11 +103,11 @@ function WorkSearchLogPage() {
       "",
       ...entries.flatMap((entry, index) => [
         `#${index + 1}`,
-        `First name: ${entry.firstName}`,
-        `Reason for call: ${entry.reasonForCall}`,
-        `Actions taken: ${entry.actionsTaken}`,
-        `Important information: ${entry.importantInformation}`,
-        `Next steps: ${entry.nextSteps}`,
+        `First name: ${displayValue(entry.firstName, "Unknown")}`,
+        `Reason for call: ${displayValue(entry.reasonForCall)}`,
+        `Actions taken: ${displayValue(entry.actionsTaken)}`,
+        `Important information: ${displayValue(entry.importantInformation)}`,
+        `Next steps: ${displayValue(entry.nextSteps)}`,
         `Checklist completion: ${entry.checklistCompletedSteps || 0}/${entry.checklistTotalSteps || 0}`,
         `Step rating: ${renderStars(entry.stepRating || 1)} (${entry.stepRating || 1}/5)`,
         "",
@@ -191,24 +196,26 @@ function WorkSearchLogPage() {
             <article key={entry.id} className="result stack">
               <div className="title-row">
                 <h3>
-                  #{index + 1} · {entry.firstName}
+                  #{index + 1} · {displayValue(entry.firstName, "Unknown")}
                 </h3>
                 <span className="muted">
                   Logged: {new Date(entry.loggedAt).toLocaleTimeString()}
                 </span>
               </div>
               <p>
-                <strong>Reason for call:</strong> {entry.reasonForCall}
+                <strong>Reason for call:</strong>{" "}
+                {displayValue(entry.reasonForCall)}
               </p>
               <p>
-                <strong>Actions taken:</strong> {entry.actionsTaken}
+                <strong>Actions taken:</strong>{" "}
+                {displayValue(entry.actionsTaken)}
               </p>
               <p>
                 <strong>Important information:</strong>{" "}
-                {entry.importantInformation}
+                {displayValue(entry.importantInformation)}
               </p>
               <p>
-                <strong>Next steps:</strong> {entry.nextSteps}
+                <strong>Next steps:</strong> {displayValue(entry.nextSteps)}
               </p>
               <p>
                 <strong>Checklist completion:</strong>{" "}

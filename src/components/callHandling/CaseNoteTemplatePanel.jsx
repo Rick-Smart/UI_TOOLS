@@ -7,12 +7,12 @@ function applySentenceCase(value) {
 }
 
 function CaseNoteTemplatePanel({
-  interactionMemoryLength,
   handleRefreshCaseTemplate,
   handleCopyCaseNoteTemplate,
   handleAppendCapturedDetails,
   handleClearCapturedDetails,
   noteCopyStatus,
+  capturedDetailsCount,
   agentName,
   setAgentName,
   caseNoteDraft,
@@ -32,23 +32,6 @@ function CaseNoteTemplatePanel({
         Fillable case note template
         <Tooltip text="Template includes required note fields and can pull copied summaries from other tools used during this interaction." />
       </h3>
-      <p className="muted">
-        Use Copy summary on tools during the call, then select Refresh template
-        to pull those details here.
-      </p>
-      <p className="muted">
-        Selecting Copy case note also captures a daily synopsis entry for the
-        Work Search Log when required note fields are completed.
-      </p>
-      <p className="muted">
-        Captured tool summaries: <strong>{interactionMemoryLength}</strong>
-      </p>
-      <p className="muted">
-        Tip: If spellcheck is not underlining typos, in Chrome open
-        chrome://settings/languages, turn on Spell check, enable English (United
-        States), then right-click inside the case note field and confirm
-        spellcheck is enabled.
-      </p>
       <div className="compact-grid">
         <label htmlFor="agent-name-input">
           Agent name
@@ -67,6 +50,7 @@ function CaseNoteTemplatePanel({
           type="button"
           className="button-secondary"
           onClick={handleRefreshCaseTemplate}
+          title="Refreshes the template and pulls in copied tool summaries for this interaction."
         >
           Refresh template
         </button>
@@ -74,6 +58,7 @@ function CaseNoteTemplatePanel({
           type="button"
           className="button-secondary"
           onClick={handleCopyCaseNoteTemplate}
+          title="Copies the current case note and captures a daily synopsis entry when required fields are complete."
         >
           Copy case note
         </button>
@@ -81,6 +66,7 @@ function CaseNoteTemplatePanel({
           type="button"
           className="button-secondary"
           onClick={handleAppendCapturedDetails}
+          title={`Adds copied tool summaries to the case note. Captured summaries available: ${capturedDetailsCount}.`}
         >
           Add captured details
         </button>
@@ -88,6 +74,7 @@ function CaseNoteTemplatePanel({
           type="button"
           className="button-secondary"
           onClick={handleClearCapturedDetails}
+          title="Removes the Tool Results section from the case note draft."
         >
           Clear captured details
         </button>
@@ -98,7 +85,7 @@ function CaseNoteTemplatePanel({
       <div className="call-note-editor">
         <label htmlFor="case-note-template">
           Case note draft
-          <Tooltip text="Spellcheck is enabled in this field. Review for policy accuracy before finalizing in system notes." />
+          <Tooltip text="Spellcheck is enabled in this field. If typos are not underlined in Chrome, enable Spell check in language settings and verify spellcheck in the editor context menu." />
         </label>
         <textarea
           id="case-note-template"
