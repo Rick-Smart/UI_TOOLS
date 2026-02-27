@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
 import Tooltip from "../components/Tooltip";
+import { copyText } from "../utils/copyText";
+import { addInteractionMemory } from "../utils/interactionMemory";
 
 const cards = [
   {
@@ -86,6 +88,7 @@ const cards = [
 
 function AgentResponseCardsPage() {
   const [query, setQuery] = useState("");
+  const [copyStatus, setCopyStatus] = useState("");
 
   const filtered = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -99,6 +102,24 @@ function AgentResponseCardsPage() {
         card.response.toLowerCase().includes(normalized),
     );
   }, [query]);
+
+  async function handleCopySummary() {
+    const topCards = filtered
+      .slice(0, 5)
+      .map((card) => `- ${card.title}: ${card.response}`);
+    const summary = [
+      `Agent card query: ${query.trim() || "(none)"}`,
+      `Matched cards: ${filtered.length}`,
+      "Top response cards:",
+      ...(topCards.length ? topCards : ["- No matching cards"]),
+    ].join("\n");
+
+    const copied = await copyText(summary);
+    if (copied) {
+      addInteractionMemory("Agent Response Cards", summary);
+    }
+    setCopyStatus(copied ? "Summary copied." : "Copy unavailable.");
+  }
 
   return (
     <section className="card stack">
@@ -123,6 +144,17 @@ function AgentResponseCardsPage() {
           onChange={(event) => setQuery(event.target.value)}
           placeholder="Search topic or keyword"
         />
+      </div>
+
+      <div className="actions-row">
+        <button
+          type="button"
+          className="button-secondary"
+          onClick={handleCopySummary}
+        >
+          Copy summary
+        </button>
+        {copyStatus ? <span className="muted">{copyStatus}</span> : null}
       </div>
 
       <div className="tools-grid" aria-live="polite">

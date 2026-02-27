@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
 import Tooltip from "../components/Tooltip";
+import { copyText } from "../utils/copyText";
 import { documentReferences } from "../data/documentReferences";
+import { addInteractionMemory } from "../utils/interactionMemory";
 
 function normalizeDocNumber(value) {
   return value.trim().toUpperCase();
@@ -12,6 +14,7 @@ function buildAzdesSearchUrl(value) {
 
 function DocumentSearchPage() {
   const [query, setQuery] = useState("");
+  const [copyStatus, setCopyStatus] = useState("");
   const normalizedQuery = normalizeDocNumber(query);
 
   const matchingDocs = useMemo(() => {
@@ -30,6 +33,24 @@ function DocumentSearchPage() {
   const searchUrl = normalizedQuery
     ? buildAzdesSearchUrl(normalizedQuery)
     : "https://des.az.gov/documents-center";
+
+  async function handleCopySummary() {
+    const topMatches = matchingDocs
+      .slice(0, 5)
+      .map((doc) => `- ${doc.number}: ${doc.title}`);
+    const summary = [
+      `Document search query: ${normalizedQuery || "(none)"}`,
+      `Matches: ${matchingDocs.length}`,
+      "Top matches:",
+      ...(topMatches.length ? topMatches : ["- No matches found"]),
+    ].join("\n");
+
+    const copied = await copyText(summary);
+    if (copied) {
+      addInteractionMemory("Document Search", summary);
+    }
+    setCopyStatus(copied ? "Summary copied." : "Copy unavailable.");
+  }
 
   return (
     <section className="card stack">
@@ -75,6 +96,14 @@ function DocumentSearchPage() {
         >
           Open Documents Center
         </a>
+        <button
+          type="button"
+          className="button-secondary"
+          onClick={handleCopySummary}
+        >
+          Copy summary
+        </button>
+        {copyStatus ? <span className="muted">{copyStatus}</span> : null}
       </div>
 
       <div className="docs-grid" aria-live="polite">

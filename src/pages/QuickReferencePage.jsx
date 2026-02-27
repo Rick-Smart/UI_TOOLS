@@ -1,7 +1,10 @@
+import { useState } from "react";
 import { documentReferences } from "../data/documentReferences";
 import { defaultLinks } from "../data/defaultLinks";
 import { topActions } from "../data/topActions";
 import { trendsTips } from "../data/trendsTips";
+import { copyText } from "../utils/copyText";
+import { addInteractionMemory } from "../utils/interactionMemory";
 
 function isActive(item) {
   if (!item.expiresOn) {
@@ -13,6 +16,26 @@ function isActive(item) {
 }
 
 function QuickReferencePage({ tools = [] }) {
+  const [copyStatus, setCopyStatus] = useState("");
+
+  async function handleCopySummary() {
+    const summary = [
+      `Top actions: ${topActions.length}`,
+      `Tool directory entries: ${tools.length}`,
+      `Document references: ${documentReferences.length}`,
+      `Key links: ${defaultLinks.length}`,
+      `Active trends/tips: ${trendsTips.filter(isActive).length}`,
+      "",
+      "Quick reference snapshot generated.",
+    ].join("\n");
+
+    const copied = await copyText(summary);
+    if (copied) {
+      addInteractionMemory("Printable Quick Reference", summary);
+    }
+    setCopyStatus(copied ? "Summary copied." : "Copy unavailable.");
+  }
+
   return (
     <section className="card stack print-friendly">
       <div className="title-row">
@@ -26,6 +49,14 @@ function QuickReferencePage({ tools = [] }) {
         <button type="button" onClick={() => window.print()}>
           Print view
         </button>
+        <button
+          type="button"
+          className="button-secondary"
+          onClick={handleCopySummary}
+        >
+          Copy summary
+        </button>
+        {copyStatus ? <span className="muted">{copyStatus}</span> : null}
       </div>
 
       <div className="result stack">

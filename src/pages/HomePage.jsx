@@ -36,7 +36,14 @@ function HomePage() {
       <div className="tools-grid home-tools-grid">
         {homeCards.map((card) => (
           <article key={card.to} className="tool-card">
-            <h3>{card.title}</h3>
+            <div className="title-row">
+              <h3>{card.title}</h3>
+              {card.audience ? (
+                <span className={`audience-badge audience-${card.audience}`}>
+                  {card.audience === "agent" ? "Agent" : "Claimant"}
+                </span>
+              ) : null}
+            </div>
             <p className="muted">{card.description}</p>
             <Link className="button-link" to={card.to}>
               Open tool

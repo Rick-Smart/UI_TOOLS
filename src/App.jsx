@@ -179,7 +179,12 @@ function App() {
               `nav-link ${isActive ? "nav-link-active" : ""}`
             }
           >
-            {item.label}
+            <span className="nav-link-label">{item.label}</span>
+            {item.audience ? (
+              <span className={`audience-badge audience-${item.audience}`}>
+                {item.audience === "agent" ? "Agent" : "Claimant"}
+              </span>
+            ) : null}
           </NavLink>
         ))}
       </nav>

@@ -1,9 +1,12 @@
 import { useMemo, useState } from "react";
 import Tooltip from "../components/Tooltip";
 import { uiTerms } from "../data/uiTerms";
+import { copyText } from "../utils/copyText";
+import { addInteractionMemory } from "../utils/interactionMemory";
 
 function TermsGlossaryPage() {
   const [query, setQuery] = useState("");
+  const [copyStatus, setCopyStatus] = useState("");
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -18,6 +21,24 @@ function TermsGlossaryPage() {
         item.definition.toLowerCase().includes(q),
     );
   }, [query]);
+
+  async function handleCopySummary() {
+    const topTerms = filtered
+      .slice(0, 5)
+      .map((item) => `- ${item.term} (${item.short}): ${item.definition}`);
+    const summary = [
+      `Terms query: ${query.trim() || "(none)"}`,
+      `Matched terms: ${filtered.length}`,
+      "Top terms:",
+      ...(topTerms.length ? topTerms : ["- No matching terms"]),
+    ].join("\n");
+
+    const copied = await copyText(summary);
+    if (copied) {
+      addInteractionMemory("UI Terms & Acronyms", summary);
+    }
+    setCopyStatus(copied ? "Summary copied." : "Copy unavailable.");
+  }
 
   return (
     <section className="card stack">
@@ -46,6 +67,17 @@ function TermsGlossaryPage() {
 
       <div className="result" aria-live="polite">
         {filtered.length} term(s)
+      </div>
+
+      <div className="actions-row">
+        <button
+          type="button"
+          className="button-secondary"
+          onClick={handleCopySummary}
+        >
+          Copy summary
+        </button>
+        {copyStatus ? <span className="muted">{copyStatus}</span> : null}
       </div>
 
       <div className="table-wrap">

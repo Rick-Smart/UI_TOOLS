@@ -1,5 +1,7 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { trendsTips } from "../data/trendsTips";
+import { copyText } from "../utils/copyText";
+import { addInteractionMemory } from "../utils/interactionMemory";
 
 const priorityRank = {
   high: 0,
@@ -17,6 +19,8 @@ function isActive(item) {
 }
 
 function TrendsTipsPage() {
+  const [copyStatus, setCopyStatus] = useState("");
+
   const activeItems = useMemo(() => {
     return [...trendsTips].filter(isActive).sort((a, b) => {
       const priorityCompare =
@@ -28,6 +32,26 @@ function TrendsTipsPage() {
       return new Date(b.effectiveDate) - new Date(a.effectiveDate);
     });
   }, []);
+
+  async function handleCopySummary() {
+    const summaryLines = activeItems
+      .slice(0, 5)
+      .map(
+        (item) =>
+          `- ${item.title} (${item.priority}) | ${item.type} | ${item.message}`,
+      );
+    const summary = [
+      `Active trends/tips: ${activeItems.length}`,
+      "Top active items:",
+      ...(summaryLines.length ? summaryLines : ["- No active items"]),
+    ].join("\n");
+
+    const copied = await copyText(summary);
+    if (copied) {
+      addInteractionMemory("Trends, Tips & Suggestions", summary);
+    }
+    setCopyStatus(copied ? "Summary copied." : "Copy unavailable.");
+  }
 
   return (
     <section className="card stack">
@@ -44,6 +68,16 @@ function TrendsTipsPage() {
       </div>
 
       <div className="stack" aria-live="polite">
+        <div className="actions-row">
+          <button
+            type="button"
+            className="button-secondary"
+            onClick={handleCopySummary}
+          >
+            Copy summary
+          </button>
+          {copyStatus ? <span className="muted">{copyStatus}</span> : null}
+        </div>
         {activeItems.map((item) => (
           <article key={item.id} className="result stack">
             <div className="title-row">

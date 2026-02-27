@@ -17,46 +17,6 @@ import WorkSearchLogPage from "../pages/WorkSearchLogPage";
 
 export const toolRegistry = [
   {
-    path: "/base-period",
-    navLabel: "Base Period",
-    title: "Base Period Calculator",
-    description:
-      "Calculate base and lag quarters using UIB-1240A calendar-quarter rules.",
-    microGuide:
-      "Enter filing date, then read the base period and lag quarter results in order.",
-    component: BasePeriodPage,
-  },
-  {
-    path: "/weekly-payable",
-    navLabel: "Weekly Payable",
-    title: "Weekly Payable Estimator",
-    description:
-      "Estimate weekly payable amount using the $160 earnings disregard and reduction rule.",
-    microGuide:
-      "Enter WBA and weekly earnings to get estimated payable amount for that week.",
-    component: WeeklyPayablePage,
-  },
-  {
-    path: "/monetary-eligibility",
-    navLabel: "Monetary Eligibility",
-    title: "Monetary Eligibility Screener",
-    description:
-      "Check both monetary qualification pathways using base-period wages.",
-    microGuide:
-      "Enter minimum wage and quarter wages to see pass/fail across both pathways.",
-    component: MonetaryEligibilityPage,
-  },
-  {
-    path: "/benefit-award",
-    navLabel: "Benefit Award",
-    title: "Benefit Award Estimator",
-    description:
-      "Estimate weekly benefit amount and max award with 24x/26x cap logic.",
-    microGuide:
-      "Enter quarter wages and unemployment-rate toggle to estimate WBA and max award.",
-    component: BenefitAwardPage,
-  },
-  {
     path: "/call-handling",
     navLabel: "Call Handling",
     title: "Call Handling Guide",
@@ -65,16 +25,7 @@ export const toolRegistry = [
     microGuide:
       "Use this page during live calls for scripts, note standards, and step-by-step checklist completion.",
     component: CallHandlingPage,
-  },
-  {
-    path: "/appeals-helper",
-    navLabel: "Appeals",
-    title: "Appeals Deadline Helper",
-    description:
-      "Calculate appeal windows and filing-date reminders by decision type.",
-    microGuide:
-      "Select decision type and date to calculate the estimated appeal deadline.",
-    component: AppealsHelperPage,
+    audience: "agent",
   },
   {
     path: "/work-search-log",
@@ -85,6 +36,7 @@ export const toolRegistry = [
     microGuide:
       "Capture first name, reason, actions, important info, and next steps for each call.",
     component: WorkSearchLogPage,
+    audience: "agent",
   },
   {
     path: "/program-triage",
@@ -95,6 +47,7 @@ export const toolRegistry = [
     microGuide:
       "Check all applicable conditions and review the suggested program path list.",
     component: ProgramTriagePage,
+    audience: "agent",
   },
   {
     path: "/agent-cards",
@@ -105,6 +58,7 @@ export const toolRegistry = [
     microGuide:
       "Search by topic and use the matching card language for consistent communication.",
     component: AgentResponseCardsPage,
+    audience: "agent",
   },
   {
     path: "/self-help",
@@ -115,36 +69,62 @@ export const toolRegistry = [
     microGuide:
       "Follow login steps, use profile navigation guidance, and reference the EIN location screenshots.",
     component: SelfHelpGuidePage,
+    audience: "agent",
   },
   {
-    path: "/terms",
-    navLabel: "Terms",
-    title: "UI Terms & Acronyms",
+    path: "/base-period",
+    navLabel: "Base Period",
+    title: "Base Period Calculator",
     description:
-      "Search common terms and approved shorthand used during UI claimant support.",
+      "Calculate base and lag quarters using UIB-1240A calendar-quarter rules.",
     microGuide:
-      "Search by term or abbreviation to quickly confirm definitions.",
-    component: TermsGlossaryPage,
+      "Enter filing date, then read the base period and lag quarter results in order.",
+    component: BasePeriodPage,
+    audience: "claimant",
   },
   {
-    path: "/doc-search",
-    navLabel: "Doc Search",
-    title: "Document Search",
+    path: "/monetary-eligibility",
+    navLabel: "Monetary Eligibility",
+    title: "Monetary Eligibility Screener",
     description:
-      "Search AZDES by document number and open official source pages directly.",
+      "Check both monetary qualification pathways using base-period wages.",
     microGuide:
-      "Enter document number, then use source/search links to open official references.",
-    component: DocumentSearchPage,
+      "Enter minimum wage and quarter wages to see pass/fail across both pathways.",
+    component: MonetaryEligibilityPage,
+    audience: "claimant",
   },
   {
-    path: "/links",
-    navLabel: "Quick Links",
-    title: "Quick Links",
+    path: "/benefit-award",
+    navLabel: "Benefit Award",
+    title: "Benefit Award Estimator",
     description:
-      "Keep frequently used AZDES UI links in one managed list saved in your browser.",
+      "Estimate weekly benefit amount and max award with 24x/26x cap logic.",
     microGuide:
-      "Use defaults or add your own links; updates are saved in local browser storage.",
-    component: LinksPage,
+      "Enter quarter wages and unemployment-rate toggle to estimate WBA and max award.",
+    component: BenefitAwardPage,
+    audience: "claimant",
+  },
+  {
+    path: "/weekly-payable",
+    navLabel: "Weekly Payable",
+    title: "Weekly Payable Estimator",
+    description:
+      "Estimate weekly payable amount using the $160 earnings disregard and reduction rule.",
+    microGuide:
+      "Enter WBA and weekly earnings to get estimated payable amount for that week.",
+    component: WeeklyPayablePage,
+    audience: "claimant",
+  },
+  {
+    path: "/appeals-helper",
+    navLabel: "Appeals",
+    title: "Appeals Deadline Helper",
+    description:
+      "Calculate appeal windows and filing-date reminders by decision type.",
+    microGuide:
+      "Select decision type and date to calculate the estimated appeal deadline.",
+    component: AppealsHelperPage,
+    audience: "claimant",
   },
   {
     path: "/date-helper",
@@ -155,6 +135,40 @@ export const toolRegistry = [
     microGuide:
       "Enter start date and offset days to calculate a target date instantly.",
     component: DateHelperPage,
+    audience: "claimant",
+  },
+  {
+    path: "/doc-search",
+    navLabel: "Doc Search",
+    title: "Document Search",
+    description:
+      "Search AZDES by document number and open official source pages directly.",
+    microGuide:
+      "Enter document number, then use source/search links to open official references.",
+    component: DocumentSearchPage,
+    audience: "claimant",
+  },
+  {
+    path: "/terms",
+    navLabel: "Terms",
+    title: "UI Terms & Acronyms",
+    description:
+      "Search common terms and approved shorthand used during UI claimant support.",
+    microGuide:
+      "Search by term or abbreviation to quickly confirm definitions.",
+    component: TermsGlossaryPage,
+    audience: "agent",
+  },
+  {
+    path: "/links",
+    navLabel: "Quick Links",
+    title: "Quick Links",
+    description:
+      "Keep frequently used AZDES UI links in one managed list saved in your browser.",
+    microGuide:
+      "Use defaults or add your own links; updates are saved in local browser storage.",
+    component: LinksPage,
+    audience: "claimant",
   },
   {
     path: "/trends-tips",
@@ -165,6 +179,7 @@ export const toolRegistry = [
     microGuide:
       "Review active guidance items sorted by priority and effective date.",
     component: TrendsTipsPage,
+    audience: "agent",
   },
   {
     path: "/quick-reference",
@@ -174,16 +189,22 @@ export const toolRegistry = [
       "Print-ready summary of top actions, tools, document references, and active tips.",
     microGuide: "Use print view for supervisor huddles and team floor support.",
     component: QuickReferencePage,
+    audience: "agent",
   },
 ];
 
 export const navItems = [
   { to: "/", label: "Home", end: true },
-  ...toolRegistry.map((tool) => ({ to: tool.path, label: tool.navLabel })),
+  ...toolRegistry.map((tool) => ({
+    to: tool.path,
+    label: tool.navLabel,
+    audience: tool.audience,
+  })),
 ];
 
 export const homeCards = toolRegistry.map((tool) => ({
   to: tool.path,
   title: tool.title,
   description: tool.description,
+  audience: tool.audience,
 }));
