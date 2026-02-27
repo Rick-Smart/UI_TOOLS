@@ -27,11 +27,16 @@ import {
   clearInteractionMemory,
   formatInteractionMemory,
   getInteractionMemory,
+  subscribeInteractionMemory,
 } from "../utils/interactionMemory";
 
 const CASE_NOTE_DRAFT_KEY = "azdes.callHandling.caseNoteDraft";
 const CUSTOM_SCRIPTS_KEY = "azdes.callHandling.customScripts";
 const AGENT_NAME_KEY = "azdes.callHandling.agentName";
+const CHECKLIST_SECTION_START = "[[Checklist Auto-Log Start]]";
+const CHECKLIST_SECTION_END = "[[Checklist Auto-Log End]]";
+const CAPTURED_DETAILS_SECTION_START = "[[Captured Tool Details Start]]";
+const CAPTURED_DETAILS_SECTION_END = "[[Captured Tool Details End]]";
 
 const scriptTypeOptions = [
   { key: "inboundGreeting", label: "Greeting (Inbound)" },
@@ -139,7 +144,99 @@ function buildCapturedDetailsSection(memoryItems) {
     return "";
   }
 
-  return `\n\nCaptured tool details:\n${formatInteractionMemory(memoryItems)}`;
+  return [
+    CAPTURED_DETAILS_SECTION_START,
+    "Captured tool details:",
+    formatInteractionMemory(memoryItems),
+    CAPTURED_DETAILS_SECTION_END,
+  ].join("\n");
+}
+
+function stripCapturedDetailsSection(caseNoteDraft) {
+  let output = String(caseNoteDraft || "");
+  let start = output.indexOf(CAPTURED_DETAILS_SECTION_START);
+
+  while (start !== -1) {
+    const endMarkerIndex = output.indexOf(CAPTURED_DETAILS_SECTION_END, start);
+    if (endMarkerIndex === -1) {
+      output = output.slice(0, start);
+      break;
+    }
+
+    const end = endMarkerIndex + CAPTURED_DETAILS_SECTION_END.length;
+    const removeStart =
+      start > 0 && output[start - 1] === "\n" ? start - 1 : start;
+    const removeEnd =
+      end < output.length && output[end] === "\n" ? end + 1 : end;
+
+    output = `${output.slice(0, removeStart)}${output.slice(removeEnd)}`;
+    start = output.indexOf(CAPTURED_DETAILS_SECTION_START);
+  }
+
+  return output.trimEnd();
+}
+
+function syncCapturedDetailsSection(caseNoteDraft, memoryItems) {
+  const baseDraft = stripCapturedDetailsSection(caseNoteDraft);
+  const capturedSection = buildCapturedDetailsSection(memoryItems);
+  if (!capturedSection) {
+    return baseDraft;
+  }
+
+  return `${baseDraft}\n\n${capturedSection}`;
+}
+
+function stripChecklistSection(caseNoteDraft) {
+  let output = String(caseNoteDraft || "");
+  let start = output.indexOf(CHECKLIST_SECTION_START);
+
+  while (start !== -1) {
+    const endMarkerIndex = output.indexOf(CHECKLIST_SECTION_END, start);
+    if (endMarkerIndex === -1) {
+      output = output.slice(0, start);
+      break;
+    }
+
+    const end = endMarkerIndex + CHECKLIST_SECTION_END.length;
+
+    const removeStart =
+      start > 0 && output[start - 1] === "\n" ? start - 1 : start;
+    const removeEnd =
+      end < output.length && output[end] === "\n" ? end + 1 : end;
+
+    output = `${output.slice(0, removeStart)}${output.slice(removeEnd)}`;
+    start = output.indexOf(CHECKLIST_SECTION_START);
+  }
+
+  return output.trimEnd();
+}
+
+function buildChecklistSection(checkState) {
+  const completedLines = orderedCallChecklist
+    .map((item, index) => ({ item, index }))
+    .filter((entry) => checkState[entry.index])
+    .map((entry) => `- Step ${entry.index + 1}: ${entry.item}`);
+
+  if (!completedLines.length) {
+    return "";
+  }
+
+  return [
+    CHECKLIST_SECTION_START,
+    "Checklist completed steps:",
+    ...completedLines,
+    CHECKLIST_SECTION_END,
+  ].join("\n");
+}
+
+function syncChecklistSection(caseNoteDraft, checkState) {
+  const baseDraft = stripChecklistSection(caseNoteDraft);
+  const checklistSection = buildChecklistSection(checkState);
+  if (!checklistSection) {
+    return baseDraft;
+  }
+
+  return `${baseDraft}\n\n${checklistSection}`;
 }
 
 function CallHandlingPage() {
@@ -168,7 +265,19 @@ function CallHandlingPage() {
   useEffect(() => {
     const memory = getInteractionMemory();
     setInteractionMemory(memory);
+
+    const unsubscribe = subscribeInteractionMemory((nextMemory) => {
+      setInteractionMemory(nextMemory);
+    });
+
+    return unsubscribe;
   }, []);
+
+  useEffect(() => {
+    setCaseNoteDraft((currentDraft) =>
+      syncCapturedDetailsSection(currentDraft, interactionMemory),
+    );
+  }, [interactionMemory]);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -306,9 +415,16 @@ function CallHandlingPage() {
   }, [selectedStep]);
 
   function toggleChecklist(index, checked) {
-    setCheckState((current) =>
-      current.map((item, itemIndex) => (itemIndex === index ? checked : item)),
-    );
+    setCheckState((current) => {
+      const nextState = current.map((item, itemIndex) =>
+        itemIndex === index ? checked : item,
+      );
+
+      setCaseNoteDraft((currentDraft) =>
+        syncChecklistSection(currentDraft, nextState),
+      );
+      return nextState;
+    });
   }
 
   async function handleCopyCloseScript() {
@@ -361,15 +477,9 @@ function CallHandlingPage() {
       return;
     }
 
-    const detailsSection = buildCapturedDetailsSection(memory);
-
-    setCaseNoteDraft((current) => {
-      if (current.includes(detailsSection.trim())) {
-        return current;
-      }
-
-      return `${current.trimEnd()}${detailsSection}`;
-    });
+    setCaseNoteDraft((currentDraft) =>
+      syncCapturedDetailsSection(currentDraft, memory),
+    );
     setNoteCopyStatus("Captured tool details added to case note.");
   }
 

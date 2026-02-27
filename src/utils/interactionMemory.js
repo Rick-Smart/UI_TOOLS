@@ -1,5 +1,6 @@
 const INTERACTION_MEMORY_KEY = "azdes.interactionMemory";
 const MAX_INTERACTION_ITEMS = 20;
+const INTERACTION_MEMORY_UPDATED_EVENT = "azdes:interaction-memory-updated";
 
 function isBrowser() {
   return typeof window !== "undefined";
@@ -49,6 +50,7 @@ export function addInteractionMemory(tool, summary) {
   const existing = getInteractionMemory();
   const next = [item, ...existing].slice(0, MAX_INTERACTION_ITEMS);
   window.localStorage.setItem(INTERACTION_MEMORY_KEY, JSON.stringify(next));
+  window.dispatchEvent(new Event(INTERACTION_MEMORY_UPDATED_EVENT));
 }
 
 export function clearInteractionMemory() {
@@ -57,6 +59,23 @@ export function clearInteractionMemory() {
   }
 
   window.localStorage.removeItem(INTERACTION_MEMORY_KEY);
+  window.dispatchEvent(new Event(INTERACTION_MEMORY_UPDATED_EVENT));
+}
+
+export function subscribeInteractionMemory(listener) {
+  if (!isBrowser()) {
+    return () => {};
+  }
+
+  const handleChange = () => {
+    listener(getInteractionMemory());
+  };
+
+  window.addEventListener(INTERACTION_MEMORY_UPDATED_EVENT, handleChange);
+
+  return () => {
+    window.removeEventListener(INTERACTION_MEMORY_UPDATED_EVENT, handleChange);
+  };
 }
 
 export function formatInteractionMemory(memoryItems) {
