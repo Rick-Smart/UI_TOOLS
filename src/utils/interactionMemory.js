@@ -48,7 +48,10 @@ export function addInteractionMemory(tool, summary) {
   };
 
   const existing = getInteractionMemory();
-  const next = [item, ...existing].slice(0, MAX_INTERACTION_ITEMS);
+  const withoutSameTool = existing.filter(
+    (entry) => String(entry.tool).toLowerCase() !== String(tool).toLowerCase(),
+  );
+  const next = [item, ...withoutSameTool].slice(0, MAX_INTERACTION_ITEMS);
   window.localStorage.setItem(INTERACTION_MEMORY_KEY, JSON.stringify(next));
   window.dispatchEvent(new Event(INTERACTION_MEMORY_UPDATED_EVENT));
 }
