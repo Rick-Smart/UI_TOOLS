@@ -1,4 +1,5 @@
 const MAX_SYNOPSIS_ITEMS = 100;
+const SYNOPSIS_TOTAL_FIELDS = 5;
 
 let dailySynopsisEntries = [];
 const listeners = new Set();
@@ -129,6 +130,20 @@ function toNumberOrZero(value) {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
 }
 
+function countCompletedSynopsisFields(entry) {
+  const values = [
+    entry?.firstName,
+    entry?.reasonForCall,
+    entry?.actionsTaken,
+    entry?.importantInformation,
+    entry?.nextSteps,
+  ];
+
+  return values.reduce((count, value) => {
+    return String(value || "").trim() ? count + 1 : count;
+  }, 0);
+}
+
 function calculateStepRating(completedSteps, totalSteps) {
   if (!totalSteps) {
     return 1;
@@ -165,10 +180,23 @@ export function addDailySynopsisEntry(entry) {
     entry?.checklistCompletedSteps,
   );
   const checklistTotalSteps = toNumberOrZero(entry?.checklistTotalSteps);
-  const stepRating = calculateStepRating(
+  const synopsisCompletedFields = countCompletedSynopsisFields({
+    firstName,
+    reasonForCall,
+    actionsTaken,
+    importantInformation,
+    nextSteps,
+  });
+  const hasPartialSynopsis =
+    synopsisCompletedFields > 0 &&
+    synopsisCompletedFields < SYNOPSIS_TOTAL_FIELDS;
+  const baseStepRating = calculateStepRating(
     checklistCompletedSteps,
     checklistTotalSteps,
   );
+  const stepRating = hasPartialSynopsis
+    ? Math.max(2, baseStepRating)
+    : baseStepRating;
 
   if (
     !hasAnySynopsisContent({
@@ -207,6 +235,8 @@ export function addDailySynopsisEntry(entry) {
     actionsTaken,
     importantInformation,
     nextSteps,
+    synopsisCompletedFields,
+    synopsisTotalFields: SYNOPSIS_TOTAL_FIELDS,
     checklistCompletedSteps,
     checklistTotalSteps,
     stepRating,

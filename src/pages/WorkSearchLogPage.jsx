@@ -108,6 +108,7 @@ function WorkSearchLogPage() {
         `Actions taken: ${displayValue(entry.actionsTaken)}`,
         `Important information: ${displayValue(entry.importantInformation)}`,
         `Next steps: ${displayValue(entry.nextSteps)}`,
+        `Field completion: ${entry.synopsisCompletedFields || 0}/${entry.synopsisTotalFields || 5}`,
         `Checklist completion: ${entry.checklistCompletedSteps || 0}/${entry.checklistTotalSteps || 0}`,
         `Step rating: ${renderStars(entry.stepRating || 1)} (${entry.stepRating || 1}/5)`,
         "",
@@ -221,6 +222,11 @@ function WorkSearchLogPage() {
                 <strong>Checklist completion:</strong>{" "}
                 {entry.checklistCompletedSteps || 0}/
                 {entry.checklistTotalSteps || 0}
+              </p>
+              <p>
+                <strong>Field completion:</strong>{" "}
+                {entry.synopsisCompletedFields || 0}/
+                {entry.synopsisTotalFields || 5}
               </p>
               <p>
                 <strong>Step rating:</strong>{" "}
