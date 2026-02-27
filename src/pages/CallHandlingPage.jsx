@@ -25,6 +25,7 @@ import { copyText } from "../utils/copyText";
 import { addDailySynopsisFromCaseNote } from "../utils/dailySynopsisMemory";
 import {
   clearInteractionMemory,
+  formatInteractionMemory,
   getInteractionMemory,
 } from "../utils/interactionMemory";
 
@@ -131,6 +132,14 @@ function getSavedCustomScripts() {
   } catch {
     return {};
   }
+}
+
+function buildCapturedDetailsSection(memoryItems) {
+  if (!memoryItems.length) {
+    return "";
+  }
+
+  return `\n\nCaptured tool details:\n${formatInteractionMemory(memoryItems)}`;
 }
 
 function CallHandlingPage() {
@@ -308,18 +317,60 @@ function CallHandlingPage() {
   }
 
   function handleRefreshCaseTemplate() {
+    const captureResult = addDailySynopsisFromCaseNote(caseNoteDraft);
     const memory = getInteractionMemory();
     setInteractionMemory(memory);
     setCheckState(orderedCallChecklist.map(() => false));
     setSelectedStep(0);
-    setCaseNoteDraft(buildCaseNoteTemplate(agentName));
-    setNoteCopyStatus("Template refreshed.");
+
+    const refreshedDraft =
+      buildCaseNoteTemplate(agentName) + buildCapturedDetailsSection(memory);
+    setCaseNoteDraft(refreshedDraft);
+
+    if (captureResult.added) {
+      setNoteCopyStatus(
+        "Template refreshed, prior case note saved, and tool details added.",
+      );
+      return;
+    }
+
+    if (captureResult.reason === "duplicate") {
+      setNoteCopyStatus(
+        "Template refreshed. Prior case note already matched the latest daily synopsis entry.",
+      );
+      return;
+    }
+
+    setNoteCopyStatus(
+      "Template refreshed. Complete Claimant, Reason, Actions, Important information, and Next steps before refresh to save a daily synopsis.",
+    );
   }
 
   function handleClearCapturedDetails() {
     clearInteractionMemory();
     setInteractionMemory([]);
     setNoteCopyStatus("Captured tool details cleared.");
+  }
+
+  function handleAppendCapturedDetails() {
+    const memory = getInteractionMemory();
+    setInteractionMemory(memory);
+
+    if (!memory.length) {
+      setNoteCopyStatus("No captured tool details to add yet.");
+      return;
+    }
+
+    const detailsSection = buildCapturedDetailsSection(memory);
+
+    setCaseNoteDraft((current) => {
+      if (current.includes(detailsSection.trim())) {
+        return current;
+      }
+
+      return `${current.trimEnd()}${detailsSection}`;
+    });
+    setNoteCopyStatus("Captured tool details added to case note.");
   }
 
   async function handleCopyCaseNoteTemplate() {
@@ -666,6 +717,7 @@ function CallHandlingPage() {
           interactionMemoryLength={interactionMemory.length}
           handleRefreshCaseTemplate={handleRefreshCaseTemplate}
           handleCopyCaseNoteTemplate={handleCopyCaseNoteTemplate}
+          handleAppendCapturedDetails={handleAppendCapturedDetails}
           handleClearCapturedDetails={handleClearCapturedDetails}
           noteCopyStatus={noteCopyStatus}
           agentName={agentName}

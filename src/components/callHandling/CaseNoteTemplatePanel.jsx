@@ -10,6 +10,7 @@ function CaseNoteTemplatePanel({
   interactionMemoryLength,
   handleRefreshCaseTemplate,
   handleCopyCaseNoteTemplate,
+  handleAppendCapturedDetails,
   handleClearCapturedDetails,
   noteCopyStatus,
   agentName,
@@ -75,6 +76,13 @@ function CaseNoteTemplatePanel({
           onClick={handleCopyCaseNoteTemplate}
         >
           Copy case note
+        </button>
+        <button
+          type="button"
+          className="button-secondary"
+          onClick={handleAppendCapturedDetails}
+        >
+          Add captured details
         </button>
         <button
           type="button"
