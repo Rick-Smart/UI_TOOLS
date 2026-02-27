@@ -36,6 +36,10 @@ function CaseNoteTemplatePanel({
         to pull those details here.
       </p>
       <p className="muted">
+        Selecting Copy case note also captures a daily synopsis entry for the
+        Work Search Log when required note fields are completed.
+      </p>
+      <p className="muted">
         Captured tool summaries: <strong>{interactionMemoryLength}</strong>
       </p>
       <p className="muted">

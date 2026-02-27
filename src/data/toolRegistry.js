@@ -79,11 +79,11 @@ export const toolRegistry = [
   {
     path: "/work-search-log",
     navLabel: "Work Search Log",
-    title: "Work Search Compliance Log",
+    title: "Daily Assistance Synopsis Log",
     description:
-      "Capture required work-search contact fields and 4-day minimum status.",
+      "Log a privacy-safe synopsis of claimants helped during the day.",
     microGuide:
-      "Add one entry per contact and verify four unique contact days before filing.",
+      "Capture first name, reason, actions, important info, and next steps for each call.",
     component: WorkSearchLogPage,
   },
   {

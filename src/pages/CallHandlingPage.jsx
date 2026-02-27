@@ -22,6 +22,7 @@ import CallChecklistPanel from "../components/callHandling/CallChecklistPanel";
 import CaseNoteTemplatePanel from "../components/callHandling/CaseNoteTemplatePanel";
 import CallRightRail from "../components/callHandling/CallRightRail";
 import { copyText } from "../utils/copyText";
+import { addDailySynopsisFromCaseNote } from "../utils/dailySynopsisMemory";
 import {
   clearInteractionMemory,
   getInteractionMemory,
@@ -323,8 +324,26 @@ function CallHandlingPage() {
 
   async function handleCopyCaseNoteTemplate() {
     const copied = await copyText(caseNoteDraft);
+    if (!copied) {
+      setNoteCopyStatus("Copy unavailable.");
+      return;
+    }
+
+    const captureResult = addDailySynopsisFromCaseNote(caseNoteDraft);
+    if (captureResult.added) {
+      setNoteCopyStatus("Case note copied and daily synopsis captured.");
+      return;
+    }
+
+    if (captureResult.reason === "duplicate") {
+      setNoteCopyStatus(
+        "Case note copied. Daily synopsis already matches latest entry.",
+      );
+      return;
+    }
+
     setNoteCopyStatus(
-      copied ? "Case note template copied." : "Copy unavailable.",
+      "Case note copied. Complete Claimant, Reason, Actions, Important information, and Next steps to capture synopsis.",
     );
   }
 
