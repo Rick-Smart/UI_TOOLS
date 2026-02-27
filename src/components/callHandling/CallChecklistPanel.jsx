@@ -28,12 +28,17 @@ function CallChecklistPanel({
             key={item}
             className={`call-step-row ${selectedStep === index ? "call-step-active" : ""}`}
           >
-            <input
-              type="checkbox"
-              checked={checkState[index]}
-              onChange={(event) => toggleChecklist(index, event.target.checked)}
-              aria-label={`Mark step ${index + 1} complete`}
-            />
+            <label className="call-step-checkbox-hit">
+              <input
+                className="call-step-checkbox"
+                type="checkbox"
+                checked={checkState[index]}
+                onChange={(event) =>
+                  toggleChecklist(index, event.target.checked)
+                }
+                aria-label={`Mark step ${index + 1} complete`}
+              />
+            </label>
             <button
               type="button"
               className="call-step-button"

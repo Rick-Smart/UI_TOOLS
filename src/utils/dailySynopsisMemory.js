@@ -30,6 +30,16 @@ function parseCaseNoteFields(caseNoteDraft) {
   for (const rawLine of lines) {
     const line = rawLine.trim();
 
+    if (
+      /^tool\s+results\s*:/i.test(line) ||
+      /^checklist\s+progress\s*:/i.test(line) ||
+      /^captured\s+tool\s+details\s*:/i.test(line) ||
+      /^\[\[/i.test(line)
+    ) {
+      activeField = "";
+      continue;
+    }
+
     if (/^claimant\s*:/i.test(line)) {
       activeField = "claimant";
       fieldMap.claimant = line.replace(/^claimant\s*:/i, "").trim();
@@ -93,6 +103,20 @@ function extractFirstName(claimantField) {
   return tokens[0].replace(/[^A-Za-z'-]/g, "");
 }
 
+function toNumberOrZero(value) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+}
+
+function calculateStepRating(completedSteps, totalSteps) {
+  if (!totalSteps) {
+    return 1;
+  }
+
+  const ratio = completedSteps / totalSteps;
+  return Math.max(1, Math.min(5, Math.round(ratio * 5)));
+}
+
 export function getDailySynopsisEntries() {
   return [...dailySynopsisEntries];
 }
@@ -115,6 +139,14 @@ export function addDailySynopsisEntry(entry) {
   const actionsTaken = String(entry?.actionsTaken || "").trim();
   const importantInformation = String(entry?.importantInformation || "").trim();
   const nextSteps = String(entry?.nextSteps || "").trim();
+  const checklistCompletedSteps = toNumberOrZero(
+    entry?.checklistCompletedSteps,
+  );
+  const checklistTotalSteps = toNumberOrZero(entry?.checklistTotalSteps);
+  const stepRating = calculateStepRating(
+    checklistCompletedSteps,
+    checklistTotalSteps,
+  );
 
   if (
     !firstName ||
@@ -136,7 +168,9 @@ export function addDailySynopsisEntry(entry) {
       normalizeComparison(actionsTaken) &&
     normalizeComparison(latest.importantInformation) ===
       normalizeComparison(importantInformation) &&
-    normalizeComparison(latest.nextSteps) === normalizeComparison(nextSteps)
+    normalizeComparison(latest.nextSteps) === normalizeComparison(nextSteps) &&
+    Number(latest.checklistCompletedSteps || 0) === checklistCompletedSteps &&
+    Number(latest.checklistTotalSteps || 0) === checklistTotalSteps
   ) {
     return { added: false, reason: "duplicate" };
   }
@@ -149,6 +183,9 @@ export function addDailySynopsisEntry(entry) {
     actionsTaken,
     importantInformation,
     nextSteps,
+    checklistCompletedSteps,
+    checklistTotalSteps,
+    stepRating,
   };
 
   dailySynopsisEntries = [nextEntry, ...dailySynopsisEntries].slice(
@@ -159,7 +196,7 @@ export function addDailySynopsisEntry(entry) {
   return { added: true, reason: "ok", entry: nextEntry };
 }
 
-export function addDailySynopsisFromCaseNote(caseNoteDraft) {
+export function addDailySynopsisFromCaseNote(caseNoteDraft, options = {}) {
   const fields = parseCaseNoteFields(caseNoteDraft);
   const firstName = extractFirstName(fields.claimant);
 
@@ -169,5 +206,7 @@ export function addDailySynopsisFromCaseNote(caseNoteDraft) {
     actionsTaken: fields.actionsTaken,
     importantInformation: fields.importantInformation,
     nextSteps: fields.nextSteps,
+    checklistCompletedSteps: options.checklistCompletedSteps,
+    checklistTotalSteps: options.checklistTotalSteps,
   });
 }

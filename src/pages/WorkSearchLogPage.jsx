@@ -7,6 +7,11 @@ import {
   subscribeDailySynopsis,
 } from "../utils/dailySynopsisMemory";
 
+function renderStars(rating) {
+  const safeRating = Math.max(1, Math.min(5, Number(rating) || 1));
+  return "★".repeat(safeRating) + "☆".repeat(5 - safeRating);
+}
+
 function WorkSearchLogPage() {
   const [entries, setEntries] = useState(getDailySynopsisEntries);
   const [copyStatus, setCopyStatus] = useState("");
@@ -39,6 +44,36 @@ function WorkSearchLogPage() {
       .map(([reason, count]) => ({ reason, count }));
   }, [entries]);
 
+  const interactionScorecard = useMemo(() => {
+    const scoredEntries = entries.filter((entry) =>
+      Number.isFinite(Number(entry?.checklistTotalSteps)),
+    );
+
+    if (!scoredEntries.length) {
+      return null;
+    }
+
+    const totals = scoredEntries.reduce(
+      (accumulator, entry) => {
+        accumulator.completed += Number(entry.checklistCompletedSteps || 0);
+        accumulator.total += Number(entry.checklistTotalSteps || 0);
+        accumulator.stars += Number(entry.stepRating || 1);
+        return accumulator;
+      },
+      { completed: 0, total: 0, stars: 0 },
+    );
+
+    const averageStars = totals.stars / scoredEntries.length;
+
+    return {
+      interactions: scoredEntries.length,
+      completed: totals.completed,
+      total: totals.total,
+      averageStars,
+      averageStarsText: renderStars(Math.round(averageStars)),
+    };
+  }, [entries]);
+
   function handleClearEntries() {
     clearDailySynopsis();
     setCopyStatus("");
@@ -53,6 +88,13 @@ function WorkSearchLogPage() {
     const lines = [
       "Daily Assistance Synopsis",
       `Entries logged: ${entries.length}`,
+      ...(interactionScorecard
+        ? [
+            `Scorecard interactions: ${interactionScorecard.interactions}`,
+            `Scorecard completion: ${interactionScorecard.completed}/${interactionScorecard.total}`,
+            `Scorecard average rating: ${interactionScorecard.averageStars.toFixed(1)}/5`,
+          ]
+        : []),
       "",
       ...entries.flatMap((entry, index) => [
         `#${index + 1}`,
@@ -61,6 +103,8 @@ function WorkSearchLogPage() {
         `Actions taken: ${entry.actionsTaken}`,
         `Important information: ${entry.importantInformation}`,
         `Next steps: ${entry.nextSteps}`,
+        `Checklist completion: ${entry.checklistCompletedSteps || 0}/${entry.checklistTotalSteps || 0}`,
+        `Step rating: ${renderStars(entry.stepRating || 1)} (${entry.stepRating || 1}/5)`,
         "",
       ]),
     ];
@@ -116,6 +160,31 @@ function WorkSearchLogPage() {
         </div>
       </div>
 
+      <div className="result stack" aria-live="polite">
+        <h3>
+          Interaction score card
+          <Tooltip text="Shows checklist completion quality per interaction using a 1-5 star score." />
+        </h3>
+        {interactionScorecard ? (
+          <>
+            <p>Scored interactions: {interactionScorecard.interactions}</p>
+            <p>
+              Steps completed: {interactionScorecard.completed}/
+              {interactionScorecard.total}
+            </p>
+            <p>
+              Average rating: {interactionScorecard.averageStarsText} (
+              {interactionScorecard.averageStars.toFixed(1)}/5)
+            </p>
+          </>
+        ) : (
+          <p className="muted">
+            No scored interactions yet. Ratings appear after a case note is
+            captured from Call Handling.
+          </p>
+        )}
+      </div>
+
       {entries.length ? (
         <div className="stack" aria-live="polite">
           {entries.map((entry, index) => (
@@ -140,6 +209,15 @@ function WorkSearchLogPage() {
               </p>
               <p>
                 <strong>Next steps:</strong> {entry.nextSteps}
+              </p>
+              <p>
+                <strong>Checklist completion:</strong>{" "}
+                {entry.checklistCompletedSteps || 0}/
+                {entry.checklistTotalSteps || 0}
+              </p>
+              <p>
+                <strong>Step rating:</strong>{" "}
+                {renderStars(entry.stepRating || 1)} ({entry.stepRating || 1}/5)
               </p>
             </article>
           ))}
