@@ -7,7 +7,12 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "kb:crawl": "node scripts/kb/crawl.mjs",
+    "kb:diff": "node scripts/kb/diff.mjs",
+    "kb:update": "node scripts/kb/update.mjs",
+    "kb:report": "node scripts/kb/report.mjs",
+    "kb:run": "node scripts/kb/run-all.mjs"
   },
   "dependencies": {
     "react": "^19.2.0",

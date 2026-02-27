@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AZUI Knowledge Base Entry",
+  "type": "object",
+  "required": [
+    "id",
+    "title",
+    "summary",
+    "topic",
+    "sourceUrl",
+    "sourceLastSeen",
+    "sourceHash",
+    "status"
+  ],
+  "properties": {
+    "id": { "type": "string" },
+    "title": { "type": "string" },
+    "summary": { "type": "string" },
+    "topic": { "type": "string" },
+    "steps": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "requiredDocuments": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "contacts": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "deadlines": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "relatedLinks": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "sourceUrl": { "type": "string" },
+    "sourceLastSeen": { "type": "string" },
+    "sourceHash": { "type": "string" },
+    "status": {
+      "type": "string",
+      "enum": ["active", "review", "deprecated"]
+    },
+    "changeNotes": { "type": "string" }
+  }
+}

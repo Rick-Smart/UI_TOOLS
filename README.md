@@ -34,3 +34,11 @@ This repo includes an automated workflow at [deploy-pages.yml](.github/workflows
 
 - App routing uses `HashRouter` to work reliably on static hosting.
 - Vite base is set to `./` in [vite.config.js](vite.config.js) for portable Pages builds.
+
+## Native KB workflow
+
+This repo includes a starter KB pipeline under [kb/README.md](kb/README.md) to support recurring source refreshes.
+
+- `npm run kb:run` executes `crawl -> diff -> update -> report`
+- Crawl scope and limits are controlled in [kb/config.json](kb/config.json)
+- Latest KB report is written to `kb/reports/latest.md`
