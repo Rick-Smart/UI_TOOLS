@@ -44,11 +44,40 @@ function toSummary(text = "") {
   return trimmed.endsWith(".") ? trimmed : `${trimmed}...`;
 }
 
+function inferTitleFromUrl(url) {
+  const noQuery = String(url || "").split("?")[0];
+  const segment = noQuery.split("/").filter(Boolean).pop() || "resource";
+  return segment
+    .replace(/[-_]+/g, " ")
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function hasUsableTitle(title) {
+  const normalized = String(title || "")
+    .trim()
+    .toLowerCase();
+  return (
+    Boolean(normalized) &&
+    normalized !== "fetch failed" &&
+    normalized !== "fetch error"
+  );
+}
+
+function isValidPage(page) {
+  return (
+    page &&
+    page.statusCode === 200 &&
+    String(page.title || "").toLowerCase() !== "fetch failed" &&
+    Boolean(page.text)
+  );
+}
+
 const bySource = new Map(
   existingKb.entries.map((entry) => [entry.sourceUrl, entry]),
 );
 const nextEntries = [];
 const now = toIsoNow();
+const linkLabelMap = crawl.linkLabelMap || {};
 
 for (const page of crawl.pages) {
   if (
@@ -58,6 +87,33 @@ for (const page of crawl.pages) {
   }
 
   const existing = bySource.get(page.url);
+
+  if (!isValidPage(page)) {
+    const label =
+      linkLabelMap[page.url] ||
+      (hasUsableTitle(existing?.title) ? existing.title : "") ||
+      inferTitleFromUrl(page.url) ||
+      "Cataloged Link";
+
+    nextEntries.push({
+      id: existing?.id || makeId(page.url),
+      title: label,
+      summary: `Cataloged URL only (crawl returned HTTP ${page.statusCode || "error"}).`,
+      topic: inferTopic(page.url, label),
+      steps: existing?.steps || [],
+      requiredDocuments: existing?.requiredDocuments || [],
+      contacts: existing?.contacts || [],
+      deadlines: existing?.deadlines || [],
+      relatedLinks: existing?.relatedLinks || [],
+      sourceUrl: page.url,
+      sourceLastSeen: now,
+      sourceHash: page.hash,
+      status: "link-only",
+      changeNotes:
+        "Page content could not be crawled; entry retained as a searchable link.",
+    });
+    continue;
+  }
 
   nextEntries.push({
     id: existing?.id || makeId(page.url),

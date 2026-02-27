@@ -81,3 +81,34 @@ export function extractLinks(html = "", pageUrl) {
 
   return [...new Set(links)];
 }
+
+export function extractLinkDetails(html = "", pageUrl) {
+  const details = [];
+  const anchorRegex = /<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi;
+  let match;
+
+  while ((match = anchorRegex.exec(html))) {
+    const rawHref = match[1]?.trim();
+    if (!rawHref || rawHref.startsWith("javascript:")) {
+      continue;
+    }
+
+    const absolute = safeUrl(rawHref, pageUrl);
+    if (!absolute) {
+      continue;
+    }
+
+    const text = stripHtml(match[2] || "")
+      .replace(/&amp;/g, "&")
+      .replace(/&nbsp;/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    details.push({
+      url: absolute.split("#")[0],
+      text,
+    });
+  }
+
+  return details;
+}

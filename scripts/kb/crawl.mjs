@@ -1,6 +1,7 @@
 import path from "node:path";
 import {
   ensureDir,
+  extractLinkDetails,
   extractLinks,
   extractTitle,
   hashText,
@@ -31,13 +32,52 @@ const {
 const visited = new Set();
 const queue = [...seedUrls];
 const pages = [];
+const linkLabelMap = {};
 const startedAt = toIsoNow();
+const fetchUserAgents = [
+  "azui-kb-bot/1.0",
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15",
+];
+
+async function fetchWithFallbackUserAgent(url) {
+  let lastResponse = null;
+
+  for (const userAgent of fetchUserAgents) {
+    const response = await fetch(url, {
+      headers: {
+        "User-Agent": userAgent,
+        Accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+      },
+    });
+
+    lastResponse = response;
+
+    if (response.ok || response.status !== 403) {
+      return response;
+    }
+  }
+
+  return lastResponse;
+}
 
 function isAllowed(url) {
   if (!allowPrefixes.some((prefix) => url.startsWith(prefix))) {
     return false;
   }
   return !excludePatterns.some((pattern) => url.includes(pattern));
+}
+
+function registerLinkLabel(url, label) {
+  const trimmed = String(label || "").trim();
+  if (!trimmed || trimmed.length < 3) {
+    return;
+  }
+
+  if (!linkLabelMap[url] || linkLabelMap[url].length < trimmed.length) {
+    linkLabelMap[url] = trimmed;
+  }
 }
 
 while (queue.length > 0 && pages.length < maxPages) {
@@ -50,11 +90,7 @@ while (queue.length > 0 && pages.length < maxPages) {
   visited.add(url);
 
   try {
-    const response = await fetch(url, {
-      headers: {
-        "User-Agent": "azui-kb-bot/1.0",
-      },
-    });
+    const response = await fetchWithFallbackUserAgent(url);
 
     const contentType = response.headers.get("content-type") || "";
     const fetchedAt = toIsoNow();
@@ -92,6 +128,11 @@ while (queue.length > 0 && pages.length < maxPages) {
     }
 
     const html = await response.text();
+    const linkDetails = extractLinkDetails(html, url);
+    for (const detail of linkDetails) {
+      registerLinkLabel(detail.url, detail.text);
+    }
+
     const links = extractLinks(html, url);
     const pdfLinks = includePdfLinks
       ? links.filter((link) => link.toLowerCase().includes(".pdf"))
@@ -156,6 +197,7 @@ writeJson(latestPath, {
   startedAt,
   completedAt: toIsoNow(),
   pageCount: pages.length,
+  linkLabelMap,
   pages,
 });
 

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-26T21:50:13.702Z",
+  "generatedAt": "2026-02-27T16:24:48.809Z",
   "entryCount": 34,
   "entries": [
     {
@@ -54,15 +54,15 @@
         "https://des.az.gov/sites/default/files/legacy/dl/HPZ-034-A-PF.pdf"
       ],
       "sourceUrl": "https://des.az.gov/services/employment/unemployment-individual",
-      "sourceLastSeen": "2026-02-26T21:50:13.702Z",
+      "sourceLastSeen": "2026-02-27T16:24:48.809Z",
       "sourceHash": "4e39bfb7b6e43c2e9bcb23090b395006c944d804108d14ed0c0357f7e1f06432",
       "status": "active",
       "changeNotes": ""
     },
     {
       "id": "kb_52bcdeaaf030",
-      "title": "Fetch Failed",
-      "summary": "Source imported. Summary pending review.",
+      "title": "Apply Ui Benefits",
+      "summary": "Cataloged URL only (crawl returned HTTP 403).",
       "topic": "General UI Benefits",
       "steps": [],
       "requiredDocuments": [],
@@ -70,15 +70,15 @@
       "deadlines": [],
       "relatedLinks": [],
       "sourceUrl": "https://des.az.gov/services/employment/unemployment-individual/apply-ui-benefits",
-      "sourceLastSeen": "2026-02-26T21:50:13.702Z",
+      "sourceLastSeen": "2026-02-27T16:24:48.809Z",
       "sourceHash": "d26eae87829adde551bf4b852f9da6b8c3c2db9b65b8b68870632a2db5f53e00",
-      "status": "active",
-      "changeNotes": ""
+      "status": "link-only",
+      "changeNotes": "Page content could not be crawled; entry retained as a searchable link."
     },
     {
       "id": "kb_ffb42c252c5e",
-      "title": "Fetch Failed",
-      "summary": "Source imported. Summary pending review.",
+      "title": "File Your Weekly Ui Claims",
+      "summary": "Cataloged URL only (crawl returned HTTP 403).",
       "topic": "Weekly Claims",
       "steps": [],
       "requiredDocuments": [],
@@ -86,15 +86,15 @@
       "deadlines": [],
       "relatedLinks": [],
       "sourceUrl": "https://des.az.gov/services/employment/unemployment-individual/file-your-weekly-ui-claims",
-      "sourceLastSeen": "2026-02-26T21:50:13.702Z",
+      "sourceLastSeen": "2026-02-27T16:24:48.809Z",
       "sourceHash": "d26eae87829adde551bf4b852f9da6b8c3c2db9b65b8b68870632a2db5f53e00",
-      "status": "active",
-      "changeNotes": ""
+      "status": "link-only",
+      "changeNotes": "Page content could not be crawled; entry retained as a searchable link."
     },
     {
       "id": "kb_550e400299f1",
-      "title": "Fetch Failed",
-      "summary": "Source imported. Summary pending review.",
+      "title": "Idme Identity Verification",
+      "summary": "Cataloged URL only (crawl returned HTTP 403).",
       "topic": "Identity Verification",
       "steps": [],
       "requiredDocuments": [],
@@ -102,10 +102,10 @@
       "deadlines": [],
       "relatedLinks": [],
       "sourceUrl": "https://des.az.gov/services/employment/unemployment-individual/idme-identity-verification",
-      "sourceLastSeen": "2026-02-26T21:50:13.702Z",
+      "sourceLastSeen": "2026-02-27T16:24:48.809Z",
       "sourceHash": "d26eae87829adde551bf4b852f9da6b8c3c2db9b65b8b68870632a2db5f53e00",
-      "status": "active",
-      "changeNotes": ""
+      "status": "link-only",
+      "changeNotes": "Page content could not be crawled; entry retained as a searchable link."
     },
     {
       "id": "kb_e0dbed8797a9",
@@ -150,15 +150,15 @@
         "https://des.az.gov/sites/default/files/media/Determination-of-Overpayment-Example.pdf"
       ],
       "sourceUrl": "https://des.az.gov/services/employment/unemployment-individual/overpayments/understanding-materials",
-      "sourceLastSeen": "2026-02-26T21:50:13.702Z",
+      "sourceLastSeen": "2026-02-27T16:24:48.809Z",
       "sourceHash": "d233c4aab72447384b726305e989385be01aced4737e9379962b99a9a817a0b6",
       "status": "active",
       "changeNotes": ""
     },
     {
       "id": "kb_9b230b86b99f",
-      "title": "Fetch Failed",
-      "summary": "Source imported. Summary pending review.",
+      "title": "Paying Back",
+      "summary": "Cataloged URL only (crawl returned HTTP 403).",
       "topic": "Overpayments",
       "steps": [],
       "requiredDocuments": [],
@@ -166,15 +166,15 @@
       "deadlines": [],
       "relatedLinks": [],
       "sourceUrl": "https://des.az.gov/services/employment/unemployment-individual/overpayments/paying-back",
-      "sourceLastSeen": "2026-02-26T21:50:13.702Z",
+      "sourceLastSeen": "2026-02-27T16:24:48.809Z",
       "sourceHash": "d26eae87829adde551bf4b852f9da6b8c3c2db9b65b8b68870632a2db5f53e00",
-      "status": "active",
-      "changeNotes": ""
+      "status": "link-only",
+      "changeNotes": "Page content could not be crawled; entry retained as a searchable link."
     },
     {
       "id": "kb_edfde4dd6826",
-      "title": "Fetch Failed",
-      "summary": "Source imported. Summary pending review.",
+      "title": "Help",
+      "summary": "Cataloged URL only (crawl returned HTTP 403).",
       "topic": "Overpayments",
       "steps": [],
       "requiredDocuments": [],
@@ -182,15 +182,15 @@
       "deadlines": [],
       "relatedLinks": [],
       "sourceUrl": "https://des.az.gov/services/employment/unemployment-individual/overpayments/help",
-      "sourceLastSeen": "2026-02-26T21:50:13.702Z",
+      "sourceLastSeen": "2026-02-27T16:24:48.809Z",
       "sourceHash": "d26eae87829adde551bf4b852f9da6b8c3c2db9b65b8b68870632a2db5f53e00",
-      "status": "active",
-      "changeNotes": ""
+      "status": "link-only",
+      "changeNotes": "Page content could not be crawled; entry retained as a searchable link."
     },
     {
       "id": "kb_dc0a6c9ca41a",
-      "title": "Fetch Failed",
-      "summary": "Source imported. Summary pending review.",
+      "title": "Faqs",
+      "summary": "Cataloged URL only (crawl returned HTTP 403).",
       "topic": "Overpayments",
       "steps": [],
       "requiredDocuments": [],
@@ -198,15 +198,15 @@
       "deadlines": [],
       "relatedLinks": [],
       "sourceUrl": "https://des.az.gov/services/employment/unemployment-individual/overpayments/faqs",
-      "sourceLastSeen": "2026-02-26T21:50:13.702Z",
+      "sourceLastSeen": "2026-02-27T16:24:48.809Z",
       "sourceHash": "d26eae87829adde551bf4b852f9da6b8c3c2db9b65b8b68870632a2db5f53e00",
-      "status": "active",
-      "changeNotes": ""
+      "status": "link-only",
+      "changeNotes": "Page content could not be crawled; entry retained as a searchable link."
     },
     {
       "id": "kb_3a9fe92aea95",
-      "title": "Fetch Failed",
-      "summary": "Source imported. Summary pending review.",
+      "title": "Reemployment Services And Eligibility Assessment Resea",
+      "summary": "Cataloged URL only (crawl returned HTTP 403).",
       "topic": "Eligibility",
       "steps": [],
       "requiredDocuments": [],
@@ -214,15 +214,15 @@
       "deadlines": [],
       "relatedLinks": [],
       "sourceUrl": "https://des.az.gov/services/employment/unemployment-individual/reemployment-services-and-eligibility-assessment-resea",
-      "sourceLastSeen": "2026-02-26T21:50:13.702Z",
+      "sourceLastSeen": "2026-02-27T16:24:48.809Z",
       "sourceHash": "d26eae87829adde551bf4b852f9da6b8c3c2db9b65b8b68870632a2db5f53e00",
-      "status": "active",
-      "changeNotes": ""
+      "status": "link-only",
+      "changeNotes": "Page content could not be crawled; entry retained as a searchable link."
     },
     {
       "id": "kb_00f022d21e43",
-      "title": "Fetch Failed",
-      "summary": "Source imported. Summary pending review.",
+      "title": "Income Tax Information Unemployment Benefits",
+      "summary": "Cataloged URL only (crawl returned HTTP 403).",
       "topic": "Tax",
       "steps": [],
       "requiredDocuments": [],
@@ -230,15 +230,15 @@
       "deadlines": [],
       "relatedLinks": [],
       "sourceUrl": "https://des.az.gov/services/employment/unemployment-individual/income-tax-information-unemployment-benefits",
-      "sourceLastSeen": "2026-02-26T21:50:13.702Z",
+      "sourceLastSeen": "2026-02-27T16:24:48.809Z",
       "sourceHash": "d26eae87829adde551bf4b852f9da6b8c3c2db9b65b8b68870632a2db5f53e00",
-      "status": "active",
-      "changeNotes": ""
+      "status": "link-only",
+      "changeNotes": "Page content could not be crawled; entry retained as a searchable link."
     },
     {
       "id": "kb_189e0995873d",
-      "title": "Fetch Failed",
-      "summary": "Source imported. Summary pending review.",
+      "title": "Eligibility Unemployment Insurance Benefits",
+      "summary": "Cataloged URL only (crawl returned HTTP 403).",
       "topic": "Eligibility",
       "steps": [],
       "requiredDocuments": [],
@@ -246,15 +246,15 @@
       "deadlines": [],
       "relatedLinks": [],
       "sourceUrl": "https://des.az.gov/services/employment/unemployment-individual/eligibility-unemployment-insurance-benefits",
-      "sourceLastSeen": "2026-02-26T21:50:13.702Z",
+      "sourceLastSeen": "2026-02-27T16:24:48.809Z",
       "sourceHash": "d26eae87829adde551bf4b852f9da6b8c3c2db9b65b8b68870632a2db5f53e00",
-      "status": "active",
-      "changeNotes": ""
+      "status": "link-only",
+      "changeNotes": "Page content could not be crawled; entry retained as a searchable link."
     },
     {
       "id": "kb_5020650fa6a1",
-      "title": "Fetch Failed",
-      "summary": "Source imported. Summary pending review.",
+      "title": "How Do I And Frequently Asked Questions",
+      "summary": "Cataloged URL only (crawl returned HTTP 403).",
       "topic": "General UI Benefits",
       "steps": [],
       "requiredDocuments": [],
@@ -262,15 +262,15 @@
       "deadlines": [],
       "relatedLinks": [],
       "sourceUrl": "https://des.az.gov/services/employment/unemployment-individual/how-do-i-and-frequently-asked-questions",
-      "sourceLastSeen": "2026-02-26T21:50:13.702Z",
+      "sourceLastSeen": "2026-02-27T16:24:48.809Z",
       "sourceHash": "d26eae87829adde551bf4b852f9da6b8c3c2db9b65b8b68870632a2db5f53e00",
-      "status": "active",
-      "changeNotes": ""
+      "status": "link-only",
+      "changeNotes": "Page content could not be crawled; entry retained as a searchable link."
     },
     {
       "id": "kb_4ec8e16699d7",
-      "title": "Fetch Failed",
-      "summary": "Source imported. Summary pending review.",
+      "title": "Forms Pamphlets",
+      "summary": "Cataloged URL only (crawl returned HTTP 403).",
       "topic": "General UI Benefits",
       "steps": [],
       "requiredDocuments": [],
@@ -278,15 +278,15 @@
       "deadlines": [],
       "relatedLinks": [],
       "sourceUrl": "https://des.az.gov/services/employment/unemployment-individual/forms-pamphlets",
-      "sourceLastSeen": "2026-02-26T21:50:13.702Z",
+      "sourceLastSeen": "2026-02-27T16:24:48.809Z",
       "sourceHash": "d26eae87829adde551bf4b852f9da6b8c3c2db9b65b8b68870632a2db5f53e00",
-      "status": "active",
-      "changeNotes": ""
+      "status": "link-only",
+      "changeNotes": "Page content could not be crawled; entry retained as a searchable link."
     },
     {
       "id": "kb_60f759d0a50f",
-      "title": "Fetch Failed",
-      "summary": "Source imported. Summary pending review.",
+      "title": "Contact AZUI",
+      "summary": "Cataloged URL only (crawl returned HTTP 403).",
       "topic": "General UI Benefits",
       "steps": [],
       "requiredDocuments": [],
@@ -294,15 +294,15 @@
       "deadlines": [],
       "relatedLinks": [],
       "sourceUrl": "https://des.az.gov/services/employment/unemployment-individual/contact-AZUI",
-      "sourceLastSeen": "2026-02-26T21:50:13.702Z",
+      "sourceLastSeen": "2026-02-27T16:24:48.809Z",
       "sourceHash": "d26eae87829adde551bf4b852f9da6b8c3c2db9b65b8b68870632a2db5f53e00",
-      "status": "active",
-      "changeNotes": ""
+      "status": "link-only",
+      "changeNotes": "Page content could not be crawled; entry retained as a searchable link."
     },
     {
       "id": "kb_a4744bee2d97",
-      "title": "Fetch Failed",
-      "summary": "Source imported. Summary pending review.",
+      "title": "Client Advocate",
+      "summary": "Cataloged URL only (crawl returned HTTP 403).",
       "topic": "General UI Benefits",
       "steps": [],
       "requiredDocuments": [],
@@ -310,15 +310,15 @@
       "deadlines": [],
       "relatedLinks": [],
       "sourceUrl": "https://des.az.gov/services/employment/unemployment-individual/contact-AZUI/client-advocate",
-      "sourceLastSeen": "2026-02-26T21:50:13.702Z",
+      "sourceLastSeen": "2026-02-27T16:24:48.809Z",
       "sourceHash": "d26eae87829adde551bf4b852f9da6b8c3c2db9b65b8b68870632a2db5f53e00",
-      "status": "active",
-      "changeNotes": ""
+      "status": "link-only",
+      "changeNotes": "Page content could not be crawled; entry retained as a searchable link."
     },
     {
       "id": "kb_12c3d533e664",
-      "title": "Fetch Failed",
-      "summary": "Source imported. Summary pending review.",
+      "title": "Unemployment Insurance Benefit Fraud",
+      "summary": "Cataloged URL only (crawl returned HTTP 403).",
       "topic": "Fraud",
       "steps": [],
       "requiredDocuments": [],
@@ -326,10 +326,10 @@
       "deadlines": [],
       "relatedLinks": [],
       "sourceUrl": "https://des.az.gov/services/employment/unemployment-individual/unemployment-insurance-benefit-fraud",
-      "sourceLastSeen": "2026-02-26T21:50:13.702Z",
+      "sourceLastSeen": "2026-02-27T16:24:48.809Z",
       "sourceHash": "d26eae87829adde551bf4b852f9da6b8c3c2db9b65b8b68870632a2db5f53e00",
-      "status": "active",
-      "changeNotes": ""
+      "status": "link-only",
+      "changeNotes": "Page content could not be crawled; entry retained as a searchable link."
     },
     {
       "id": "kb_10a38803144a",
@@ -374,15 +374,15 @@
         "https://des.az.gov/sites/default/files/media/UI-Fraud-Convictions-Quarterly-Report.pdf"
       ],
       "sourceUrl": "https://des.az.gov/services/employment/unemployment-individual/unemployment-insurance-benefit-fraud-convictions",
-      "sourceLastSeen": "2026-02-26T21:50:13.702Z",
+      "sourceLastSeen": "2026-02-27T16:24:48.809Z",
       "sourceHash": "b7c0e735c5d3bc796d92d9bee4f9484adcb9380e9e508fc84492baf8e8caea51",
       "status": "active",
       "changeNotes": ""
     },
     {
       "id": "kb_5bd8afa6f2cf",
-      "title": "Fetch Failed",
-      "summary": "Source imported. Summary pending review.",
+      "title": "Ui Benefits Compensation Fraud",
+      "summary": "Cataloged URL only (crawl returned HTTP 403).",
       "topic": "Fraud",
       "steps": [],
       "requiredDocuments": [],
@@ -390,15 +390,15 @@
       "deadlines": [],
       "relatedLinks": [],
       "sourceUrl": "https://des.az.gov/services/employment/unemployment-individual/ui-benefits-compensation-fraud",
-      "sourceLastSeen": "2026-02-26T21:50:13.702Z",
+      "sourceLastSeen": "2026-02-27T16:24:48.809Z",
       "sourceHash": "d26eae87829adde551bf4b852f9da6b8c3c2db9b65b8b68870632a2db5f53e00",
-      "status": "active",
-      "changeNotes": ""
+      "status": "link-only",
+      "changeNotes": "Page content could not be crawled; entry retained as a searchable link."
     },
     {
       "id": "kb_48339f9412f3",
-      "title": "Fetch Failed",
-      "summary": "Source imported. Summary pending review.",
+      "title": "Weekly Unemployment Insurance Benefit Claims Reported Earnings",
+      "summary": "Cataloged URL only (crawl returned HTTP 403).",
       "topic": "Weekly Claims",
       "steps": [],
       "requiredDocuments": [],
@@ -406,15 +406,15 @@
       "deadlines": [],
       "relatedLinks": [],
       "sourceUrl": "https://des.az.gov/services/employment/unemployment-individual/weekly-unemployment-insurance-benefit-claims-reported-earnings",
-      "sourceLastSeen": "2026-02-26T21:50:13.702Z",
+      "sourceLastSeen": "2026-02-27T16:24:48.809Z",
       "sourceHash": "d26eae87829adde551bf4b852f9da6b8c3c2db9b65b8b68870632a2db5f53e00",
-      "status": "active",
-      "changeNotes": ""
+      "status": "link-only",
+      "changeNotes": "Page content could not be crawled; entry retained as a searchable link."
     },
     {
       "id": "kb_c07a985fb05b",
-      "title": "Fetch Failed",
-      "summary": "Source imported. Summary pending review.",
+      "title": "Unemployment Insurance Benefits Appeals",
+      "summary": "Cataloged URL only (crawl returned HTTP 403).",
       "topic": "Appeals",
       "steps": [],
       "requiredDocuments": [],
@@ -422,15 +422,15 @@
       "deadlines": [],
       "relatedLinks": [],
       "sourceUrl": "https://des.az.gov/services/employment/unemployment-individual/unemployment-insurance-benefits-appeals",
-      "sourceLastSeen": "2026-02-26T21:50:13.702Z",
+      "sourceLastSeen": "2026-02-27T16:24:48.809Z",
       "sourceHash": "d26eae87829adde551bf4b852f9da6b8c3c2db9b65b8b68870632a2db5f53e00",
-      "status": "active",
-      "changeNotes": ""
+      "status": "link-only",
+      "changeNotes": "Page content could not be crawled; entry retained as a searchable link."
     },
     {
       "id": "kb_0275740b28f8",
-      "title": "Fetch Failed",
-      "summary": "Source imported. Summary pending review.",
+      "title": "Legal Representation",
+      "summary": "Cataloged URL only (crawl returned HTTP 403).",
       "topic": "Appeals",
       "steps": [],
       "requiredDocuments": [],
@@ -438,10 +438,10 @@
       "deadlines": [],
       "relatedLinks": [],
       "sourceUrl": "https://des.az.gov/services/employment/unemployment-individual/how-file-appeal-ui-benefits/legal-representation",
-      "sourceLastSeen": "2026-02-26T21:50:13.702Z",
+      "sourceLastSeen": "2026-02-27T16:24:48.809Z",
       "sourceHash": "d26eae87829adde551bf4b852f9da6b8c3c2db9b65b8b68870632a2db5f53e00",
-      "status": "active",
-      "changeNotes": ""
+      "status": "link-only",
+      "changeNotes": "Page content could not be crawled; entry retained as a searchable link."
     },
     {
       "id": "kb_926eb0f4746d",
@@ -486,15 +486,15 @@
         "https://des.az.gov/sites/default/files/legacy/dl/HPZ-034-A-PF.pdf"
       ],
       "sourceUrl": "https://des.az.gov/services/employment/unemployment-individual/1099-g-tax-forms",
-      "sourceLastSeen": "2026-02-26T21:50:13.702Z",
+      "sourceLastSeen": "2026-02-27T16:24:48.809Z",
       "sourceHash": "4d8184319b1b725162db74f1974ac8f5e1cfb2b1fbbc253e487bad20907e967a",
       "status": "active",
       "changeNotes": ""
     },
     {
       "id": "kb_cde4d2929bbb",
-      "title": "Fetch Failed",
-      "summary": "Source imported. Summary pending review.",
+      "title": "Applying Unemployment Insurance Benefits QAs",
+      "summary": "Cataloged URL only (crawl returned HTTP 403).",
       "topic": "General UI Benefits",
       "steps": [],
       "requiredDocuments": [],
@@ -502,15 +502,15 @@
       "deadlines": [],
       "relatedLinks": [],
       "sourceUrl": "https://des.az.gov/services/employment/unemployment-individual/applying-unemployment-insurance-benefits-QAs",
-      "sourceLastSeen": "2026-02-26T21:50:13.702Z",
+      "sourceLastSeen": "2026-02-27T16:24:48.809Z",
       "sourceHash": "d26eae87829adde551bf4b852f9da6b8c3c2db9b65b8b68870632a2db5f53e00",
-      "status": "active",
-      "changeNotes": ""
+      "status": "link-only",
+      "changeNotes": "Page content could not be crawled; entry retained as a searchable link."
     },
     {
       "id": "kb_4a936ad5c35c",
-      "title": "Fetch Failed",
-      "summary": "Source imported. Summary pending review.",
+      "title": "Weekly Unemployment Insurance Claims QAs",
+      "summary": "Cataloged URL only (crawl returned HTTP 403).",
       "topic": "Weekly Claims",
       "steps": [],
       "requiredDocuments": [],
@@ -518,15 +518,15 @@
       "deadlines": [],
       "relatedLinks": [],
       "sourceUrl": "https://des.az.gov/services/employment/unemployment-individual/weekly-unemployment-insurance-claims-QAs",
-      "sourceLastSeen": "2026-02-26T21:50:13.702Z",
+      "sourceLastSeen": "2026-02-27T16:24:48.809Z",
       "sourceHash": "d26eae87829adde551bf4b852f9da6b8c3c2db9b65b8b68870632a2db5f53e00",
-      "status": "active",
-      "changeNotes": ""
+      "status": "link-only",
+      "changeNotes": "Page content could not be crawled; entry retained as a searchable link."
     },
     {
       "id": "kb_126df45c6faf",
-      "title": "Fetch Failed",
-      "summary": "Source imported. Summary pending review.",
+      "title": "Electronic Payment Card",
+      "summary": "Cataloged URL only (crawl returned HTTP 403).",
       "topic": "General UI Benefits",
       "steps": [],
       "requiredDocuments": [],
@@ -534,15 +534,15 @@
       "deadlines": [],
       "relatedLinks": [],
       "sourceUrl": "https://des.az.gov/services/employment/unemployment-individual/unemployment-benefit/electronic-payment-card",
-      "sourceLastSeen": "2026-02-26T21:50:13.702Z",
+      "sourceLastSeen": "2026-02-27T16:24:48.809Z",
       "sourceHash": "d26eae87829adde551bf4b852f9da6b8c3c2db9b65b8b68870632a2db5f53e00",
-      "status": "active",
-      "changeNotes": ""
+      "status": "link-only",
+      "changeNotes": "Page content could not be crawled; entry retained as a searchable link."
     },
     {
       "id": "kb_479b82943d90",
-      "title": "Fetch Failed",
-      "summary": "Source imported. Summary pending review.",
+      "title": "Wage Statement Ub 107 Unemployment Insurance Benefits",
+      "summary": "Cataloged URL only (crawl returned HTTP 403).",
       "topic": "General UI Benefits",
       "steps": [],
       "requiredDocuments": [],
@@ -550,10 +550,10 @@
       "deadlines": [],
       "relatedLinks": [],
       "sourceUrl": "https://des.az.gov/services/employment/unemployment-individual/wage-statement-ub-107-unemployment-insurance-benefits",
-      "sourceLastSeen": "2026-02-26T21:50:13.702Z",
+      "sourceLastSeen": "2026-02-27T16:24:48.809Z",
       "sourceHash": "d26eae87829adde551bf4b852f9da6b8c3c2db9b65b8b68870632a2db5f53e00",
-      "status": "active",
-      "changeNotes": ""
+      "status": "link-only",
+      "changeNotes": "Page content could not be crawled; entry retained as a searchable link."
     },
     {
       "id": "kb_8e2c6889ca47",
@@ -603,15 +603,15 @@
         "https://des.az.gov/sites/default/files/legacy/dl/HPZ-034-A-PF.pdf"
       ],
       "sourceUrl": "https://des.az.gov/services/employment/unemployment-individual/unemployment-benefit/receiving-ui-benefits-faq",
-      "sourceLastSeen": "2026-02-26T21:50:13.702Z",
+      "sourceLastSeen": "2026-02-27T16:24:48.809Z",
       "sourceHash": "1cfdb4a0dde11491a728875b0f4017f00020cb461ec0dced62d08a472c3f48c6",
       "status": "active",
       "changeNotes": ""
     },
     {
       "id": "kb_35afb9cf6367",
-      "title": "Fetch Failed",
-      "summary": "Source imported. Summary pending review.",
+      "title": "Unemployment Insurance Weekly Claim Not Filed",
+      "summary": "Cataloged URL only (crawl returned HTTP 403).",
       "topic": "Weekly Claims",
       "steps": [],
       "requiredDocuments": [],
@@ -619,10 +619,10 @@
       "deadlines": [],
       "relatedLinks": [],
       "sourceUrl": "https://des.az.gov/services/employment/unemployment-individual/unemployment-insurance-weekly-claim-not-filed",
-      "sourceLastSeen": "2026-02-26T21:50:13.702Z",
+      "sourceLastSeen": "2026-02-27T16:24:48.809Z",
       "sourceHash": "d26eae87829adde551bf4b852f9da6b8c3c2db9b65b8b68870632a2db5f53e00",
-      "status": "active",
-      "changeNotes": ""
+      "status": "link-only",
+      "changeNotes": "Page content could not be crawled; entry retained as a searchable link."
     },
     {
       "id": "kb_70d64b733b2a",
@@ -667,7 +667,7 @@
         "https://des.az.gov/sites/default/files/legacy/dl/HPZ-034-A-PF.pdf"
       ],
       "sourceUrl": "https://des.az.gov/services/employment/unemployment-individual/az-ui-call-center-and-ui-benefit-systems-holiday-schedule",
-      "sourceLastSeen": "2026-02-26T21:50:13.702Z",
+      "sourceLastSeen": "2026-02-27T16:24:48.809Z",
       "sourceHash": "7283bd53145e216ccea2047c73e046b4fcbe1a895b1aebe171501ad8723b6ec1",
       "status": "active",
       "changeNotes": ""
@@ -716,15 +716,15 @@
         "https://des.az.gov/sites/default/files/dl/UB-108.pdf"
       ],
       "sourceUrl": "https://des.az.gov/services/employment/unemployment-individual/change-personal-information-unemployment-benefits",
-      "sourceLastSeen": "2026-02-26T21:50:13.702Z",
+      "sourceLastSeen": "2026-02-27T16:24:48.809Z",
       "sourceHash": "033d0f6f19d6ca49cdb11c1adbb56fdcabc7105f33b99c83e054d797e646c4b1",
       "status": "active",
       "changeNotes": ""
     },
     {
       "id": "kb_ae09b7640b05",
-      "title": "Fetch Failed",
-      "summary": "Source imported. Summary pending review.",
+      "title": "Arizona Employment Service Registration",
+      "summary": "Cataloged URL only (crawl returned HTTP 403).",
       "topic": "General UI Benefits",
       "steps": [],
       "requiredDocuments": [],
@@ -732,15 +732,15 @@
       "deadlines": [],
       "relatedLinks": [],
       "sourceUrl": "https://des.az.gov/services/employment/unemployment-individual/arizona-employment-service-registration",
-      "sourceLastSeen": "2026-02-26T21:50:13.702Z",
+      "sourceLastSeen": "2026-02-27T16:24:48.809Z",
       "sourceHash": "d26eae87829adde551bf4b852f9da6b8c3c2db9b65b8b68870632a2db5f53e00",
-      "status": "active",
-      "changeNotes": ""
+      "status": "link-only",
+      "changeNotes": "Page content could not be crawled; entry retained as a searchable link."
     },
     {
       "id": "kb_0310cac4ccfc",
-      "title": "Fetch Failed",
-      "summary": "Source imported. Summary pending review.",
+      "title": "Unemployment Insurance Benefits Definitions Base Period",
+      "summary": "Cataloged URL only (crawl returned HTTP 403).",
       "topic": "General UI Benefits",
       "steps": [],
       "requiredDocuments": [],
@@ -748,15 +748,15 @@
       "deadlines": [],
       "relatedLinks": [],
       "sourceUrl": "https://des.az.gov/services/employment/unemployment-individual/unemployment-insurance-benefits-definitions-base-period",
-      "sourceLastSeen": "2026-02-26T21:50:13.702Z",
+      "sourceLastSeen": "2026-02-27T16:24:48.809Z",
       "sourceHash": "d26eae87829adde551bf4b852f9da6b8c3c2db9b65b8b68870632a2db5f53e00",
-      "status": "active",
-      "changeNotes": ""
+      "status": "link-only",
+      "changeNotes": "Page content could not be crawled; entry retained as a searchable link."
     },
     {
       "id": "kb_1ef2bf126451",
-      "title": "Fetch Failed",
-      "summary": "Source imported. Summary pending review.",
+      "title": "Using Az Unemployment Insurance Call Center Phone System",
+      "summary": "Cataloged URL only (crawl returned HTTP 403).",
       "topic": "General UI Benefits",
       "steps": [],
       "requiredDocuments": [],
@@ -764,10 +764,10 @@
       "deadlines": [],
       "relatedLinks": [],
       "sourceUrl": "https://des.az.gov/services/employment/unemployment-individual/using-az-unemployment-insurance-call-center-phone-system",
-      "sourceLastSeen": "2026-02-26T21:50:13.702Z",
+      "sourceLastSeen": "2026-02-27T16:24:48.809Z",
       "sourceHash": "d26eae87829adde551bf4b852f9da6b8c3c2db9b65b8b68870632a2db5f53e00",
-      "status": "active",
-      "changeNotes": ""
+      "status": "link-only",
+      "changeNotes": "Page content could not be crawled; entry retained as a searchable link."
     },
     {
       "id": "kb_6a88d22a3734",
@@ -813,7 +813,7 @@
         "https://des.az.gov/sites/default/files/legacy/dl/HPZ-034-A-PF.pdf"
       ],
       "sourceUrl": "https://des.az.gov/services/employment/unemployment-individual/receiving-benefits/reporting-missing-payments",
-      "sourceLastSeen": "2026-02-26T21:50:13.702Z",
+      "sourceLastSeen": "2026-02-27T16:24:48.809Z",
       "sourceHash": "5f86a79c8bb951c92cadb0c5f82142f865756b2c522a88a54c5533da9f3075c3",
       "status": "active",
       "changeNotes": ""
