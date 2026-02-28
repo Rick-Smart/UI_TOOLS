@@ -3,6 +3,7 @@ import AppealsHelperPage from "../pages/AppealsHelperPage";
 import BasePeriodPage from "../pages/BasePeriodPage";
 import BenefitAwardPage from "../pages/BenefitAwardPage";
 import CallHandlingPage from "../pages/CallHandlingPage";
+import ClaimantResourcesPage from "../pages/ClaimantResourcesPage";
 import DateHelperPage from "../pages/DateHelperPage";
 import DocumentSearchPage from "../pages/DocumentSearchPage";
 import LinksPage from "../pages/LinksPage";
@@ -67,9 +68,20 @@ export const toolRegistry = [
     description:
       "Step-by-step login and profile guidance, including EIN lookup location and troubleshooting notes.",
     microGuide:
-      "Follow login steps, use profile navigation guidance, and reference the EIN location screenshots.",
+      "Use agent guidance for claimant login/profile support and troubleshooting.",
     component: SelfHelpGuidePage,
     audience: "agent",
+  },
+  {
+    path: "/claimant-resources",
+    navLabel: "Claimant Resources",
+    title: "Claimant Resources",
+    description:
+      "Claimant-facing self-help guides and resources that agents can share during support calls.",
+    microGuide:
+      "Open downloadable and embeddable claimant resources (PDFs/videos) to guide claimants.",
+    component: ClaimantResourcesPage,
+    audience: "claimant",
   },
   {
     path: "/base-period",
