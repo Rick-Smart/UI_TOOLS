@@ -33,9 +33,9 @@ export const toolRegistry = [
     navLabel: "Work Search Log",
     title: "Daily Assistance Synopsis Log",
     description:
-      "Log a privacy-safe synopsis of claimants helped during the day.",
+      "Capture redacted call summaries and operational completion details for claimants helped during the day.",
     microGuide:
-      "Capture first name, reason, actions, important info, and next steps for each call.",
+      "Auto-captures first name plus call summary fields from Call Handling, with PII/CPNI redacted and retained in the daily log.",
     component: WorkSearchLogPage,
     audience: "agent",
   },

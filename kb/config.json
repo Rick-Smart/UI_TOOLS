@@ -3,24 +3,19 @@
   "rootUrl": "https://des.az.gov",
   "seedUrls": [
     "https://des.az.gov/services/employment/unemployment-individual",
+    "https://des.az.gov/documents-center",
+    "https://des.az.gov/digital-library",
     "https://des.az.gov/sitemap"
   ],
-  "allowPrefixes": [
-    "https://des.az.gov/services/employment/unemployment-individual",
-    "https://des.az.gov/services/employment/cactus",
-    "https://des.az.gov/work-search",
-    "https://des.az.gov/ui-data-dashboard",
-    "https://des.az.gov/sitemap"
-  ],
+  "allowPrefixes": ["https://des.az.gov/"],
   "excludePatterns": [
     "/admin/",
-    "/search/",
     "/user/login",
     "/user/logout",
     "/user/register",
     "/user/password"
   ],
-  "crawlDelayMs": 10000,
-  "maxPages": 120,
+  "crawlDelayMs": 1000,
+  "maxPages": 1000,
   "includePdfLinks": true
 }

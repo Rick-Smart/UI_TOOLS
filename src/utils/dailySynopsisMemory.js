@@ -22,7 +22,9 @@ function hasAnySynopsisContent(entry) {
     String(entry?.reasonForCall || "").trim() ||
     String(entry?.actionsTaken || "").trim() ||
     String(entry?.importantInformation || "").trim() ||
-    String(entry?.nextSteps || "").trim(),
+    String(entry?.nextSteps || "").trim() ||
+    toNumberOrZero(entry?.checklistCompletedSteps) ||
+    toNumberOrZero(entry?.checklistTotalSteps),
   );
 }
 
@@ -112,6 +114,37 @@ function parseCaseNoteFields(caseNoteDraft) {
   return fieldMap;
 }
 
+function containsSensitivePattern(value) {
+  const text = String(value || "");
+
+  const patterns = [
+    /\b\d{3}[-\s]\d{2}[-\s]\d{4}\b/,
+    /\b\d{9}\b/,
+    /\b\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/,
+    /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i,
+    /\bpin\b\s*[:#-]?\s*\d{4,8}\b/i,
+  ];
+
+  return patterns.some((pattern) => pattern.test(text));
+}
+
+function redactSensitivePatterns(value) {
+  const text = String(value || "");
+  const redactMatch = (match) => match.replace(/[^\s]/g, "*");
+
+  const patterns = [
+    /\b\d{3}[-\s]\d{2}[-\s]\d{4}\b/g,
+    /\b\d{9}\b/g,
+    /\b\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/g,
+    /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi,
+    /\b(pin\b\s*[:#-]?\s*)\d{4,8}\b/gi,
+  ];
+
+  return patterns.reduce((output, pattern) => {
+    return output.replace(pattern, redactMatch);
+  }, text);
+}
+
 function extractFirstName(claimantField) {
   const tokens = String(claimantField || "")
     .trim()
@@ -176,6 +209,8 @@ export function addDailySynopsisEntry(entry) {
   const actionsTaken = String(entry?.actionsTaken || "").trim();
   const importantInformation = String(entry?.importantInformation || "").trim();
   const nextSteps = String(entry?.nextSteps || "").trim();
+  const redacted = Boolean(entry?.redacted);
+  const forceCapture = Boolean(entry?.forceCapture);
   const checklistCompletedSteps = toNumberOrZero(
     entry?.checklistCompletedSteps,
   );
@@ -199,12 +234,15 @@ export function addDailySynopsisEntry(entry) {
     : baseStepRating;
 
   if (
+    !forceCapture &&
     !hasAnySynopsisContent({
       firstName,
       reasonForCall,
       actionsTaken,
       importantInformation,
       nextSteps,
+      checklistCompletedSteps,
+      checklistTotalSteps,
     })
   ) {
     return { added: false, reason: "blank" };
@@ -212,8 +250,10 @@ export function addDailySynopsisEntry(entry) {
 
   const latest = dailySynopsisEntries[0];
   if (
+    !forceCapture &&
     latest &&
     normalizeComparison(latest.firstName) === normalizeComparison(firstName) &&
+    Boolean(latest.redacted) === redacted &&
     normalizeComparison(latest.reasonForCall) ===
       normalizeComparison(reasonForCall) &&
     normalizeComparison(latest.actionsTaken) ===
@@ -221,6 +261,7 @@ export function addDailySynopsisEntry(entry) {
     normalizeComparison(latest.importantInformation) ===
       normalizeComparison(importantInformation) &&
     normalizeComparison(latest.nextSteps) === normalizeComparison(nextSteps) &&
+    Number(latest.synopsisCompletedFields || 0) === synopsisCompletedFields &&
     Number(latest.checklistCompletedSteps || 0) === checklistCompletedSteps &&
     Number(latest.checklistTotalSteps || 0) === checklistTotalSteps
   ) {
@@ -235,6 +276,7 @@ export function addDailySynopsisEntry(entry) {
     actionsTaken,
     importantInformation,
     nextSteps,
+    redacted,
     synopsisCompletedFields,
     synopsisTotalFields: SYNOPSIS_TOTAL_FIELDS,
     checklistCompletedSteps,
@@ -249,15 +291,41 @@ export function addDailySynopsisEntry(entry) {
 
 export function addDailySynopsisFromCaseNote(caseNoteDraft, options = {}) {
   const fields = parseCaseNoteFields(caseNoteDraft);
-  const firstName = extractFirstName(fields.claimant);
+  const claimantForCapture = redactSensitivePatterns(fields.claimant);
+  const reasonForCall = redactSensitivePatterns(fields.reasonForCall);
+  const actionsTaken = redactSensitivePatterns(fields.actionsTaken);
+  const importantInformation = redactSensitivePatterns(
+    fields.importantInformation,
+  );
+  const nextSteps = redactSensitivePatterns(fields.nextSteps);
+  const hadSensitiveData = [
+    fields.claimant,
+    fields.reasonForCall,
+    fields.actionsTaken,
+    fields.importantInformation,
+    fields.nextSteps,
+  ].some((value) => containsSensitivePattern(value));
 
-  return addDailySynopsisEntry({
+  const firstName = extractFirstName(claimantForCapture);
+
+  const result = addDailySynopsisEntry({
     firstName,
-    reasonForCall: fields.reasonForCall,
-    actionsTaken: fields.actionsTaken,
-    importantInformation: fields.importantInformation,
-    nextSteps: fields.nextSteps,
+    reasonForCall,
+    actionsTaken,
+    importantInformation,
+    nextSteps,
+    redacted: hadSensitiveData,
+    forceCapture: options.forceCapture,
     checklistCompletedSteps: options.checklistCompletedSteps,
     checklistTotalSteps: options.checklistTotalSteps,
   });
+
+  if (!result.added) {
+    return result;
+  }
+
+  return {
+    ...result,
+    redacted: hadSensitiveData,
+  };
 }

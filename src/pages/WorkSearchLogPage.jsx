@@ -32,23 +32,6 @@ function WorkSearchLogPage() {
     return unsubscribe;
   }, [copyStatus]);
 
-  const callReasonSummary = useMemo(() => {
-    const counts = new Map();
-
-    entries.forEach((entry) => {
-      const key = entry.reasonForCall.trim().toLowerCase();
-      if (!key) {
-        return;
-      }
-      counts.set(key, (counts.get(key) || 0) + 1);
-    });
-
-    return Array.from(counts.entries())
-      .sort((left, right) => right[1] - left[1])
-      .slice(0, 3)
-      .map(([reason, count]) => ({ reason, count }));
-  }, [entries]);
-
   const interactionScorecard = useMemo(() => {
     const scoredEntries = entries.filter((entry) =>
       Number.isFinite(Number(entry?.checklistTotalSteps)),
@@ -79,6 +62,10 @@ function WorkSearchLogPage() {
     };
   }, [entries]);
 
+  const redactedCount = useMemo(() => {
+    return entries.filter((entry) => entry.redacted).length;
+  }, [entries]);
+
   function handleClearEntries() {
     clearDailySynopsis();
     setCopyStatus("");
@@ -104,6 +91,7 @@ function WorkSearchLogPage() {
       ...entries.flatMap((entry, index) => [
         `#${index + 1}`,
         `First name: ${displayValue(entry.firstName, "Unknown")}`,
+        `Redaction applied: ${entry.redacted ? "Yes" : "No"}`,
         `Reason for call: ${displayValue(entry.reasonForCall)}`,
         `Actions taken: ${displayValue(entry.actionsTaken)}`,
         `Important information: ${displayValue(entry.importantInformation)}`,
@@ -133,19 +121,14 @@ function WorkSearchLogPage() {
       <div className="result stack" aria-live="polite">
         <h3>
           Daily status
-          <Tooltip text="This is a quick daily synopsis feed captured from Call Handling. Do not include last names, phone numbers, or email addresses in case notes." />
+          <Tooltip text="This feed captures call summary details and automatically redacts PII/CPNI patterns such as SSN, phone, email, and PIN values." />
         </h3>
         <p>People helped (synopses): {entries.length}</p>
-        {callReasonSummary.length ? (
-          <p>
-            Top reasons:{" "}
-            {callReasonSummary
-              .map((item) => `${item.reason} (${item.count})`)
-              .join(", ")}
-          </p>
-        ) : (
-          <p className="muted">No synopses captured yet.</p>
-        )}
+        <p>Entries with redaction applied: {redactedCount}</p>
+        <p className="muted">
+          Call details are retained with automatic redaction where sensitive
+          patterns are detected.
+        </p>
         <div className="actions-row">
           <button
             type="button"
@@ -203,6 +186,14 @@ function WorkSearchLogPage() {
                   Logged: {new Date(entry.loggedAt).toLocaleTimeString()}
                 </span>
               </div>
+              <p>
+                <strong>First name reference:</strong>{" "}
+                {displayValue(entry.firstName, "Unknown")}
+              </p>
+              <p>
+                <strong>Redaction applied:</strong>{" "}
+                {entry.redacted ? "Yes" : "No"}
+              </p>
               <p>
                 <strong>Reason for call:</strong>{" "}
                 {displayValue(entry.reasonForCall)}

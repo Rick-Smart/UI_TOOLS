@@ -34,6 +34,7 @@ import kbArticlesData from "../kb/data/articles.json";
 const TOOLTIP_LEGEND_DISMISSED_KEY = "azdes.tooltipLegendDismissed";
 const dataModules = import.meta.glob("./data/*.js", { eager: true });
 const autoIndexedDataItems = buildAutoIndexedDataItems(dataModules);
+const kbEntries = kbArticlesData?.entries ?? [];
 
 function getTooltipLegendDismissed() {
   if (typeof window === "undefined") {
@@ -73,8 +74,6 @@ function App() {
     getTooltipLegendDismissed,
   );
 
-  const kbEntries = kbArticlesData?.entries || [];
-
   useEffect(() => {
     return subscribeManagedLinks(setManagedLinks);
   }, []);
@@ -112,7 +111,7 @@ function App() {
       supportResources,
       contactInfo,
     });
-  }, [kbEntries, managedLinks, searchQuery]);
+  }, [managedLinks, searchQuery]);
 
   const focusedDocuments = useMemo(() => {
     return buildFocusedDocuments({
@@ -187,12 +186,25 @@ function App() {
             <span className="nav-link-label">{item.label}</span>
             {item.audience ? (
               <span className={`audience-badge audience-${item.audience}`}>
-                {item.audience === "agent" ? "Agent" : "Claimant"}
+                {item.audience === "agent" ? "Agent Tool" : "Claimant Support"}
               </span>
             ) : null}
           </NavLink>
         ))}
       </nav>
+
+      <section className="card stack" aria-label="Audience badge key">
+        <p className="muted section-copy">
+          Badge key:
+          <span className="audience-badge audience-agent">Agent Tool</span>
+          internal agent-only workflows and references.
+          <span className="audience-badge audience-claimant">
+            Claimant Support
+          </span>{" "}
+          tools used to answer claimant questions and guide claimant-facing
+          actions.
+        </p>
+      </section>
 
       {searchQuery.trim() ? (
         <section className="card stack" aria-live="polite">

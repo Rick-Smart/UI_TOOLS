@@ -254,7 +254,8 @@ function syncCapturedDetailsSection(caseNoteDraft, memoryItems, checkState) {
 function CallHandlingPage() {
   const [copyStatus, setCopyStatus] = useState("");
   const [noteCopyStatus, setNoteCopyStatus] = useState("");
-  const [interactionMemory, setInteractionMemory] = useState([]);
+  const [interactionMemory, setInteractionMemory] =
+    useState(getInteractionMemory);
   const [selectedStep, setSelectedStep] = useState(0);
   const [selectedScriptType, setSelectedScriptType] =
     useState("inboundGreeting");
@@ -280,21 +281,15 @@ function CallHandlingPage() {
   );
 
   useEffect(() => {
-    const memory = getInteractionMemory();
-    setInteractionMemory(memory);
-
     const unsubscribe = subscribeInteractionMemory((nextMemory) => {
       setInteractionMemory(nextMemory);
+      setCaseNoteDraft((currentDraft) =>
+        syncCapturedDetailsSection(currentDraft, nextMemory, checkState),
+      );
     });
 
     return unsubscribe;
-  }, []);
-
-  useEffect(() => {
-    setCaseNoteDraft((currentDraft) =>
-      syncCapturedDetailsSection(currentDraft, interactionMemory, checkState),
-    );
-  }, [interactionMemory, checkState]);
+  }, [checkState]);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -407,17 +402,15 @@ function CallHandlingPage() {
   );
 
   const activeScriptOptions = scriptCatalog[selectedScriptType] || [];
+  const selectedScriptIndex =
+    scriptIndex >= activeScriptOptions.length ? 0 : scriptIndex;
   const activeScript =
-    activeScriptOptions[scriptIndex] || activeScriptOptions[0] || null;
+    activeScriptOptions[selectedScriptIndex] || activeScriptOptions[0] || null;
 
-  useEffect(() => {
-    if (scriptIndex >= activeScriptOptions.length) {
-      setScriptIndex(0);
-    }
-  }, [activeScriptOptions.length, scriptIndex]);
+  function handleSelectStep(stepIndex) {
+    setSelectedStep(stepIndex);
 
-  useEffect(() => {
-    const suggestedType = stepScriptTypeMap[selectedStep];
+    const suggestedType = stepScriptTypeMap[stepIndex];
     if (!suggestedType) {
       return;
     }
@@ -426,7 +419,7 @@ function CallHandlingPage() {
       current === suggestedType ? current : suggestedType,
     );
     setScriptIndex(0);
-  }, [selectedStep]);
+  }
 
   function toggleChecklist(index, checked) {
     setCheckState((current) => {
@@ -448,6 +441,7 @@ function CallHandlingPage() {
 
   function handleRefreshCaseTemplate() {
     const captureResult = addDailySynopsisFromCaseNote(caseNoteDraft, {
+      forceCapture: true,
       checklistCompletedSteps: checklistCompletedCount,
       checklistTotalSteps: orderedCallChecklist.length,
     });
@@ -460,7 +454,9 @@ function CallHandlingPage() {
 
     if (captureResult.added) {
       setNoteCopyStatus(
-        "Template refreshed, prior case note saved, and captured tool details cleared for a new interaction.",
+        captureResult.redacted
+          ? "Template refreshed, prior case note saved with sensitive details redacted in synopsis capture, and captured tool details cleared for a new interaction."
+          : "Template refreshed, prior case note saved, and captured tool details cleared for a new interaction.",
       );
       return;
     }
@@ -506,11 +502,16 @@ function CallHandlingPage() {
     }
 
     const captureResult = addDailySynopsisFromCaseNote(caseNoteDraft, {
+      forceCapture: true,
       checklistCompletedSteps: checklistCompletedCount,
       checklistTotalSteps: orderedCallChecklist.length,
     });
     if (captureResult.added) {
-      setNoteCopyStatus("Case note copied and daily synopsis captured.");
+      setNoteCopyStatus(
+        captureResult.redacted
+          ? "Case note copied and daily synopsis captured with sensitive details redacted."
+          : "Case note copied and daily synopsis captured.",
+      );
       return;
     }
 
@@ -532,7 +533,9 @@ function CallHandlingPage() {
     }
 
     setScriptIndex((current) => {
-      const next = current + direction;
+      const safeCurrent =
+        current >= activeScriptOptions.length || current < 0 ? 0 : current;
+      const next = safeCurrent + direction;
       if (next < 0) {
         return activeScriptOptions.length - 1;
       }
@@ -828,7 +831,6 @@ function CallHandlingPage() {
             {callGuideMeta.program}
           </p>
         </div>
-        <span className="pill">Guide access restored</span>
       </div>
 
       <section className="call-workspace">
@@ -838,7 +840,7 @@ function CallHandlingPage() {
           selectedStep={selectedStep}
           checkState={checkState}
           toggleChecklist={toggleChecklist}
-          setSelectedStep={setSelectedStep}
+          setSelectedStep={handleSelectStep}
         />
 
         <CaseNoteTemplatePanel
@@ -869,7 +871,7 @@ function CallHandlingPage() {
           activeScript={activeScript}
           handleRemoveCurrentCustomScript={handleRemoveCurrentCustomScript}
           activeScriptOptions={activeScriptOptions}
-          scriptIndex={scriptIndex}
+          scriptIndex={selectedScriptIndex}
           handleResetCustomScriptsForType={handleResetCustomScriptsForType}
           handleResetAllCustomScripts={handleResetAllCustomScripts}
           newCustomScript={newCustomScript}

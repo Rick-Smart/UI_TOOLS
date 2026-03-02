@@ -159,16 +159,19 @@ function SelfHelpGuidePage() {
   const [expandedTopic, setExpandedTopic] = useState(DEFAULT_TOPIC);
   const normalizedQuery = findQuery.trim().toLowerCase();
 
-  const workflowInstructionSets = [
-    {
-      heading: "Login steps",
-      steps: selfHelpGuideContent.loginSteps,
-    },
-    {
-      heading: "EIN lookup in Profile",
-      steps: selfHelpGuideContent.einLookupSteps,
-    },
-  ];
+  const workflowInstructionSets = useMemo(
+    () => [
+      {
+        heading: "Login steps",
+        steps: selfHelpGuideContent.loginSteps,
+      },
+      {
+        heading: "EIN lookup in Profile",
+        steps: selfHelpGuideContent.einLookupSteps,
+      },
+    ],
+    [],
+  );
 
   const filteredWorkflowInstructionSets = useMemo(() => {
     if (!normalizedQuery) {
@@ -191,7 +194,7 @@ function SelfHelpGuidePage() {
         (set) =>
           set.steps.length || includesQuery(normalizedQuery, set.heading),
       );
-  }, [normalizedQuery]);
+  }, [normalizedQuery, workflowInstructionSets]);
 
   const filteredTroubleshootingNotes = useMemo(() => {
     if (activeType !== "all" && activeType !== "notes") {

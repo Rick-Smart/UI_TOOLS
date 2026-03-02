@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import Tooltip from "../components/Tooltip";
 import { copyText } from "../utils/copyText";
@@ -6,40 +6,38 @@ import { addInteractionMemory } from "../utils/interactionMemory";
 
 function ProgramTriagePage() {
   const [searchParams] = useSearchParams();
-  const [answers, setAnswers] = useState({
-    federalEmployee: false,
-    exMilitaryOrNoaa: false,
-    multiStateWages: false,
-    approvedTraining: false,
-    sharedWork: false,
-    workersCompInjury: false,
-    laborDispute: false,
-    disasterDeclared: false,
-    tradeImpacted: false,
-  });
-  const [copyStatus, setCopyStatus] = useState("");
-
-  useEffect(() => {
+  const [answers, setAnswers] = useState(() => {
     const preset = searchParams.get("preset");
-    if (!preset) {
-      return;
-    }
+    const defaults = {
+      federalEmployee: false,
+      exMilitaryOrNoaa: false,
+      multiStateWages: false,
+      approvedTraining: false,
+      sharedWork: false,
+      workersCompInjury: false,
+      laborDispute: false,
+      disasterDeclared: false,
+      tradeImpacted: false,
+    };
 
     if (preset === "federal-military") {
-      setAnswers((current) => ({
-        ...current,
+      return {
+        ...defaults,
         federalEmployee: true,
         exMilitaryOrNoaa: true,
-      }));
+      };
     }
 
     if (preset === "disaster") {
-      setAnswers((current) => ({
-        ...current,
+      return {
+        ...defaults,
         disasterDeclared: true,
-      }));
+      };
     }
-  }, [searchParams]);
+
+    return defaults;
+  });
+  const [copyStatus, setCopyStatus] = useState("");
 
   function setAnswer(field, value) {
     setAnswers((current) => ({ ...current, [field]: value }));

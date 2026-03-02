@@ -40,7 +40,9 @@ function HomePage() {
               <h3>{card.title}</h3>
               {card.audience ? (
                 <span className={`audience-badge audience-${card.audience}`}>
-                  {card.audience === "agent" ? "Agent" : "Claimant"}
+                  {card.audience === "agent"
+                    ? "Agent Tool"
+                    : "Claimant Support"}
                 </span>
               ) : null}
             </div>
