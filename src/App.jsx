@@ -125,7 +125,7 @@ function App() {
   return (
     <main className="page stack">
       <header className="stack header-block">
-        <h1>AZDES UI Toolbox</h1>
+        <h1>AZDES UI Knowledge Base</h1>
         <p className="subtitle">
           Multi-page workspace for AZDES UI tools and shared links.
         </p>
