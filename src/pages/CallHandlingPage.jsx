@@ -254,6 +254,32 @@ function CallHandlingPage() {
   );
 
   useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    window.dispatchEvent(
+      new CustomEvent("azdes.callHandling.checklist-progress", {
+        detail: {
+          completed: checklistCompletedCount,
+          total: orderedCallChecklist.length,
+        },
+      }),
+    );
+
+    return () => {
+      window.dispatchEvent(
+        new CustomEvent("azdes.callHandling.checklist-progress", {
+          detail: {
+            completed: 0,
+            total: orderedCallChecklist.length,
+          },
+        }),
+      );
+    };
+  }, [checklistCompletedCount]);
+
+  useEffect(() => {
     const unsubscribe = subscribeInteractionMemory((nextMemory) => {
       setInteractionMemory(nextMemory);
       setCaseNoteDraft((currentDraft) =>

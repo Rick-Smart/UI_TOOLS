@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import TopBar from "../TopBar/TopBar";
 import SidebarNav from "../SidebarNav/SidebarNav";
 import AppButton from "../../ui/AppButton/AppButton";
+import AgentPetHost from "../../integrations/AgentPetHost";
 import "./PageTemplate.css";
 
 const SIDEBAR_VISIBLE_KEY = "azdes.sidebarVisible";
@@ -77,6 +78,8 @@ function PageTemplate({
       <div className="app-shell">
         <section className="app-content stack">{children}</section>
       </div>
+
+      <AgentPetHost />
 
       <div
         className={`sidebar-overlay ${isSidebarVisible ? "sidebar-overlay-open" : ""}`}

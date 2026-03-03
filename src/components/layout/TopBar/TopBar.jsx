@@ -1,5 +1,14 @@
+import { useEffect, useMemo, useState } from "react";
 import Tooltip from "../../Tooltip";
 import AppButton from "../../ui/AppButton/AppButton";
+import {
+  choosePet,
+  dismissPet,
+  getPetCatalog,
+  getPetStateForCurrentAgent,
+  showPet,
+  subscribePetState,
+} from "../../../utils/petBridge";
 import "./TopBar.css";
 
 function TopBar({
@@ -11,6 +20,19 @@ function TopBar({
   isSidebarVisible,
   onToggleSidebar,
 }) {
+  const [petState, setPetState] = useState(getPetStateForCurrentAgent);
+  const petCatalog = useMemo(() => getPetCatalog(), []);
+
+  useEffect(() => {
+    return subscribePetState((nextState) => {
+      setPetState(nextState);
+    });
+  }, []);
+
+  const showPetControls = Boolean(petState?.profile?.unlocked);
+  const isPetVisible = Boolean(petState?.profile?.enabled);
+  const selectedPetId = petState?.profile?.selectedPetId || "";
+
   return (
     <header className="top-bar" aria-label="Application top bar">
       <div className="top-bar-left">
@@ -51,35 +73,76 @@ function TopBar({
         </span>
       </div>
 
-      {isTooltipLegendDismissed ? (
-        <AppButton
-          type="button"
-          className="tooltip-legend-restore"
-          onClick={onShowTips}
-        >
-          Show tips
-        </AppButton>
-      ) : (
-        <div
-          className="tooltip-legend muted"
-          role="note"
-          aria-label="Tooltip help legend"
-        >
-          <span className="tooltip-badge" aria-hidden="true">
-            ?
-          </span>
-          Use <strong>?</strong> for guidance. Press <strong>Esc</strong> to
-          close tips.
+      <div className="top-bar-actions">
+        {showPetControls ? (
+          <div className="top-bar-pet-menu" aria-label="Pet controls">
+            <span className="pill">Pet</span>
+            <label className="sr-only" htmlFor="pet-selector">
+              Choose pet
+            </label>
+            <select
+              id="pet-selector"
+              className="top-bar-pet-select"
+              value={selectedPetId}
+              onChange={(event) => choosePet(event.target.value)}
+            >
+              <option value="">Choose pet</option>
+              {petCatalog.map((pet) => (
+                <option key={pet.id} value={pet.id}>
+                  {pet.name}
+                </option>
+              ))}
+            </select>
+            {isPetVisible ? (
+              <AppButton
+                type="button"
+                className="button-secondary"
+                onClick={dismissPet}
+              >
+                Dismiss pet
+              </AppButton>
+            ) : (
+              <AppButton
+                type="button"
+                className="button-secondary"
+                onClick={showPet}
+              >
+                Show pet
+              </AppButton>
+            )}
+          </div>
+        ) : null}
+
+        {isTooltipLegendDismissed ? (
           <AppButton
             type="button"
-            className="tooltip-legend-close"
-            onClick={onDismissTips}
-            aria-label="Dismiss tooltip help legend"
+            className="tooltip-legend-restore"
+            onClick={onShowTips}
           >
-            Dismiss
+            Show tips
           </AppButton>
-        </div>
-      )}
+        ) : (
+          <div
+            className="tooltip-legend muted"
+            role="note"
+            aria-label="Tooltip help legend"
+          >
+            <span className="tooltip-badge" aria-hidden="true">
+              ?
+            </span>
+            Use <strong>?</strong> for guidance. Press <strong>Esc</strong> to
+            close tips.
+            <AppButton
+              type="button"
+              className="tooltip-legend-close"
+              onClick={onDismissTips}
+              aria-label="Dismiss tooltip help legend"
+            >
+              Dismiss
+            </AppButton>
+          </div>
+        )}
+      </div>
     </header>
   );
 }

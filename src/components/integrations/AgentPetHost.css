@@ -1,0 +1,17 @@
+.agent-pet-roamer-layer {
+  position: fixed;
+  inset: var(--header-offset) 0 0 0;
+  width: 100%;
+  height: calc(100vh - var(--header-offset));
+  border: 0;
+  background: transparent;
+  pointer-events: none;
+  z-index: 35;
+}
+
+.agent-pet-dev-fab {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 58;
+}

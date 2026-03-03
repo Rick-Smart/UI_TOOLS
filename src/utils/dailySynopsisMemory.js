@@ -1,3 +1,5 @@
+import { applySynopsisPetReward } from "./petBridge";
+
 const MAX_SYNOPSIS_ITEMS = 100;
 const SYNOPSIS_TOTAL_FIELDS = 5;
 
@@ -286,6 +288,9 @@ export function addDailySynopsisEntry(entry) {
 
   setEntries([nextEntry, ...dailySynopsisEntries]);
   emitChange();
+
+  applySynopsisPetReward(nextEntry);
+
   return { added: true, reason: "ok", entry: nextEntry };
 }
 
