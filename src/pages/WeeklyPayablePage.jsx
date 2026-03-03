@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import PageSection from "../components/layout/PageSection";
 import { copyText } from "../utils/copyText";
 import { addInteractionMemory } from "../utils/interactionMemory";
 
@@ -57,15 +58,10 @@ function WeeklyPayablePage() {
   }
 
   return (
-    <section className="card stack">
-      <div>
-        <h2>Weekly Payable Estimator</h2>
-        <p className="muted section-copy">
-          Uses UIB-1240A weekly earnings treatment: first $160 is excluded, and
-          each dollar above $160 reduces weekly payable benefits.
-        </p>
-      </div>
-
+    <PageSection
+      title="Weekly Payable Estimator"
+      description="Uses UIB-1240A weekly earnings treatment: first $160 is excluded, and each dollar above $160 reduces weekly payable benefits."
+    >
       <div className="input-grid compact-grid">
         <div>
           <label htmlFor="wba">Weekly benefit amount (WBA)</label>
@@ -145,7 +141,7 @@ function WeeklyPayablePage() {
           </div>
         </div>
       )}
-    </section>
+    </PageSection>
   );
 }
 

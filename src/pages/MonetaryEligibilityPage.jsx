@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import PageSection from "../components/layout/PageSection";
 import Tooltip from "../components/Tooltip";
 import { copyText } from "../utils/copyText";
 import { addInteractionMemory } from "../utils/interactionMemory";
@@ -69,15 +70,10 @@ function MonetaryEligibilityPage() {
   }
 
   return (
-    <section className="card stack">
-      <div>
-        <h2>Monetary Eligibility Screener</h2>
-        <p className="muted section-copy">
-          Screens monetary eligibility using UIB-1240A criteria. Enter current
-          Arizona minimum wage and base-period quarter wages.
-        </p>
-      </div>
-
+    <PageSection
+      title="Monetary Eligibility Screener"
+      description="Screens monetary eligibility using UIB-1240A criteria. Enter current Arizona minimum wage and base-period quarter wages."
+    >
       <div className="input-grid">
         <div>
           <label htmlFor="min-wage">
@@ -183,7 +179,7 @@ function MonetaryEligibilityPage() {
           </div>
         </div>
       )}
-    </section>
+    </PageSection>
   );
 }
 

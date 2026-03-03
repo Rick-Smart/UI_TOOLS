@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import PageSection from "../components/layout/PageSection";
 import Tooltip from "../components/Tooltip";
 import { uiTerms } from "../data/uiTerms";
 import { copyText } from "../utils/copyText";
@@ -41,16 +42,16 @@ function TermsGlossaryPage() {
   }
 
   return (
-    <section className="card stack">
-      <div>
-        <h2>UI Terms & Acronyms</h2>
-        <p className="muted section-copy">
+    <PageSection
+      title="UI Terms & Acronyms"
+      description={
+        <>
           Search common UI terms and approved shorthand to support clear
           claimant communication.
           <Tooltip text="Use this glossary to standardize language across agents and reduce conflicting explanations." />
-        </p>
-      </div>
-
+        </>
+      }
+    >
       <div className="compact-grid">
         <label htmlFor="term-search">
           Search terms
@@ -109,7 +110,7 @@ function TermsGlossaryPage() {
           </tbody>
         </table>
       </div>
-    </section>
+    </PageSection>
   );
 }
 

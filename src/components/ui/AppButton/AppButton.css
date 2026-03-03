@@ -1,0 +1,23 @@
+.app-button {
+  transition:
+    border-color 0.12s ease,
+    background 0.12s ease,
+    color 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.app-button:not(:disabled):focus-visible {
+  outline: 3px solid var(--accent-weak);
+  outline-offset: 2px;
+}
+
+.app-button.app-button-hovered:not(:disabled),
+.app-button:not(:disabled):hover {
+  box-shadow: 0 0 0 3px var(--accent-weak);
+}
+
+.app-button.button-secondary.app-button-hovered:not(:disabled),
+.app-button.button-secondary:not(:disabled):hover {
+  border-color: var(--accent);
+  background: var(--accent-weak);
+}

@@ -1,4 +1,6 @@
 import { useMemo, useState } from "react";
+import PageSection from "../components/layout/PageSection";
+import AppButton from "../components/ui/AppButton/AppButton";
 import Tooltip from "../components/Tooltip";
 import { copyText } from "../utils/copyText";
 import { addInteractionMemory } from "../utils/interactionMemory";
@@ -57,15 +59,10 @@ function BenefitAwardPage() {
   }
 
   return (
-    <section className="card stack">
-      <div>
-        <h2>Benefit Award Estimator</h2>
-        <p className="muted section-copy">
-          Estimates weekly benefit amount and maximum award using guide
-          formulas.
-        </p>
-      </div>
-
+    <PageSection
+      title="Benefit Award Estimator"
+      description="Estimates weekly benefit amount and maximum award using guide formulas."
+    >
       <div className="input-grid">
         <div>
           <label htmlFor="benefit-q1">Q1 wages</label>
@@ -154,18 +151,18 @@ function BenefitAwardPage() {
             </li>
           </ul>
           <div className="actions-row">
-            <button
+            <AppButton
               type="button"
-              className="button-secondary"
+              variant="secondary"
               onClick={handleCopySummary}
             >
               Copy summary
-            </button>
+            </AppButton>
             {copyStatus ? <span className="muted">{copyStatus}</span> : null}
           </div>
         </div>
       )}
-    </section>
+    </PageSection>
   );
 }
 

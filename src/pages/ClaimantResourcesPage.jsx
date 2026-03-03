@@ -2,8 +2,13 @@ import {
   claimantMediaResources,
   claimantResourcesContent,
 } from "../data/selfHelpResources";
+import PageSection from "../components/layout/PageSection";
 import { copyText } from "../utils/copyText";
 import { useMemo, useState } from "react";
+import ResourceSearchBar from "../components/resources/ResourceSearchBar/ResourceSearchBar";
+import ResourceTypeChips from "../components/resources/ResourceTypeChips/ResourceTypeChips";
+import TopicAccordionList from "../components/resources/TopicAccordionList/TopicAccordionList";
+import ResourceMediaCard from "../components/resources/ResourceMediaCard/ResourceMediaCard";
 
 const RESOURCE_TYPE_OPTIONS = [
   { value: "all", label: "All" },
@@ -48,85 +53,6 @@ function getResourceType(resource) {
 
 function getResourceTopic(resource) {
   return String(resource?.topic || "General");
-}
-
-function MediaResourceCard({ resource }) {
-  const hasSrc = typeof resource.src === "string" && resource.src.trim();
-  const resourceUrl = hasSrc ? toMediaUrl(resource.src) : "";
-  const openUrl = resource.openUrl || resourceUrl;
-  const showCardTitle = resource.type !== "image-sequence";
-
-  return (
-    <div className="result stack">
-      {showCardTitle ? <h3>{resource.title}</h3> : null}
-
-      {resource.type === "image-sequence" ? (
-        <div className="self-help-sequence-vertical">
-          {(resource.images || []).map((imageItem, index) => (
-            <article key={imageItem.id} className="stack">
-              <div className="self-help-step-heading-row">
-                <span className="self-help-step-badge">Step {index + 1}</span>
-                <h4 className="self-help-step-title">
-                  {imageItem.heading || `Workflow step ${index + 1}`}
-                </h4>
-              </div>
-              {Array.isArray(imageItem.instructions) &&
-              imageItem.instructions.length ? (
-                <ul className="list self-help-step-list">
-                  {imageItem.instructions.map((instruction) => (
-                    <li key={`${imageItem.id}-${instruction}`}>
-                      {instruction}
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
-              <figure className="guide-image-block">
-                <img
-                  className="guide-image self-help-workflow-image"
-                  src={toMediaUrl(imageItem.src)}
-                  alt={imageItem.alt || resource.title}
-                />
-              </figure>
-            </article>
-          ))}
-        </div>
-      ) : null}
-
-      {resource.type === "pdf" && resource.embed ? (
-        <iframe
-          className="self-help-resource-frame"
-          src={resourceUrl}
-          title={resource.title}
-        />
-      ) : null}
-
-      {resource.type === "video" && resource.embedUrl ? (
-        <iframe
-          className="self-help-resource-frame"
-          src={resource.embedUrl}
-          title={resource.title}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          referrerPolicy="strict-origin-when-cross-origin"
-          allowFullScreen
-        />
-      ) : null}
-
-      {resource.caption ? <p className="muted">{resource.caption}</p> : null}
-
-      <div className="actions-row">
-        {openUrl ? (
-          <a
-            href={openUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="button-link"
-          >
-            Open resource
-          </a>
-        ) : null}
-      </div>
-    </div>
-  );
 }
 
 function ClaimantResourcesPage() {
@@ -246,47 +172,26 @@ function ClaimantResourcesPage() {
     only, and uniform self-help-workflow-image sizing.
   */
   return (
-    <section className="card stack">
-      <div>
-        <h2>{claimantResourcesContent.title}</h2>
-        <p className="muted section-copy">
-          {claimantResourcesContent.description}
-        </p>
-      </div>
+    <PageSection
+      title={claimantResourcesContent.title}
+      description={claimantResourcesContent.description}
+    >
+      <ResourceSearchBar
+        id="claimant-resources-find"
+        label="Find claimant resources"
+        value={findQuery}
+        onChange={setFindQuery}
+        placeholder="Search links, PDFs, videos, or workflow steps"
+        matchCount={totalMatches}
+        showMatchCount
+      />
 
-      <div className="compact-grid">
-        <label htmlFor="claimant-resources-find">Find claimant resources</label>
-        <input
-          id="claimant-resources-find"
-          type="text"
-          value={findQuery}
-          onChange={(event) => setFindQuery(event.target.value)}
-          placeholder="Search links, PDFs, videos, or workflow steps"
-        />
-        {normalizedQuery ? (
-          <p className="muted">Matches: {totalMatches}</p>
-        ) : null}
-      </div>
-
-      <div
-        className="type-chip-row"
-        role="group"
-        aria-label="Resource type filters"
-      >
-        {RESOURCE_TYPE_OPTIONS.map((option) => {
-          const isActive = activeType === option.value;
-          return (
-            <button
-              key={option.value}
-              type="button"
-              className={`type-chip ${isActive ? "type-chip-active" : ""}`}
-              onClick={() => setActiveType(option.value)}
-            >
-              {option.label}
-            </button>
-          );
-        })}
-      </div>
+      <ResourceTypeChips
+        options={RESOURCE_TYPE_OPTIONS}
+        activeValue={activeType}
+        onSelect={setActiveType}
+        ariaLabel="Resource type filters"
+      />
 
       <div className="result stack">
         <h3>Share with claimant</h3>
@@ -320,47 +225,28 @@ function ClaimantResourcesPage() {
       </div>
 
       <div className="stack" aria-live="polite">
-        {resourcesByTopic.length ? (
-          <div className="stack">
-            {resourcesByTopic.map((topicGroup) => {
-              const isOpen = topicGroup.topic === activeExpandedTopic;
-
-              return (
-                <section key={topicGroup.topic} className="result stack">
-                  <button
-                    type="button"
-                    className="accordion-trigger"
-                    onClick={() =>
-                      setExpandedTopic((current) =>
-                        current === topicGroup.topic ? "" : topicGroup.topic,
-                      )
-                    }
-                    aria-expanded={isOpen}
-                  >
-                    <span>{topicGroup.topic}</span>
-                    <span className="muted">{topicGroup.resources.length}</span>
-                  </button>
-                  {isOpen ? (
-                    <div className="self-help-resource-grid">
-                      {topicGroup.resources.map((resource) => (
-                        <MediaResourceCard
-                          key={resource.id}
-                          resource={resource}
-                        />
-                      ))}
-                    </div>
-                  ) : null}
-                </section>
-              );
-            })}
-          </div>
-        ) : (
-          <p className="muted">
-            No claimant media resources match this search.
-          </p>
-        )}
+        <TopicAccordionList
+          groups={resourcesByTopic}
+          activeTopic={activeExpandedTopic}
+          onToggleTopic={(topic) =>
+            setExpandedTopic((current) => (current === topic ? "" : topic))
+          }
+          emptyText="No claimant media resources match this search."
+          renderGroupContent={(topicGroup) => (
+            <div className="self-help-resource-grid">
+              {topicGroup.resources.map((resource) => (
+                <ResourceMediaCard
+                  key={resource.id}
+                  resource={resource}
+                  toMediaUrl={toMediaUrl}
+                  showStandaloneImage={false}
+                />
+              ))}
+            </div>
+          )}
+        />
       </div>
-    </section>
+    </PageSection>
   );
 }
 

@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import PageSection from "../components/layout/PageSection";
 import { trendsTips } from "../data/trendsTips";
 import { copyText } from "../utils/copyText";
 import { addInteractionMemory } from "../utils/interactionMemory";
@@ -54,19 +55,19 @@ function TrendsTipsPage() {
   }
 
   return (
-    <section className="card stack">
-      <div className="title-row">
-        <div>
-          <h2>Trends, Tips & Suggestions</h2>
-          <p className="muted section-copy">
-            Leader-updated campaign guidance. Edit data in
-            <strong> src/data/trendsTips.js</strong> and redeploy to publish
-            updates.
-          </p>
-        </div>
+    <PageSection
+      title="Trends, Tips & Suggestions"
+      description={
+        <>
+          Leader-updated campaign guidance. Edit data in
+          <strong> src/data/trendsTips.js</strong> and redeploy to publish
+          updates.
+        </>
+      }
+      headerContent={
         <span className="pill">{activeItems.length} active items</span>
-      </div>
-
+      }
+    >
       <div className="stack" aria-live="polite">
         <div className="actions-row">
           <button
@@ -93,7 +94,7 @@ function TrendsTipsPage() {
           </article>
         ))}
       </div>
-    </section>
+    </PageSection>
   );
 }
 

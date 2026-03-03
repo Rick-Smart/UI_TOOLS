@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import PageSection from "../components/layout/PageSection";
 import Tooltip from "../components/Tooltip";
 import { copyText } from "../utils/copyText";
 import { addInteractionMemory } from "../utils/interactionMemory";
@@ -122,16 +123,16 @@ function AgentResponseCardsPage() {
   }
 
   return (
-    <section className="card stack">
-      <div>
-        <h2>Agent Response Cards</h2>
-        <p className="muted section-copy">
+    <PageSection
+      title="Agent Response Cards"
+      description={
+        <>
           Quick, policy-aligned talking points for high-frequency claimant
           questions.
           <Tooltip text="Use these as consistent base language, then tailor to the caller’s exact situation." />
-        </p>
-      </div>
-
+        </>
+      }
+    >
       <div className="compact-grid">
         <label htmlFor="card-search">
           Search response cards
@@ -168,7 +169,7 @@ function AgentResponseCardsPage() {
           </article>
         ))}
       </div>
-    </section>
+    </PageSection>
   );
 }
 

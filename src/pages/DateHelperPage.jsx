@@ -1,4 +1,6 @@
 import { useMemo, useState } from "react";
+import PageSection from "../components/layout/PageSection";
+import AppButton from "../components/ui/AppButton/AppButton";
 import { copyText } from "../utils/copyText";
 import { addInteractionMemory } from "../utils/interactionMemory";
 import { dateFormatter } from "../utils/quarterUtils";
@@ -35,14 +37,10 @@ function DateHelperPage() {
   }
 
   return (
-    <section className="card stack">
-      <div>
-        <h2>Date Offset Helper</h2>
-        <p className="muted section-copy">
-          Add positive or negative day offsets to get due dates quickly.
-        </p>
-      </div>
-
+    <PageSection
+      title="Date Offset Helper"
+      description="Add positive or negative day offsets to get due dates quickly."
+    >
       <div className="input-grid compact-grid">
         <div>
           <label htmlFor="offset-start">Start date</label>
@@ -69,16 +67,16 @@ function DateHelperPage() {
       </div>
 
       <div className="actions-row">
-        <button
+        <AppButton
           type="button"
-          className="button-secondary"
+          variant="secondary"
           onClick={handleCopySummary}
         >
           Copy summary
-        </button>
+        </AppButton>
         {copyStatus ? <span className="muted">{copyStatus}</span> : null}
       </div>
-    </section>
+    </PageSection>
   );
 }
 

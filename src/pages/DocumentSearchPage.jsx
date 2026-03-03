@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import PageSection from "../components/layout/PageSection";
 import Tooltip from "../components/Tooltip";
 import { copyText } from "../utils/copyText";
 import { documentReferences } from "../data/documentReferences";
@@ -53,19 +54,18 @@ function DocumentSearchPage() {
   }
 
   return (
-    <section className="card stack">
-      <div className="title-row">
-        <div>
-          <h2>Document Search</h2>
-          <p className="muted section-copy">
-            Search AZDES by document number and quickly open known document
-            pages.
-            <Tooltip text="Use document number format (UIB-xxxx or UB-xxx) for fastest results." />
-          </p>
-        </div>
+    <PageSection
+      title="Document Search"
+      description={
+        <>
+          Search AZDES by document number and quickly open known document pages.
+          <Tooltip text="Use document number format (UIB-xxxx or UB-xxx) for fastest results." />
+        </>
+      }
+      headerContent={
         <span className="pill">{matchingDocs.length} matches</span>
-      </div>
-
+      }
+    >
       <div className="input-row compact-grid">
         <div>
           <label htmlFor="doc-number">Document number</label>
@@ -141,7 +141,7 @@ function DocumentSearchPage() {
           </article>
         ))}
       </div>
-    </section>
+    </PageSection>
   );
 }
 

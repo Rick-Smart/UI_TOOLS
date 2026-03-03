@@ -1,4 +1,5 @@
 import Tooltip from "../Tooltip";
+import AppButton from "../ui/AppButton/AppButton";
 
 function CallChecklistPanel({
   orderedCallChecklist,
@@ -39,7 +40,7 @@ function CallChecklistPanel({
                 aria-label={`Mark step ${index + 1} complete`}
               />
             </label>
-            <button
+            <AppButton
               type="button"
               className="call-step-button"
               onClick={() => setSelectedStep(index)}
@@ -48,7 +49,7 @@ function CallChecklistPanel({
                 <strong className="call-step-label">Step {index + 1}:</strong>{" "}
                 <span>{item}</span>
               </span>
-            </button>
+            </AppButton>
           </div>
         ))}
       </div>

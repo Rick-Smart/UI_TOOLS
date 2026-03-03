@@ -3,6 +3,11 @@ import {
   selfHelpMediaResources,
 } from "../data/selfHelpResources";
 import { useMemo, useState } from "react";
+import PageSection from "../components/layout/PageSection";
+import ResourceSearchBar from "../components/resources/ResourceSearchBar/ResourceSearchBar";
+import ResourceTypeChips from "../components/resources/ResourceTypeChips/ResourceTypeChips";
+import TopicAccordionList from "../components/resources/TopicAccordionList/TopicAccordionList";
+import ResourceMediaCard from "../components/resources/ResourceMediaCard/ResourceMediaCard";
 
 const RESOURCE_TYPE_OPTIONS = [
   { value: "all", label: "All" },
@@ -40,110 +45,6 @@ function getResourceType(resource) {
 
 function getResourceTopic(resource) {
   return String(resource?.topic || "General");
-}
-
-function MediaResourceCard({ resource, workflowInstructionSets = [] }) {
-  const hasSrc = typeof resource.src === "string" && resource.src.trim();
-  const resourceUrl = hasSrc ? toMediaUrl(resource.src) : "";
-  const openUrl = resource.openUrl || resourceUrl;
-  const showCardTitle = resource.type !== "image-sequence";
-
-  return (
-    <div className="result stack">
-      {showCardTitle ? <h3>{resource.title}</h3> : null}
-      {resource.type === "image" ? (
-        <figure className="guide-image-block">
-          <img
-            className="guide-image"
-            src={resourceUrl}
-            alt={resource.alt || resource.title}
-          />
-          {resource.caption ? (
-            <figcaption className="muted">{resource.caption}</figcaption>
-          ) : null}
-        </figure>
-      ) : null}
-
-      {resource.type === "image-sequence" ? (
-        <div className="self-help-sequence-vertical">
-          {/*
-            Workflow convention:
-            1) Render workflow images vertically in process order.
-            2) Always show an explicit Step badge tied to each image.
-            3) Keep workflow images visually uniform with self-help-workflow-image.
-          */}
-          {(resource.images || []).map((imageItem, index) => {
-            const imageUrl = toMediaUrl(imageItem.src);
-            const stepLabel = `Step ${index + 1}`;
-            const instructionSet = workflowInstructionSets[index];
-            const heading =
-              instructionSet?.heading || `Workflow step ${index + 1}`;
-            const instructionSteps = instructionSet?.steps || [];
-
-            return (
-              <article key={imageItem.id} className="stack">
-                <div className="self-help-step-heading-row">
-                  <span className="self-help-step-badge">{stepLabel}</span>
-                  <h4 className="self-help-step-title">{heading}</h4>
-                </div>
-                {instructionSteps.length ? (
-                  <ul className="list self-help-step-list">
-                    {instructionSteps.map((step) => (
-                      <li key={`${imageItem.id}-${step}`}>{step}</li>
-                    ))}
-                  </ul>
-                ) : null}
-                <figure className="guide-image-block">
-                  <img
-                    className="guide-image self-help-workflow-image"
-                    src={imageUrl}
-                    alt={imageItem.alt || imageItem.caption || resource.title}
-                  />
-                </figure>
-              </article>
-            );
-          })}
-        </div>
-      ) : null}
-
-      {resource.type === "pdf" && resource.embed ? (
-        <iframe
-          className="self-help-resource-frame"
-          src={resourceUrl}
-          title={resource.title}
-        />
-      ) : null}
-
-      {resource.type === "video" && resource.embedUrl ? (
-        <iframe
-          className="self-help-resource-frame"
-          src={resource.embedUrl}
-          title={resource.title}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          referrerPolicy="strict-origin-when-cross-origin"
-          allowFullScreen
-        />
-      ) : null}
-
-      {(resource.type === "pdf" || resource.type === "video") &&
-      resource.caption ? (
-        <p className="muted">{resource.caption}</p>
-      ) : null}
-
-      <div className="actions-row">
-        {openUrl ? (
-          <a
-            href={openUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="button-link"
-          >
-            Open resource
-          </a>
-        ) : null}
-      </div>
-    </div>
-  );
 }
 
 function SelfHelpGuidePage() {
@@ -286,45 +187,26 @@ function SelfHelpGuidePage() {
     filteredTroubleshootingNotes.length + filteredMediaResources.length;
 
   return (
-    <section className="card stack">
-      <div>
-        <h2>{selfHelpGuideContent.title}</h2>
-        <p className="muted section-copy">{selfHelpGuideContent.description}</p>
-      </div>
+    <PageSection
+      title={selfHelpGuideContent.title}
+      description={selfHelpGuideContent.description}
+    >
+      <ResourceSearchBar
+        id="self-help-find"
+        label="Find in self-help"
+        value={findQuery}
+        onChange={setFindQuery}
+        placeholder="Search steps, notes, or media"
+        matchCount={totalMatches}
+        showMatchCount
+      />
 
-      <div className="compact-grid">
-        <label htmlFor="self-help-find">Find in self-help</label>
-        <input
-          id="self-help-find"
-          type="text"
-          value={findQuery}
-          onChange={(event) => setFindQuery(event.target.value)}
-          placeholder="Search steps, notes, or media"
-        />
-        {normalizedQuery ? (
-          <p className="muted">Matches: {totalMatches}</p>
-        ) : null}
-      </div>
-
-      <div
-        className="type-chip-row"
-        role="group"
-        aria-label="Agent self-help filters"
-      >
-        {RESOURCE_TYPE_OPTIONS.map((option) => {
-          const isActive = activeType === option.value;
-          return (
-            <button
-              key={option.value}
-              type="button"
-              className={`type-chip ${isActive ? "type-chip-active" : ""}`}
-              onClick={() => setActiveType(option.value)}
-            >
-              {option.label}
-            </button>
-          );
-        })}
-      </div>
+      <ResourceTypeChips
+        options={RESOURCE_TYPE_OPTIONS}
+        activeValue={activeType}
+        onSelect={setActiveType}
+        ariaLabel="Agent self-help filters"
+      />
 
       <div className="result stack">
         <h3>Self-help workflow</h3>
@@ -358,48 +240,29 @@ function SelfHelpGuidePage() {
         ) : null}
 
         <h3>Agent self-help media references</h3>
-        {resourcesByTopic.length ? (
-          <div className="stack">
-            {resourcesByTopic.map((topicGroup) => {
-              const isOpen = topicGroup.topic === activeExpandedTopic;
-
-              return (
-                <section key={topicGroup.topic} className="result stack">
-                  <button
-                    type="button"
-                    className="accordion-trigger"
-                    onClick={() =>
-                      setExpandedTopic((current) =>
-                        current === topicGroup.topic ? "" : topicGroup.topic,
-                      )
-                    }
-                    aria-expanded={isOpen}
-                  >
-                    <span>{topicGroup.topic}</span>
-                    <span className="muted">{topicGroup.resources.length}</span>
-                  </button>
-                  {isOpen ? (
-                    <div className="self-help-resource-grid">
-                      {topicGroup.resources.map((resource) => (
-                        <MediaResourceCard
-                          key={resource.id}
-                          resource={resource}
-                          workflowInstructionSets={
-                            filteredWorkflowInstructionSets
-                          }
-                        />
-                      ))}
-                    </div>
-                  ) : null}
-                </section>
-              );
-            })}
-          </div>
-        ) : (
-          <p className="muted">No media resources match this search.</p>
-        )}
+        <TopicAccordionList
+          groups={resourcesByTopic}
+          activeTopic={activeExpandedTopic}
+          onToggleTopic={(topic) =>
+            setExpandedTopic((current) => (current === topic ? "" : topic))
+          }
+          emptyText="No media resources match this search."
+          renderGroupContent={(topicGroup) => (
+            <div className="self-help-resource-grid">
+              {topicGroup.resources.map((resource) => (
+                <ResourceMediaCard
+                  key={resource.id}
+                  resource={resource}
+                  toMediaUrl={toMediaUrl}
+                  workflowInstructionSets={filteredWorkflowInstructionSets}
+                  showStandaloneImage
+                />
+              ))}
+            </div>
+          )}
+        />
       </div>
-    </section>
+    </PageSection>
   );
 }
 

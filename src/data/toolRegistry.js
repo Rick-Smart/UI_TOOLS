@@ -214,6 +214,11 @@ export const navItems = [
   })),
 ];
 
+export const sidebarSections = [
+  { key: "agent", title: "Agent Tool", audience: "agent" },
+  { key: "claimant", title: "Claimant Support", audience: "claimant" },
+];
+
 export const homeCards = toolRegistry.map((tool) => ({
   to: tool.path,
   title: tool.title,

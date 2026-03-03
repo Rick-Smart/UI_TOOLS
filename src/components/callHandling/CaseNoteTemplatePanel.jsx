@@ -1,4 +1,5 @@
 import Tooltip from "../Tooltip";
+import AppButton from "../ui/AppButton/AppButton";
 
 function applySentenceCase(value) {
   return value.replace(/(^|[.!?]\s+)([a-z])/g, (match, prefix, letter) => {
@@ -46,38 +47,38 @@ function CaseNoteTemplatePanel({
         />
       </div>
       <div className="actions-row">
-        <button
+        <AppButton
           type="button"
-          className="button-secondary"
+          variant="secondary"
           onClick={handleRefreshCaseTemplate}
           title="Refreshes the template and pulls in copied tool summaries for this interaction."
         >
           Refresh template
-        </button>
-        <button
+        </AppButton>
+        <AppButton
           type="button"
-          className="button-secondary"
+          variant="secondary"
           onClick={handleCopyCaseNoteTemplate}
           title="Copies the current case note and captures a daily synopsis entry when required fields are complete."
         >
           Copy case note
-        </button>
-        <button
+        </AppButton>
+        <AppButton
           type="button"
-          className="button-secondary"
+          variant="secondary"
           onClick={handleAppendCapturedDetails}
           title={`Adds copied tool summaries to the case note. Captured summaries available: ${capturedDetailsCount}.`}
         >
           Add captured details
-        </button>
-        <button
+        </AppButton>
+        <AppButton
           type="button"
-          className="button-secondary"
+          variant="secondary"
           onClick={handleClearCapturedDetails}
           title="Removes the Tool Results section from the case note draft."
         >
           Clear captured details
-        </button>
+        </AppButton>
         {noteCopyStatus ? (
           <span className="muted">{noteCopyStatus}</span>
         ) : null}

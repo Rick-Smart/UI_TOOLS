@@ -1,0 +1,79 @@
+.sidebar-nav {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 12px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+  display: grid;
+  align-content: start;
+  grid-auto-rows: max-content;
+  gap: 12px;
+}
+
+.sidebar-nav-header {
+  display: grid;
+  gap: 4px;
+}
+
+.sidebar-nav-header h2 {
+  font-size: 18px;
+  margin-bottom: 0;
+}
+
+.sidebar-home-list,
+.sidebar-nav-groups,
+.sidebar-links {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sidebar-nav-groups {
+  display: grid;
+  align-content: start;
+  grid-auto-rows: max-content;
+  gap: 10px;
+}
+
+.sidebar-group {
+  display: grid;
+  gap: 8px;
+}
+
+.sidebar-group-toggle {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text);
+  padding: 8px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: left;
+}
+
+.sidebar-group-label {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.sidebar-links {
+  display: grid;
+  gap: 6px;
+  overflow: hidden;
+}
+
+.sidebar-links-collapse {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.sidebar-links-open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import PageSection from "../components/layout/PageSection";
 import Tooltip from "../components/Tooltip";
 import {
   readManagedLinks,
@@ -67,20 +68,20 @@ function LinksPage() {
   }
 
   return (
-    <section className="card stack">
-      <div className="title-row">
-        <div>
-          <h2>Quick Links</h2>
-          <p className="muted section-copy">
-            Save frequently used links in your local browser storage.
-            <Tooltip text="Saved links are browser-local on this device; they are not synced across users or devices." />
-          </p>
-        </div>
+    <PageSection
+      title="Quick Links"
+      description={
+        <>
+          Save frequently used links in your local browser storage.
+          <Tooltip text="Saved links are browser-local on this device; they are not synced across users or devices." />
+        </>
+      }
+      headerContent={
         <span className="pill">
           {links.length} links / {groupedCount} groups
         </span>
-      </div>
-
+      }
+    >
       <div className="input-grid">
         <div>
           <label htmlFor="link-name">Link name</label>
@@ -156,7 +157,7 @@ function LinksPage() {
           </article>
         ))}
       </div>
-    </section>
+    </PageSection>
   );
 }
 

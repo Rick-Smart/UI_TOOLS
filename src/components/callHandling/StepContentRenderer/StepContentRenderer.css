@@ -1,0 +1,4 @@
+.step-content-renderer {
+  display: grid;
+  gap: 12px;
+}

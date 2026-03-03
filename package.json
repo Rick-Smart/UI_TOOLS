@@ -1,7 +1,7 @@
 {
-  "name": "azdes-ui-toolbox",
+  "name": "AZDES-UI-KB",
   "private": true,
-  "version": "1.24.4",
+  "version": "2.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",

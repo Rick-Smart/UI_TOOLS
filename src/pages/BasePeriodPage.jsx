@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import PageSection from "../components/layout/PageSection";
 import Tooltip from "../components/Tooltip";
 import { copyText } from "../utils/copyText";
 import { addInteractionMemory } from "../utils/interactionMemory";
@@ -95,16 +96,10 @@ function BasePeriodPage() {
   }
 
   return (
-    <section className="card stack">
-      <div>
-        <h2>Base Period Calculator</h2>
-        <p className="muted section-copy">
-          Base period is the first four of the last five completed quarters
-          before filing. Quarter changes begin with the first full week (Sunday)
-          of January, April, July, and October.
-        </p>
-      </div>
-
+    <PageSection
+      title="Base Period Calculator"
+      description="Base period is the first four of the last five completed quarters before filing. Quarter changes begin with the first full week (Sunday) of January, April, July, and October."
+    >
       <div className="input-row">
         <div>
           <label htmlFor="claim-date">Claim filing date</label>
@@ -235,7 +230,7 @@ function BasePeriodPage() {
           </div>
         </>
       )}
-    </section>
+    </PageSection>
   );
 }
 

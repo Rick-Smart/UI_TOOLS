@@ -1,8 +1,57 @@
 import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import PageSection from "../components/layout/PageSection";
 import Tooltip from "../components/Tooltip";
+import TriageQuestionList from "../components/programTriage/TriageQuestionList/TriageQuestionList";
+import TriageRecommendations from "../components/programTriage/TriageRecommendations/TriageRecommendations";
 import { copyText } from "../utils/copyText";
 import { addInteractionMemory } from "../utils/interactionMemory";
+
+const TRIAGE_QUESTIONS = [
+  {
+    key: "federalEmployee",
+    label: "Claimant last worked in federal civilian employment",
+    tooltip: "Select for former federal civilian workers (UCFE screening).",
+  },
+  {
+    key: "exMilitaryOrNoaa",
+    label: "Claimant separated from military service or NOAA",
+    tooltip:
+      "Select for former service member/NOAA separation (UCX screening).",
+  },
+  {
+    key: "multiStateWages",
+    label: "Wages earned in multiple states",
+    tooltip:
+      "Select when claimant indicates wages in Arizona and at least one other state.",
+  },
+  {
+    key: "approvedTraining",
+    label: "Currently in potentially approved training",
+  },
+  {
+    key: "sharedWork",
+    label: "Employer has approved Shared Work plan",
+  },
+  {
+    key: "workersCompInjury",
+    label: "Work-related injury/disability with workers compensation history",
+  },
+  {
+    key: "laborDispute",
+    label: "Strike/lockout labor dispute at worksite",
+  },
+  {
+    key: "disasterDeclared",
+    label: "Claim connected to federally declared disaster",
+    tooltip:
+      "Use only when the unemployment reason is linked to a declared disaster event.",
+  },
+  {
+    key: "tradeImpacted",
+    label: "Job loss tied to import/outsourcing trade impacts",
+  },
+];
 
 function ProgramTriagePage() {
   const [searchParams] = useSearchParams();
@@ -95,142 +144,27 @@ function ProgramTriagePage() {
   }
 
   return (
-    <section className="card stack">
-      <div>
-        <h2>Program Triage Wizard</h2>
-        <p className="muted section-copy">
-          Quick routing helper for the Arizona UI programs listed in UIB-1240A.
-        </p>
-        <p className="muted">
-          Select all conditions that apply for the current caller.
-          <Tooltip text="This is a routing helper. It does not replace policy determinations." />
-        </p>
-      </div>
+    <PageSection
+      title="Program Triage Wizard"
+      description="Quick routing helper for the Arizona UI programs listed in UIB-1240A."
+    >
+      <p className="muted">
+        Select all conditions that apply for the current caller.
+        <Tooltip text="This is a routing helper. It does not replace policy determinations." />
+      </p>
 
-      <div className="input-grid">
-        <label className="checkbox-row">
-          <input
-            type="checkbox"
-            checked={answers.federalEmployee}
-            onChange={(event) =>
-              setAnswer("federalEmployee", event.target.checked)
-            }
-          />
-          <span>
-            Claimant last worked in federal civilian employment
-            <Tooltip text="Select for former federal civilian workers (UCFE screening)." />
-          </span>
-        </label>
-        <label className="checkbox-row">
-          <input
-            type="checkbox"
-            checked={answers.exMilitaryOrNoaa}
-            onChange={(event) =>
-              setAnswer("exMilitaryOrNoaa", event.target.checked)
-            }
-          />
-          <span>
-            Claimant separated from military service or NOAA
-            <Tooltip text="Select for former service member/NOAA separation (UCX screening)." />
-          </span>
-        </label>
-        <label className="checkbox-row">
-          <input
-            type="checkbox"
-            checked={answers.multiStateWages}
-            onChange={(event) =>
-              setAnswer("multiStateWages", event.target.checked)
-            }
-          />
-          <span>
-            Wages earned in multiple states
-            <Tooltip text="Select when claimant indicates wages in Arizona and at least one other state." />
-          </span>
-        </label>
-        <label className="checkbox-row">
-          <input
-            type="checkbox"
-            checked={answers.approvedTraining}
-            onChange={(event) =>
-              setAnswer("approvedTraining", event.target.checked)
-            }
-          />
-          <span>Currently in potentially approved training</span>
-        </label>
-        <label className="checkbox-row">
-          <input
-            type="checkbox"
-            checked={answers.sharedWork}
-            onChange={(event) => setAnswer("sharedWork", event.target.checked)}
-          />
-          <span>Employer has approved Shared Work plan</span>
-        </label>
-        <label className="checkbox-row">
-          <input
-            type="checkbox"
-            checked={answers.workersCompInjury}
-            onChange={(event) =>
-              setAnswer("workersCompInjury", event.target.checked)
-            }
-          />
-          <span>
-            Work-related injury/disability with workers compensation history
-          </span>
-        </label>
-        <label className="checkbox-row">
-          <input
-            type="checkbox"
-            checked={answers.laborDispute}
-            onChange={(event) =>
-              setAnswer("laborDispute", event.target.checked)
-            }
-          />
-          <span>Strike/lockout labor dispute at worksite</span>
-        </label>
-        <label className="checkbox-row">
-          <input
-            type="checkbox"
-            checked={answers.disasterDeclared}
-            onChange={(event) =>
-              setAnswer("disasterDeclared", event.target.checked)
-            }
-          />
-          <span>
-            Claim connected to federally declared disaster
-            <Tooltip text="Use only when the unemployment reason is linked to a declared disaster event." />
-          </span>
-        </label>
-        <label className="checkbox-row">
-          <input
-            type="checkbox"
-            checked={answers.tradeImpacted}
-            onChange={(event) =>
-              setAnswer("tradeImpacted", event.target.checked)
-            }
-          />
-          <span>Job loss tied to import/outsourcing trade impacts</span>
-        </label>
-      </div>
+      <TriageQuestionList
+        questions={TRIAGE_QUESTIONS}
+        answers={answers}
+        onAnswerChange={setAnswer}
+      />
 
-      <div className="result stack" aria-live="polite">
-        <h3>Suggested program path(s)</h3>
-        <ul className="list">
-          {recommendations.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
-        <div className="actions-row">
-          <button
-            type="button"
-            className="button-secondary"
-            onClick={handleCopySummary}
-          >
-            Copy summary
-          </button>
-          {copyStatus ? <span className="muted">{copyStatus}</span> : null}
-        </div>
-      </div>
-    </section>
+      <TriageRecommendations
+        recommendations={recommendations}
+        copyStatus={copyStatus}
+        onCopySummary={handleCopySummary}
+      />
+    </PageSection>
   );
 }
 

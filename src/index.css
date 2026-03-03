@@ -52,10 +52,6 @@ p {
   gap: 18px;
 }
 
-.header-block {
-  margin-bottom: 4px;
-}
-
 h1 {
   font-size: clamp(28px, 4vw, 36px);
 }
@@ -93,6 +89,23 @@ h3 {
   flex-wrap: wrap;
 }
 
+.top-nav-shell {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 10px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+  position: sticky;
+  top: 78px;
+  z-index: 24;
+}
+
+.top-nav-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 8px;
+}
+
 .nav-link {
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -105,10 +118,25 @@ h3 {
   gap: 8px;
 }
 
+.top-nav-link {
+  min-height: 44px;
+  width: 100%;
+  justify-content: space-between;
+  background: var(--bg);
+  transition:
+    border-color 0.12s ease,
+    background 0.12s ease,
+    color 0.12s ease;
+}
+
+.top-nav-link:hover {
+  border-color: var(--accent);
+}
+
 .nav-link-active {
   background: var(--accent-weak);
   color: var(--accent);
-  border-color: transparent;
+  border-color: var(--accent);
 }
 
 .title-row {
@@ -117,6 +145,21 @@ h3 {
   align-items: start;
   gap: 12px;
   flex-wrap: wrap;
+}
+
+.page-section-header {
+  align-items: baseline;
+}
+
+.page-section-title {
+  margin-bottom: 0;
+  font-size: clamp(26px, 3.2vw, 30px);
+  line-height: 1.2;
+}
+
+.page-section-descriptor {
+  margin-top: 0;
+  white-space: nowrap;
 }
 
 .grid {
@@ -140,7 +183,18 @@ h3 {
   padding: 14px;
   background: #0f172a;
   display: grid;
+  grid-template-rows: auto minmax(48px, 1fr) auto;
   gap: 10px;
+}
+
+.tool-card-action-wrap {
+  min-height: 40px;
+  display: flex;
+  align-items: end;
+}
+
+.tool-card-action {
+  min-height: 36px;
 }
 
 .home-top-actions-grid {
@@ -568,6 +622,13 @@ input:focus-visible,
   max-width: 360px;
 }
 
+.page-section-header {
+  align-items: start;
+}
+
+.page-section-descriptor {
+  white-space: normal;
+}
 .call-col-middle {
   flex: 2 1 560px;
 }
@@ -690,6 +751,21 @@ input:focus-visible,
 }
 
 @media (max-width: 980px) {
+  .top-nav-shell {
+    top: 152px;
+    overflow-x: auto;
+  }
+
+  .top-nav-row {
+    display: flex;
+    flex-wrap: nowrap;
+    min-width: max-content;
+  }
+
+  .top-nav-link {
+    min-width: 230px;
+  }
+
   .call-col-left,
   .call-col-middle,
   .call-col-right {
@@ -828,7 +904,8 @@ footer {
   }
 
   .nav-row,
-  .header-block,
+  .top-nav-shell,
+  .top-bar,
   footer,
   .button-link,
   button {

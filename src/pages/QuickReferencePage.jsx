@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import PageSection from "../components/layout/PageSection";
 import { documentReferences } from "../data/documentReferences";
 import { topActions } from "../data/topActions";
 import { trendsTips } from "../data/trendsTips";
@@ -42,28 +43,26 @@ function QuickReferencePage({ tools = [] }) {
   }
 
   return (
-    <section className="card stack print-friendly">
-      <div className="title-row">
-        <div>
-          <h2>Campaign Quick Reference</h2>
-          <p className="muted section-copy">
-            Printable summary of top actions, tools, references, and active
-            campaign tips.
-          </p>
+    <PageSection
+      title="Campaign Quick Reference"
+      description="Printable summary of top actions, tools, references, and active campaign tips."
+      className="print-friendly"
+      headerContent={
+        <div className="actions-row">
+          <button type="button" onClick={() => window.print()}>
+            Print view
+          </button>
+          <button
+            type="button"
+            className="button-secondary"
+            onClick={handleCopySummary}
+          >
+            Copy summary
+          </button>
+          {copyStatus ? <span className="muted">{copyStatus}</span> : null}
         </div>
-        <button type="button" onClick={() => window.print()}>
-          Print view
-        </button>
-        <button
-          type="button"
-          className="button-secondary"
-          onClick={handleCopySummary}
-        >
-          Copy summary
-        </button>
-        {copyStatus ? <span className="muted">{copyStatus}</span> : null}
-      </div>
-
+      }
+    >
       <div className="result stack">
         <h3>Today&apos;s Top Actions</h3>
         <ul className="list">
@@ -118,7 +117,7 @@ function QuickReferencePage({ tools = [] }) {
           ))}
         </ul>
       </div>
-    </section>
+    </PageSection>
   );
 }
 

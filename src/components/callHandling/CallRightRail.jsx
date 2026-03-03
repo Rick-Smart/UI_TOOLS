@@ -1,9 +1,12 @@
+import { useState } from "react";
 import Tooltip from "../Tooltip";
+import ScriptOptionsPanel from "./ScriptOptionsPanel/ScriptOptionsPanel";
+import AppButton from "../ui/AppButton/AppButton";
 
 function CallRightRail({
   selectedStep,
   orderedCallChecklist,
-  renderSelectedStepContent,
+  stepContent,
   selectedScriptType,
   setSelectedScriptType,
   setScriptIndex,
@@ -29,6 +32,54 @@ function CallRightRail({
   contactInfo,
   supportResources,
 }) {
+  const [quickPreviewType, setQuickPreviewType] = useState("");
+
+  function toggleQuickPreview(type) {
+    setQuickPreviewType((current) => (current === type ? "" : type));
+  }
+
+  function renderQuickPreview() {
+    if (quickPreviewType === "voicemail") {
+      return (
+        <div className="result stack">
+          <h3>Voicemail script</h3>
+          <p>{voicemailScripts.voicemail}</p>
+        </div>
+      );
+    }
+
+    if (quickPreviewType === "ghostCall") {
+      return (
+        <div className="result stack">
+          <h3>Ghost call script</h3>
+          <p>{voicemailScripts.ghost}</p>
+        </div>
+      );
+    }
+
+    if (quickPreviewType === "difficultCaller") {
+      return (
+        <div className="result stack">
+          <h3>Difficult caller scripts</h3>
+          <p>
+            <strong>Warning 1:</strong> {difficultCallerScripts.warning1}
+          </p>
+          <p>
+            <strong>Warning 2:</strong> {difficultCallerScripts.warning2}
+          </p>
+          <p>
+            <strong>Final:</strong> {difficultCallerScripts.final}
+          </p>
+          <p className="muted">
+            Note suffix: {difficultCallerScripts.noteSuffix}
+          </p>
+        </div>
+      );
+    }
+
+    return null;
+  }
+
   return (
     <div className="stack call-col call-col-right">
       <div className="result stack" aria-live="polite">
@@ -40,148 +91,61 @@ function CallRightRail({
           <strong>Step {selectedStep + 1}:</strong>{" "}
           {orderedCallChecklist[selectedStep]}
         </p>
-        {renderSelectedStepContent()}
-      </div>
-
-      <div className="result stack" aria-live="polite">
-        <h3>
-          Script options
-          <Tooltip text="Approved script is always included. Use Prev/Next to cycle approved, suggested, and your saved custom scripts." />
-        </h3>
-        <div className="input-grid compact-grid">
-          <div>
-            <label htmlFor="script-type-select">Script type</label>
-            <select
-              id="script-type-select"
-              value={selectedScriptType}
-              onChange={(event) => {
-                setSelectedScriptType(event.target.value);
-                setScriptIndex(0);
-                setScriptEditStatus("");
-                setScriptCopyStatus("");
-              }}
-            >
-              {scriptTypeOptions.map((item) => (
-                <option key={item.key} value={item.key}>
-                  {item.label}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
+        {stepContent}
         <div className="actions-row">
-          <button
+          <AppButton
             type="button"
-            className="button-secondary"
-            onClick={() => handleCycleScript(-1)}
+            variant="secondary"
+            onClick={() => toggleQuickPreview("voicemail")}
           >
-            Prev
-          </button>
-          <button
+            Voicemail script
+          </AppButton>
+          <AppButton
             type="button"
-            className="button-secondary"
-            onClick={() => handleCycleScript(1)}
+            variant="secondary"
+            onClick={() => toggleQuickPreview("ghostCall")}
           >
-            Next
-          </button>
-          <button
+            Ghost call script
+          </AppButton>
+          <AppButton
             type="button"
-            className="button-secondary"
-            onClick={handleCopyActiveScript}
+            variant="secondary"
+            onClick={() => toggleQuickPreview("difficultCaller")}
           >
-            Copy script
-          </button>
-          {activeScript?.source === "custom" ? (
-            <button
-              type="button"
-              className="button-secondary"
-              onClick={handleRemoveCurrentCustomScript}
-            >
-              Remove custom
-            </button>
-          ) : null}
-          <span className="muted">
-            {activeScriptOptions.length
-              ? `${scriptIndex + 1} of ${activeScriptOptions.length}`
-              : "No scripts available"}
-          </span>
-        </div>
-        <div className="actions-row">
-          <button
-            type="button"
-            className="button-secondary"
-            onClick={handleResetCustomScriptsForType}
-          >
-            Reset this type
-          </button>
-          <button
-            type="button"
-            className="button-secondary"
-            onClick={handleResetAllCustomScripts}
-          >
-            Reset all custom
-          </button>
+            Difficult caller scripts
+          </AppButton>
         </div>
         <p className="muted">
-          Source: <strong>{activeScript?.source || "n/a"}</strong>
+          Quick access displays script text here only and does not change Script
+          options. Select the same button again to hide it.
         </p>
-        <textarea
-          className="note-field-large"
-          readOnly
-          value={activeScript?.text || ""}
-        />
-        {scriptCopyStatus ? <p className="muted">{scriptCopyStatus}</p> : null}
-        <div>
-          <label htmlFor="custom-script-input">Add custom script</label>
-          <p className="muted">
-            Custom scripts must be approved by leadership before use.
-          </p>
-          <textarea
-            id="custom-script-input"
-            className="note-field-large"
-            value={newCustomScript}
-            onChange={(event) => setNewCustomScript(event.target.value)}
-            placeholder="Add your preferred script wording for this script type"
-          />
-          <div className="actions-row">
-            <button
-              type="button"
-              className="button-secondary"
-              onClick={handleSaveCustomScript}
-            >
-              Save custom script
-            </button>
-            {scriptEditStatus ? (
-              <span className="muted">{scriptEditStatus}</span>
-            ) : null}
-          </div>
-        </div>
+        {renderQuickPreview()}
       </div>
+
+      <ScriptOptionsPanel
+        selectedScriptType={selectedScriptType}
+        setSelectedScriptType={setSelectedScriptType}
+        setScriptIndex={setScriptIndex}
+        setScriptEditStatus={setScriptEditStatus}
+        setScriptCopyStatus={setScriptCopyStatus}
+        scriptTypeOptions={scriptTypeOptions}
+        handleCycleScript={handleCycleScript}
+        handleCopyActiveScript={handleCopyActiveScript}
+        activeScript={activeScript}
+        handleRemoveCurrentCustomScript={handleRemoveCurrentCustomScript}
+        activeScriptOptions={activeScriptOptions}
+        scriptIndex={scriptIndex}
+        handleResetCustomScriptsForType={handleResetCustomScriptsForType}
+        handleResetAllCustomScripts={handleResetAllCustomScripts}
+        newCustomScript={newCustomScript}
+        setNewCustomScript={setNewCustomScript}
+        handleSaveCustomScript={handleSaveCustomScript}
+        scriptEditStatus={scriptEditStatus}
+        scriptCopyStatus={scriptCopyStatus}
+      />
 
       <div className="result stack">
         <h3>At-a-glance resources</h3>
-        <p>
-          <strong>Voicemail:</strong> {voicemailScripts.voicemail}
-        </p>
-        <p>
-          <strong>Ghost call:</strong> {voicemailScripts.ghost}
-        </p>
-        <p>
-          <strong>Difficult caller warning 1:</strong>{" "}
-          {difficultCallerScripts.warning1}
-        </p>
-        <p>
-          <strong>Difficult caller warning 2:</strong>{" "}
-          {difficultCallerScripts.warning2}
-        </p>
-        <p>
-          <strong>Difficult caller final:</strong>{" "}
-          {difficultCallerScripts.final}
-        </p>
-        <p className="muted">
-          Note suffix: {difficultCallerScripts.noteSuffix}
-        </p>
-
         <p>
           <strong>If claimant cannot be verified</strong>
         </p>

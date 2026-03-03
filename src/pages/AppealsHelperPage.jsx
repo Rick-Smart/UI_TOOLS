@@ -1,4 +1,6 @@
 import { useMemo, useState } from "react";
+import PageSection from "../components/layout/PageSection";
+import AppButton from "../components/ui/AppButton/AppButton";
 import Tooltip from "../components/Tooltip";
 import { copyText } from "../utils/copyText";
 import { addInteractionMemory } from "../utils/interactionMemory";
@@ -61,14 +63,10 @@ function AppealsHelperPage() {
   }
 
   return (
-    <section className="card stack">
-      <div>
-        <h2>Appeals Deadline Helper</h2>
-        <p className="muted section-copy">
-          Calculates appeal timing windows from UIB-1240A timelines.
-        </p>
-      </div>
-
+    <PageSection
+      title="Appeals Deadline Helper"
+      description="Calculates appeal timing windows from UIB-1240A timelines."
+    >
       <div className="input-grid compact-grid">
         <div>
           <label htmlFor="determination-date">
@@ -133,18 +131,18 @@ function AppealsHelperPage() {
             <Tooltip text="Late appeals can be rejected without sufficient written cause, so include details." />
           </p>
           <div className="actions-row">
-            <button
+            <AppButton
               type="button"
-              className="button-secondary"
+              variant="secondary"
               onClick={handleCopySummary}
             >
               Copy summary
-            </button>
+            </AppButton>
             {copyStatus ? <span className="muted">{copyStatus}</span> : null}
           </div>
         </div>
       )}
-    </section>
+    </PageSection>
   );
 }
 
