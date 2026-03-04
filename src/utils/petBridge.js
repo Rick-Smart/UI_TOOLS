@@ -42,6 +42,11 @@ const POINTS_BY_STARS = {
   4: 23,
   5: 31,
 };
+const TOOL_USAGE_POINTS = 3;
+const TOOL_SUMMARY_POINTS = 4;
+const TOOL_USAGE_COOLDOWN_MIN_MS = 3 * 60 * 1000;
+const TOOL_USAGE_COOLDOWN_MAX_MS = 5 * 60 * 1000;
+const MAX_REWARD_HISTORY_ITEMS = 300;
 
 function isBrowser() {
   return typeof window !== "undefined";
@@ -146,9 +151,13 @@ function buildDefaultProgress() {
     schemaVersion: PET_SCHEMA_VERSION,
     qualifyingFiveStarCount: 0,
     totalPoints: 0,
+    spentPoints: 0,
     totalRewards: 0,
+    toolUsageRewards: 0,
     lastRewardStars: 0,
     processedInteractionIds: [],
+    toolRewardCooldownByKey: {},
+    rewardHistory: [],
     lastRewardAt: null,
     createdAt: now,
     updatedAt: now,
@@ -161,6 +170,8 @@ function buildDefaultInventory() {
     schemaVersion: PET_SCHEMA_VERSION,
     ownedPetIds: PET_CATALOG.map((pet) => pet.id),
     unlockedPetIds: PET_CATALOG.map((pet) => pet.id),
+    assetsOwned: [],
+    treatsOwned: {},
     createdAt: now,
     updatedAt: now,
   };
@@ -202,13 +213,33 @@ function sanitizeProgress(progress) {
     Number(merged.qualifyingFiveStarCount) || 0,
   );
   merged.totalPoints = Math.max(0, Number(merged.totalPoints) || 0);
+  merged.spentPoints = Math.max(0, Number(merged.spentPoints) || 0);
   merged.totalRewards = Math.max(0, Number(merged.totalRewards) || 0);
+  merged.toolUsageRewards = Math.max(0, Number(merged.toolUsageRewards) || 0);
   merged.lastRewardStars = Math.max(
     0,
     Math.min(5, Number(merged.lastRewardStars) || 0),
   );
   merged.processedInteractionIds = Array.isArray(merged.processedInteractionIds)
     ? merged.processedInteractionIds.filter((item) => typeof item === "string")
+    : [];
+  merged.toolRewardCooldownByKey = Object.fromEntries(
+    Object.entries(merged.toolRewardCooldownByKey || {}).filter(
+      ([key, value]) =>
+        typeof key === "string" && Number.isFinite(Number(value)),
+    ),
+  );
+  merged.rewardHistory = Array.isArray(merged.rewardHistory)
+    ? merged.rewardHistory
+        .filter(
+          (entry) =>
+            entry &&
+            typeof entry.id === "string" &&
+            typeof entry.reason === "string" &&
+            Number.isFinite(Number(entry.points)) &&
+            typeof entry.loggedAt === "string",
+        )
+        .slice(0, MAX_REWARD_HISTORY_ITEMS)
     : [];
 
   return merged;
@@ -250,7 +281,74 @@ function sanitizeInventory(inventory) {
     merged.unlockedPetIds = fallback.unlockedPetIds;
   }
 
+  merged.assetsOwned = Array.isArray(merged.assetsOwned)
+    ? [
+        ...new Set(
+          merged.assetsOwned.filter((item) => typeof item === "string"),
+        ),
+      ]
+    : [];
+
+  merged.treatsOwned = Object.fromEntries(
+    Object.entries(merged.treatsOwned || {}).filter(
+      ([key, value]) =>
+        typeof key === "string" &&
+        Number.isFinite(Number(value)) &&
+        Number(value) > 0,
+    ),
+  );
+
   return merged;
+}
+
+function normalizeToolRewardKey(value) {
+  const raw = String(value || "")
+    .trim()
+    .toLowerCase();
+
+  if (!raw || raw === "/") {
+    return "";
+  }
+
+  return raw.replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
+
+function getPointsBalance(progress) {
+  return Math.max(
+    0,
+    Number(progress.totalPoints || 0) - Number(progress.spentPoints || 0),
+  );
+}
+
+function createRewardHistoryEntry({
+  reason,
+  points,
+  toolKey = "",
+  metadata = {},
+}) {
+  return {
+    id: `reward-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    reason,
+    points: Number(points) || 0,
+    toolKey,
+    metadata,
+    loggedAt: new Date().toISOString(),
+  };
+}
+
+function withRewardHistory(progress, entry) {
+  return {
+    ...progress,
+    rewardHistory: [entry, ...(progress.rewardHistory || [])].slice(
+      0,
+      MAX_REWARD_HISTORY_ITEMS,
+    ),
+  };
+}
+
+function getToolRewardCooldownMs() {
+  const spread = TOOL_USAGE_COOLDOWN_MAX_MS - TOOL_USAGE_COOLDOWN_MIN_MS;
+  return TOOL_USAGE_COOLDOWN_MIN_MS + Math.round(Math.random() * spread);
 }
 
 function readPetState(agentId = getCurrentAgentId()) {
@@ -393,6 +491,219 @@ export function showPet() {
 
   savePetState({ keys, profile: nextProfile, progress, inventory });
   emitPetStateUpdate({ agentId, reason: "show-pet" });
+}
+
+export function awardToolUsageReward({
+  toolPath = "",
+  toolName = "",
+  source = "tool-start",
+} = {}) {
+  if (!isBrowser()) {
+    return { awarded: false, reason: "not-browser" };
+  }
+
+  const toolKey = normalizeToolRewardKey(toolPath || toolName);
+  if (!toolKey) {
+    return { awarded: false, reason: "invalid-tool" };
+  }
+
+  const points =
+    source === "summary-copy" ? TOOL_SUMMARY_POINTS : TOOL_USAGE_POINTS;
+  const now = Date.now();
+  const { agentId, keys, profile, progress, inventory } = readPetState();
+  const cooldownUntil = Number(
+    progress.toolRewardCooldownByKey?.[toolKey] || 0,
+  );
+
+  if (cooldownUntil > now) {
+    return {
+      awarded: false,
+      reason: "cooldown",
+      cooldownRemainingMs: cooldownUntil - now,
+      toolKey,
+      balance: getPointsBalance(progress),
+    };
+  }
+
+  const nextCooldownMs = getToolRewardCooldownMs();
+  const nextProgressBase = {
+    ...progress,
+    totalPoints: Number(progress.totalPoints || 0) + points,
+    totalRewards: Number(progress.totalRewards || 0) + 1,
+    toolUsageRewards: Number(progress.toolUsageRewards || 0) + 1,
+    toolRewardCooldownByKey: {
+      ...(progress.toolRewardCooldownByKey || {}),
+      [toolKey]: now + nextCooldownMs,
+    },
+    lastRewardAt: new Date(now).toISOString(),
+    updatedAt: new Date(now).toISOString(),
+  };
+
+  const historyEntry = createRewardHistoryEntry({
+    reason: source,
+    points,
+    toolKey,
+    metadata: {
+      toolPath,
+      toolName,
+    },
+  });
+  const nextProgress = withRewardHistory(nextProgressBase, historyEntry);
+
+  savePetState({ keys, profile, progress: nextProgress, inventory });
+
+  emitPetStateUpdate({
+    agentId,
+    reason: "tool-usage-reward",
+    source,
+    toolKey,
+    points,
+    balance: getPointsBalance(nextProgress),
+  });
+  emitPetReward({
+    agentId,
+    reason: "tool-usage-reward",
+    source,
+    toolKey,
+    rewardPoints: points,
+    balance: getPointsBalance(nextProgress),
+  });
+
+  return {
+    awarded: true,
+    reason: "ok",
+    toolKey,
+    points,
+    balance: getPointsBalance(nextProgress),
+    cooldownMs: nextCooldownMs,
+  };
+}
+
+export function resetToolUsageRewardCooldowns(resetReason = "manual") {
+  if (!isBrowser()) {
+    return { reset: false, reason: "not-browser" };
+  }
+
+  const { agentId, keys, profile, progress, inventory } = readPetState();
+  if (!Object.keys(progress.toolRewardCooldownByKey || {}).length) {
+    return { reset: false, reason: "already-clear" };
+  }
+
+  const nextProgress = {
+    ...progress,
+    toolRewardCooldownByKey: {},
+    updatedAt: new Date().toISOString(),
+  };
+
+  savePetState({ keys, profile, progress: nextProgress, inventory });
+  emitPetStateUpdate({
+    agentId,
+    reason: "tool-cooldown-reset",
+    resetReason,
+  });
+
+  return { reset: true, reason: "ok" };
+}
+
+export function spendPetPoints({ itemType, itemId, cost, quantity = 1 } = {}) {
+  if (!isBrowser()) {
+    return { spent: false, reason: "not-browser" };
+  }
+
+  const safeItemType = String(itemType || "")
+    .trim()
+    .toLowerCase();
+  const safeItemId = String(itemId || "").trim();
+  const safeCost = Math.max(0, Number(cost) || 0);
+  const safeQuantity = Math.max(1, Math.floor(Number(quantity) || 1));
+
+  if (!safeItemType || !safeItemId || !safeCost) {
+    return { spent: false, reason: "invalid-input" };
+  }
+
+  const totalCost = safeCost * safeQuantity;
+  const { agentId, keys, profile, progress, inventory } = readPetState();
+  const balance = getPointsBalance(progress);
+
+  if (balance < totalCost) {
+    return {
+      spent: false,
+      reason: "insufficient-points",
+      balance,
+      totalCost,
+    };
+  }
+
+  const nextInventory = { ...inventory };
+  if (safeItemType === "asset") {
+    nextInventory.assetsOwned = Array.from(
+      new Set([...(inventory.assetsOwned || []), safeItemId]),
+    );
+  }
+
+  if (safeItemType === "treat") {
+    const existingTreats = Number(inventory.treatsOwned?.[safeItemId] || 0);
+    nextInventory.treatsOwned = {
+      ...(inventory.treatsOwned || {}),
+      [safeItemId]: existingTreats + safeQuantity,
+    };
+  }
+
+  nextInventory.updatedAt = new Date().toISOString();
+
+  const nextProgressBase = {
+    ...progress,
+    spentPoints: Number(progress.spentPoints || 0) + totalCost,
+    updatedAt: new Date().toISOString(),
+  };
+  const historyEntry = createRewardHistoryEntry({
+    reason: "store-purchase",
+    points: -totalCost,
+    metadata: {
+      itemType: safeItemType,
+      itemId: safeItemId,
+      quantity: safeQuantity,
+    },
+  });
+  const nextProgress = withRewardHistory(nextProgressBase, historyEntry);
+
+  savePetState({
+    keys,
+    profile,
+    progress: nextProgress,
+    inventory: nextInventory,
+  });
+
+  emitPetStateUpdate({
+    agentId,
+    reason: "store-purchase",
+    itemType: safeItemType,
+    itemId: safeItemId,
+    quantity: safeQuantity,
+    totalCost,
+    balance: getPointsBalance(nextProgress),
+  });
+
+  return {
+    spent: true,
+    reason: "ok",
+    balance: getPointsBalance(nextProgress),
+    totalCost,
+  };
+}
+
+export function getPetEconomyForCurrentAgent() {
+  const { agentId, progress, inventory } = readPetState();
+  return {
+    agentId,
+    totalEarnedPoints: Number(progress.totalPoints || 0),
+    spentPoints: Number(progress.spentPoints || 0),
+    balance: getPointsBalance(progress),
+    totalRewards: Number(progress.totalRewards || 0),
+    toolUsageRewards: Number(progress.toolUsageRewards || 0),
+    rewardHistory: [...(progress.rewardHistory || [])],
+    inventory,
+  };
 }
 
 export function applySynopsisPetReward(entry) {

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import {
+  awardToolUsageReward,
   getPetIframeUrl,
   getPetStateForCurrentAgent,
   simulatePetRewardForTesting,
@@ -19,6 +20,7 @@ function AgentPetHost() {
   const iframeRef = useRef(null);
   const isDevBuild = Boolean(import.meta.env?.DEV);
   const location = useLocation();
+  const previousPathnameRef = useRef("");
   const debugFlag = new URLSearchParams(location.search).get("petDebug");
   const isDebugPetUi =
     isDevBuild && (debugFlag === "1" || debugFlag === "true");
@@ -26,6 +28,40 @@ function AgentPetHost() {
   const iframeSrc = isDebugPetUi
     ? `${getPetIframeUrl()}&debug=1`
     : getPetIframeUrl();
+
+  useEffect(() => {
+    if (!isPetSystemEnabled) {
+      return;
+    }
+
+    const pathname = String(location.pathname || "");
+    const previousPathname = previousPathnameRef.current;
+    previousPathnameRef.current = pathname;
+
+    if (!pathname || pathname === "/" || pathname === previousPathname) {
+      return;
+    }
+
+    awardToolUsageReward({
+      source: "tool-start",
+      toolPath: pathname,
+    });
+
+    if (!iframeRef.current?.contentWindow) {
+      return;
+    }
+
+    iframeRef.current.contentWindow.postMessage(
+      {
+        type: "azdes.pet.tool-start",
+        context: {
+          pathname,
+          startedAt: Date.now(),
+        },
+      },
+      "*",
+    );
+  }, [isPetSystemEnabled, location.pathname]);
 
   useEffect(() => {
     if (!isPetSystemEnabled) {

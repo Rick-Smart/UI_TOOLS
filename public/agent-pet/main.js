@@ -804,6 +804,11 @@ function init() {
           return;
         }
         engine.handleViewportClick(clickX, clickY);
+        return;
+      }
+
+      if (event?.data?.type === "azdes.pet.tool-start") {
+        engine.triggerTaskCompletionEmotionBurst();
       }
     } catch (error) {
       runtimeDiagnostics.logError(

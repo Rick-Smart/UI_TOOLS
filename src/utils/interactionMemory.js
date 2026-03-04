@@ -1,3 +1,5 @@
+import { awardToolUsageReward } from "./petBridge";
+
 const INTERACTION_MEMORY_KEY = "azdes.interactionMemory";
 const MAX_INTERACTION_ITEMS = 20;
 const INTERACTION_MEMORY_UPDATED_EVENT = "azdes:interaction-memory-updated";
@@ -53,6 +55,10 @@ export function addInteractionMemory(tool, summary) {
   );
   const next = [item, ...withoutSameTool].slice(0, MAX_INTERACTION_ITEMS);
   window.localStorage.setItem(INTERACTION_MEMORY_KEY, JSON.stringify(next));
+  awardToolUsageReward({
+    source: "summary-copy",
+    toolName: tool,
+  });
   window.dispatchEvent(new Event(INTERACTION_MEMORY_UPDATED_EVENT));
 }
 

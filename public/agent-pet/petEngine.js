@@ -3511,9 +3511,15 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
     }
   }
 
+  function triggerTaskCompletionEmotionBurst() {
+    pendingMilestoneEmotionBursts += 1;
+    milestoneBoostUntil = Date.now() + 1500;
+  }
+
   return {
     start,
     stop,
     handleViewportClick,
+    triggerTaskCompletionEmotionBurst,
   };
 }

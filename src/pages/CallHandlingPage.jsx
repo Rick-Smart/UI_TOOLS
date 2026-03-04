@@ -37,6 +37,7 @@ import {
   getInteractionMemory,
   subscribeInteractionMemory,
 } from "../utils/interactionMemory";
+import { resetToolUsageRewardCooldowns } from "../utils/petBridge";
 import PageSection from "../components/layout/PageSection";
 import AppButton from "../components/ui/AppButton/AppButton";
 import AppModal from "../components/ui/AppModal/AppModal";
@@ -426,6 +427,8 @@ function CallHandlingPage() {
   }
 
   function handleRefreshCaseTemplate() {
+    resetToolUsageRewardCooldowns("call-template-refresh");
+
     const captureResult = addDailySynopsisFromCaseNote(caseNoteDraft, {
       forceCapture: true,
       checklistCompletedSteps: checklistCompletedCount,
