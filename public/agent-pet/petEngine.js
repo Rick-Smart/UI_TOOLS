@@ -36,6 +36,7 @@ const DEFAULT_ATLAS_SCALE = 1.5;
 const PET_SIZE_MULTIPLIER = 1.5;
 const LAZY_MOVEMENT_MULTIPLIER = 0.5;
 const MAX_SEQUENCE_HIDDEN_STAGE_MS = 5200;
+const FISH_SPECIES_ROTATION_INDEX_KEY = "azdes.pet.fishSpeciesRotationIndex";
 const ATLAS_IMAGE_CACHE = new Map();
 const ATLAS_FRAME_METRICS_CACHE = new Map();
 const MOVEMENT_ACTIONS = new Set([
@@ -70,6 +71,39 @@ function getFishSpeciesKey(actionKey) {
   const normalized = toActionKey(actionKey);
   const match = normalized.match(/^(.+)-(movement|barrel-roll|death)$/);
   return match ? match[1] : "";
+}
+
+function pickNextFishSpeciesKey(validSpecies, nextRandom) {
+  const speciesList = Array.from(
+    new Set((Array.isArray(validSpecies) ? validSpecies : []).filter(Boolean)),
+  );
+  if (!speciesList.length) {
+    return "";
+  }
+
+  try {
+    if (typeof window !== "undefined" && window.localStorage) {
+      const lastIndexRaw = Number(
+        window.localStorage.getItem(FISH_SPECIES_ROTATION_INDEX_KEY),
+      );
+      const hasValidIndex =
+        Number.isFinite(lastIndexRaw) &&
+        lastIndexRaw >= 0 &&
+        lastIndexRaw < speciesList.length;
+      const nextIndex = hasValidIndex
+        ? (Math.floor(lastIndexRaw) + 1) % speciesList.length
+        : Math.floor(nextRandom() * speciesList.length);
+      window.localStorage.setItem(
+        FISH_SPECIES_ROTATION_INDEX_KEY,
+        String(nextIndex),
+      );
+      return speciesList[nextIndex] || speciesList[0] || "";
+    }
+  } catch {
+    return speciesList[Math.floor(nextRandom() * speciesList.length)] || "";
+  }
+
+  return speciesList[Math.floor(nextRandom() * speciesList.length)] || "";
 }
 
 function resolveFrameIndexByTicks(
@@ -1258,13 +1292,10 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
           !validSpecies.includes(fishVariantSpeciesKey)
         ) {
           const previousSpeciesKey = fishVariantSpeciesKey;
-          const pickedMovementKey =
-            validMovementPool[
-              Math.floor(nextRandom() * validMovementPool.length)
-            ] ||
-            validMovementPool[0] ||
-            "";
-          fishVariantSpeciesKey = getFishSpeciesKey(pickedMovementKey);
+          fishVariantSpeciesKey = pickNextFishSpeciesKey(
+            validSpecies,
+            nextRandom,
+          );
 
           if (fishVariantSpeciesKey !== previousSpeciesKey) {
             fishSchoolTargetCount = 0;
@@ -1284,8 +1315,6 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
               ),
             );
 
-          const scopedRollKey = `${fishVariantSpeciesKey}-barrel-roll`;
-          const hasScopedRoll = hasAnimationFrames(animationSet, scopedRollKey);
           const scopedPools = behaviorProfile?.animationPools || {};
 
           behaviorProfile = {
@@ -1294,37 +1323,19 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
               ...scopedPools,
               movement: keepScopedKeys(scopedPools.movement),
               idle: keepScopedKeys(scopedPools.idle),
-              interaction: Array.from(
-                new Set([
-                  ...keepScopedKeys(scopedPools.interaction),
-                  ...(hasScopedRoll ? [scopedRollKey] : []),
-                ]),
-              ),
-              celebration: Array.from(
-                new Set([
-                  ...keepScopedKeys(scopedPools.celebration),
-                  ...(hasScopedRoll ? [scopedRollKey] : []),
-                ]),
-              ),
+              interaction: keepScopedKeys(scopedPools.interaction),
+              celebration: keepScopedKeys(scopedPools.celebration),
             },
             playfulNature: {
               ...(behaviorProfile?.playfulNature || {}),
-              actionKeys: Array.from(
-                new Set([
-                  ...keepScopedKeys(behaviorProfile?.playfulNature?.actionKeys),
-                  ...(hasScopedRoll ? [scopedRollKey] : []),
-                ]),
+              actionKeys: keepScopedKeys(
+                behaviorProfile?.playfulNature?.actionKeys,
               ),
             },
             taskCompletion: {
               ...(behaviorProfile?.taskCompletion || {}),
-              actionKeys: Array.from(
-                new Set([
-                  ...keepScopedKeys(
-                    behaviorProfile?.taskCompletion?.actionKeys,
-                  ),
-                  ...(hasScopedRoll ? [scopedRollKey] : []),
-                ]),
+              actionKeys: keepScopedKeys(
+                behaviorProfile?.taskCompletion?.actionKeys,
               ),
             },
           };
