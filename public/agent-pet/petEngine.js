@@ -405,7 +405,6 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
   let fishVariantSpeciesKey = "";
   let fishSchoolTargetCount = 0;
   let fishSchoolFollowers = [];
-  let fishLeadPathHistory = [];
   let fishVisualTiltRad = 0;
   let fishPathTracePoints = [];
   let fishPathTraceLastAt = 0;
@@ -556,17 +555,6 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
     }
 
     const radius = Math.max(spriteWidth * 1.4, 40);
-    const lagFramesRange = Array.isArray(schoolConfig?.pathLagFramesRange)
-      ? schoolConfig.pathLagFramesRange
-      : [18, 78];
-    const minLagFrames = Math.max(
-      2,
-      Math.round(Number(lagFramesRange[0] ?? 18)),
-    );
-    const maxLagFrames = Math.max(
-      minLagFrames,
-      Math.round(Number(lagFramesRange[1] ?? 78)),
-    );
     const followerMinVisualWidthPx = Math.max(
       6,
       Number(schoolConfig?.followerMinVisualWidthPx ?? 10),
@@ -644,12 +632,6 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
         travelFactor:
           minTravelFactor +
           nextRandom() * Math.max(0, maxTravelFactor - minTravelFactor),
-        wanderAngle: nextRandom() * Math.PI * 2,
-        pathLagFrames:
-          minLagFrames +
-          Math.floor(
-            nextRandom() * Math.max(1, maxLagFrames - minLagFrames + 1),
-          ),
         bubbleNextAt: 0,
       });
     }
@@ -659,47 +641,16 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
     }
   }
 
-  function updateFishLeadPathHistory({
-    x,
-    y,
-    vx,
-    vy,
-    schoolConfig,
-    anchorRepeat = 0,
-  }) {
-    const maxPoints = Math.max(
-      120,
-      Math.round(Number(schoolConfig?.pathHistoryMaxPoints ?? 900)),
-    );
-
-    const point = {
-      x: Number(x) || 0,
-      y: Number(y) || 0,
-      vx: Number(vx) || 0,
-      vy: Number(vy) || 0,
-    };
-    fishLeadPathHistory.push(point);
-
-    const repeatCount = Math.max(0, Math.round(Number(anchorRepeat || 0)));
-    for (let index = 0; index < repeatCount; index += 1) {
-      fishLeadPathHistory.push(point);
-    }
-
-    if (fishLeadPathHistory.length > maxPoints) {
-      fishLeadPathHistory.splice(0, fishLeadPathHistory.length - maxPoints);
-    }
-  }
-
   function updateFishSchoolFollowers({
-    originX,
-    originY,
+    leadX,
+    leadY,
+    leadVX,
+    leadVY,
     spriteWidth,
     spriteHeight,
     deltaMs,
     movementActive,
     speedMultiplier,
-    leaderVelocityX,
-    leaderVelocityY,
     schoolConfig,
   }) {
     if (!fishSchoolFollowers.length) {
@@ -729,31 +680,33 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
       spriteWidth * 0.4,
       Number(schoolConfig?.separationRadiusPx ?? 30),
     );
-    const cohesionWeight =
-      Number(schoolConfig?.cohesionWeight ?? 0.0014) * dt * 0.8;
-    const alignmentWeight =
-      Number(schoolConfig?.alignmentWeight ?? 0.028) * dt * 0.55;
-    const separationWeight =
-      Number(schoolConfig?.separationWeight ?? 0.012) * dt * 0.8;
-    const leaderPullWeight =
-      Number(schoolConfig?.leaderPullWeight ?? 0.002) * dt * 0.9;
-    const leaderVelocityMatchWeight =
-      Number(schoolConfig?.leaderVelocityMatchWeight ?? 0.015) * dt;
-    const leaderVelocityMatchFactor = Math.max(
+    const boidNeighborRadius = Math.max(
+      neighborRadius,
+      Number(schoolConfig?.boidNeighborRadiusPx ?? neighborRadius),
+    );
+    const boidSeparationRadius = Math.max(
+      spriteWidth * 0.24,
+      Number(schoolConfig?.boidSeparationRadiusPx ?? separationRadius),
+    );
+    const boidMaxForceBase = Math.max(
+      0.001,
+      Number(schoolConfig?.boidMaxForce ?? 0.085),
+    );
+    const boidAlignmentWeight = Math.max(
       0,
-      Math.min(1, Number(schoolConfig?.leaderVelocityMatchFactor ?? 0.35)),
+      Number(schoolConfig?.boidAlignmentWeight ?? 0.9),
     );
-    const lagFramesRange = Array.isArray(schoolConfig?.pathLagFramesRange)
-      ? schoolConfig.pathLagFramesRange
-      : [18, 78];
-    const minLagFrames = Math.max(
-      2,
-      Math.round(Number(lagFramesRange[0] ?? 18)),
+    const boidCohesionWeight = Math.max(
+      0,
+      Number(schoolConfig?.boidCohesionWeight ?? 0.7),
     );
-    const maxLagFrames = Math.max(
-      minLagFrames,
-      Math.round(Number(lagFramesRange[1] ?? 78)),
+    const boidSeparationWeight = Math.max(
+      0,
+      Number(schoolConfig?.boidSeparationWeight ?? 1.4),
     );
+    const boidLeaderPullWeight =
+      Math.max(0, Number(schoolConfig?.boidLeaderPullWeight ?? 0)) * dt * 0.9;
+    const boidEnforceMinSpeed = schoolConfig?.boidEnforceMinSpeed === true;
     const followerMinVisualWidthPx = Math.max(
       6,
       Number(schoolConfig?.followerMinVisualWidthPx ?? 10),
@@ -832,60 +785,12 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
         Number(schoolConfig?.followerTravelFactorCeiling ?? 0.97),
       ),
     );
-    const pathFollowWeight =
-      Math.max(0, Number(schoolConfig?.pathFollowWeight ?? 0.0018)) * dt;
-    const pathVelocityWeight =
-      Math.max(0, Number(schoolConfig?.pathVelocityWeight ?? 0.16)) * dt;
-    const pathSineAmplitudeRange = Array.isArray(
-      schoolConfig?.pathSineAmplitudeRangePx,
-    )
-      ? schoolConfig.pathSineAmplitudeRangePx
-      : [8, 24];
-    const minPathSineAmplitudePx = Math.max(
-      0,
-      Number(pathSineAmplitudeRange[0] ?? 8),
-    );
-    const maxPathSineAmplitudePx = Math.max(
-      minPathSineAmplitudePx,
-      Number(pathSineAmplitudeRange[1] ?? 24),
-    );
-    const pathSineFrequencyRange = Array.isArray(
-      schoolConfig?.pathSineFrequencyRange,
-    )
-      ? schoolConfig.pathSineFrequencyRange
-      : [0.045, 0.105];
-    const minPathSineFrequency = Math.max(
-      0.001,
-      Number(pathSineFrequencyRange[0] ?? 0.045),
-    );
-    const maxPathSineFrequency = Math.max(
-      minPathSineFrequency,
-      Number(pathSineFrequencyRange[1] ?? 0.105),
-    );
-    const pathSineTickRateRange = Array.isArray(
-      schoolConfig?.pathSineTickRateRange,
-    )
-      ? schoolConfig.pathSineTickRateRange
-      : [0.78, 1.28];
-    const minPathSineTickRate = Math.max(
-      0.2,
-      Number(pathSineTickRateRange[0] ?? 0.78),
-    );
-    const maxPathSineTickRate = Math.max(
-      minPathSineTickRate,
-      Number(pathSineTickRateRange[1] ?? 1.28),
-    );
-    const minForwardComponent =
-      Math.max(0, Number(schoolConfig?.minForwardComponent ?? 0.12)) *
-      speedMultiplier;
-    const wanderWeight =
-      Number(schoolConfig?.wanderWeight ?? 0.004) * dt * 0.28;
     const minSpeed =
       Math.max(0.05, Number(schoolConfig?.minSpeed ?? 0.2)) * speedMultiplier;
     const maxSpeed =
       Math.max(minSpeed + 0.05, Number(schoolConfig?.maxSpeed ?? 1.9)) *
       speedMultiplier;
-    const leaderSpeed = Math.hypot(leaderVelocityX, leaderVelocityY);
+    const leaderSpeed = Math.hypot(leadVX, leadVY);
     const leaderSpeedCapRatio = Math.max(
       0,
       Number(schoolConfig?.leaderSpeedCapRatio ?? 0.92),
@@ -914,29 +819,6 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
           minTravelFactor +
           nextRandom() * Math.max(0, maxTravelFactor - minTravelFactor);
       }
-      if (!Number.isFinite(fish.pathSineAmplitudePx)) {
-        fish.pathSineAmplitudePx =
-          minPathSineAmplitudePx +
-          nextRandom() *
-            Math.max(0, maxPathSineAmplitudePx - minPathSineAmplitudePx);
-      }
-      if (!Number.isFinite(fish.pathSineFrequency)) {
-        fish.pathSineFrequency =
-          minPathSineFrequency +
-          nextRandom() *
-            Math.max(0, maxPathSineFrequency - minPathSineFrequency);
-      }
-      if (!Number.isFinite(fish.pathSinePhase)) {
-        fish.pathSinePhase = nextRandom() * Math.PI * 2;
-      }
-      if (!Number.isFinite(fish.pathSineTickRate)) {
-        fish.pathSineTickRate =
-          minPathSineTickRate +
-          nextRandom() * Math.max(0, maxPathSineTickRate - minPathSineTickRate);
-      }
-      fish.pathSineTick =
-        Number(fish.pathSineTick || 0) +
-        dt * Number(fish.pathSineTickRate || 1);
       const baseSpeedFactor = Math.max(
         minSpeedFactor,
         Math.min(
@@ -993,12 +875,10 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
         followerMinSpeed + 0.04,
         dynamicMaxSpeed * followerSpeedFactor,
       );
-      let localForwardX =
-        leaderSpeed > 0.06 ? leaderVelocityX / leaderSpeed : fish.vx || 1;
-      let localForwardY =
-        leaderSpeed > 0.06 ? leaderVelocityY / leaderSpeed : fish.vy || 0;
-      let localTargetVX = leaderVelocityX;
-      let localTargetVY = leaderVelocityY;
+      const localForwardX =
+        leaderSpeed > 0.06 ? leadVX / leaderSpeed : fish.vx || 1;
+      const localForwardY =
+        leaderSpeed > 0.06 ? leadVY / leaderSpeed : fish.vy || 0;
       let localFacingX =
         Math.abs(fish.facingVX) > 0.0001
           ? Number(fish.facingVX)
@@ -1013,6 +893,7 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
       let cohesionY = 0;
       let separationX = 0;
       let separationY = 0;
+      let separationSamples = 0;
       let neighbors = 0;
 
       for (
@@ -1029,7 +910,7 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
         const dy = other.y - fish.y;
         const distance = Math.hypot(dx, dy) || 0.0001;
 
-        if (distance <= neighborRadius) {
+        if (distance <= boidNeighborRadius) {
           neighbors += 1;
           alignX += other.vx;
           alignY += other.vy;
@@ -1037,11 +918,27 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
           cohesionY += other.y;
         }
 
-        if (!allowFollowerOverlap && distance <= separationRadius) {
-          const push = (separationRadius - distance) / separationRadius;
-          separationX -= (dx / distance) * push;
-          separationY -= (dy / distance) * push;
+        if (distance <= boidSeparationRadius) {
+          separationX += (fish.x - other.x) / distance;
+          separationY += (fish.y - other.y) / distance;
+          separationSamples += 1;
         }
+      }
+
+      const leadDX = leadX - fish.x;
+      const leadDY = leadY - fish.y;
+      const leadDistance = Math.hypot(leadDX, leadDY) || 0.0001;
+      if (leadDistance <= boidNeighborRadius) {
+        neighbors += 1;
+        alignX += leadVX;
+        alignY += leadVY;
+        cohesionX += leadX;
+        cohesionY += leadY;
+      }
+      if (leadDistance <= boidSeparationRadius) {
+        separationX += (fish.x - leadX) / leadDistance;
+        separationY += (fish.y - leadY) / leadDistance;
+        separationSamples += 1;
       }
 
       if (neighbors > 0) {
@@ -1051,174 +948,92 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
         cohesionY = cohesionY / neighbors - fish.y;
       }
 
-      fish.vx += (alignX - fish.vx) * alignmentWeight;
-      fish.vy += (alignY - fish.vy) * alignmentWeight;
-      fish.vx += cohesionX * cohesionWeight;
-      fish.vy += cohesionY * cohesionWeight;
-      fish.vx += separationX * separationWeight;
-      fish.vy += separationY * separationWeight;
+      const limitVector = (valueX, valueY, maxMagnitude) => {
+        const magnitude = Math.hypot(valueX, valueY);
+        if (magnitude <= maxMagnitude || magnitude <= 0.0001) {
+          return { x: valueX, y: valueY };
+        }
 
-      fish.vx += (originX - fish.x) * leaderPullWeight;
-      fish.vy += (originY - fish.y) * leaderPullWeight;
+        const ratio = maxMagnitude / magnitude;
+        return { x: valueX * ratio, y: valueY * ratio };
+      };
 
-      if (!Number.isFinite(fish.pathLagFrames)) {
-        fish.pathLagFrames =
-          minLagFrames +
-          Math.floor(
-            nextRandom() * Math.max(1, maxLagFrames - minLagFrames + 1),
+      const boidMaxForce =
+        boidMaxForceBase * (0.82 + (1 - normalizedScale) * 0.34) * dt;
+      const followerSpeed = Math.hypot(fish.vx, fish.vy);
+      const desiredSpeed = Math.max(
+        followerMinSpeed,
+        Math.min(
+          followerDynamicMaxSpeed,
+          Math.max(followerMinSpeed + 0.02, followerSpeed),
+        ),
+      );
+
+      let boidForceX = 0;
+      let boidForceY = 0;
+
+      if (neighbors > 0) {
+        const alignLength = Math.hypot(alignX, alignY) || 0;
+        if (alignLength > 0.0001) {
+          const desiredAlignX = (alignX / alignLength) * desiredSpeed;
+          const desiredAlignY = (alignY / alignLength) * desiredSpeed;
+          const alignSteer = limitVector(
+            desiredAlignX - fish.vx,
+            desiredAlignY - fish.vy,
+            boidMaxForce,
           );
-      }
+          boidForceX += alignSteer.x * boidAlignmentWeight;
+          boidForceY += alignSteer.y * boidAlignmentWeight;
+        }
 
-      if (fishLeadPathHistory.length) {
-        const lagFrames = Math.max(
-          minLagFrames,
-          Math.min(
-            maxLagFrames,
-            Math.round(Number(fish.pathLagFrames || minLagFrames)),
-          ),
-        );
-        const sampleIndex = Math.max(
-          0,
-          fishLeadPathHistory.length - 1 - lagFrames,
-        );
-        const pathTarget = fishLeadPathHistory[sampleIndex];
-        if (pathTarget) {
-          const centerToFishX = pathTarget.x - fish.x;
-          const centerToFishY = pathTarget.y - fish.y;
-          const centerToFishLength =
-            Math.hypot(centerToFishX, centerToFishY) || 0;
-          const pathVelocityLength =
-            Math.hypot(
-              Number(pathTarget.vx || 0),
-              Number(pathTarget.vy || 0),
-            ) || 0;
-          const fallbackDirX =
-            Math.abs(Number(fish.waveDirX || 0)) > 0.0001
-              ? Number(fish.waveDirX)
-              : localForwardX;
-          const fallbackDirY =
-            Math.abs(Number(fish.waveDirY || 0)) > 0.0001
-              ? Number(fish.waveDirY)
-              : localForwardY;
-          const rawPathDirX =
-            pathVelocityLength > 0.04
-              ? Number(pathTarget.vx || 0) / pathVelocityLength
-              : fallbackDirX;
-          const rawPathDirY =
-            pathVelocityLength > 0.04
-              ? Number(pathTarget.vy || 0) / pathVelocityLength
-              : fallbackDirY;
-          fish.waveDirX = lerp(
-            Number(fish.waveDirX || rawPathDirX),
-            rawPathDirX,
-            0.22,
+        const toCenterX = cohesionX - fish.x;
+        const toCenterY = cohesionY - fish.y;
+        const toCenterLength = Math.hypot(toCenterX, toCenterY) || 0;
+        if (toCenterLength > 0.0001) {
+          const desiredCohesionX = (toCenterX / toCenterLength) * desiredSpeed;
+          const desiredCohesionY = (toCenterY / toCenterLength) * desiredSpeed;
+          const cohesionSteer = limitVector(
+            desiredCohesionX - fish.vx,
+            desiredCohesionY - fish.vy,
+            boidMaxForce,
           );
-          fish.waveDirY = lerp(
-            Number(fish.waveDirY || rawPathDirY),
-            rawPathDirY,
-            0.22,
-          );
-          const pathDirLength =
-            Math.hypot(Number(fish.waveDirX), Number(fish.waveDirY)) || 1;
-          const pathDirX = Number(fish.waveDirX) / pathDirLength;
-          const pathDirY = Number(fish.waveDirY) / pathDirLength;
-          const normalX = -pathDirY;
-          const normalY = pathDirX;
-          const guidePhase =
-            Number(fish.pathSinePhase || 0) +
-            Number(fish.pathSineTick || 0) *
-              Number(fish.pathSineFrequency || minPathSineFrequency);
-          const sineOffsetPx =
-            Math.sin(guidePhase) *
-            Number(fish.pathSineAmplitudePx || minPathSineAmplitudePx);
-          const waveTargetX =
-            Number(pathTarget.x || 0) + normalX * sineOffsetPx;
-          const waveTargetY =
-            Number(pathTarget.y || 0) + normalY * sineOffsetPx;
-          const previousWaveTargetX = Number(fish.waveTargetX);
-          const previousWaveTargetY = Number(fish.waveTargetY);
-          fish.waveTargetX = waveTargetX;
-          fish.waveTargetY = waveTargetY;
-
-          const waveTargetVX = Number.isFinite(previousWaveTargetX)
-            ? (waveTargetX - previousWaveTargetX) / Math.max(0.0001, dt)
-            : Number(pathTarget.vx || 0);
-          const waveTargetVY = Number.isFinite(previousWaveTargetY)
-            ? (waveTargetY - previousWaveTargetY) / Math.max(0.0001, dt)
-            : Number(pathTarget.vy || 0);
-          fish.waveTargetVX = waveTargetVX;
-          fish.waveTargetVY = waveTargetVY;
-
-          const smallFishWaveDrive = 1 + (1 - normalizedScale) * 1.25;
-          const waveFollowWeight = pathFollowWeight * smallFishWaveDrive;
-          const pathVelocityBlendScale = 0.24 + normalizedScale * 0.66;
-          const waveVelocityInfluence = 0.32 + (1 - normalizedScale) * 0.48;
-
-          fish.vx += (waveTargetX - fish.x) * waveFollowWeight;
-          fish.vy += (waveTargetY - fish.y) * waveFollowWeight;
-          fish.vx +=
-            (waveTargetVX - fish.vx) *
-            pathVelocityWeight *
-            waveVelocityInfluence;
-          fish.vy +=
-            (waveTargetVY - fish.vy) *
-            pathVelocityWeight *
-            waveVelocityInfluence;
-          fish.vx +=
-            (Number(pathTarget.vx || 0) - fish.vx) *
-            pathVelocityWeight *
-            pathVelocityBlendScale;
-          fish.vy +=
-            (Number(pathTarget.vy || 0) - fish.vy) *
-            pathVelocityWeight *
-            pathVelocityBlendScale;
-
-          const towardPathX = waveTargetX - fish.x;
-          const towardPathY = waveTargetY - fish.y;
-          const towardPathLength = Math.hypot(towardPathX, towardPathY);
-          if (towardPathLength > 0.001) {
-            localFacingX = towardPathX / towardPathLength;
-            localFacingY = towardPathY / towardPathLength;
-          }
-
-          localTargetVX = lerp(
-            Number(pathTarget.vx || 0),
-            waveTargetVX,
-            waveVelocityInfluence,
-          );
-          localTargetVY = lerp(
-            Number(pathTarget.vy || 0),
-            waveTargetVY,
-            waveVelocityInfluence,
-          );
-          const pathForwardLength =
-            Math.hypot(localTargetVX, localTargetVY) || 0;
-          if (pathForwardLength > 0.04) {
-            localForwardX = localTargetVX / pathForwardLength;
-            localForwardY = localTargetVY / pathForwardLength;
-            if (towardPathLength <= 0.001) {
-              localFacingX = localForwardX;
-              localFacingY = localForwardY;
-            }
-          }
+          boidForceX += cohesionSteer.x * boidCohesionWeight;
+          boidForceY += cohesionSteer.y * boidCohesionWeight;
         }
       }
 
-      fish.vx +=
-        (localTargetVX - fish.vx) *
-        leaderVelocityMatchWeight *
-        leaderVelocityMatchFactor;
-      fish.vy +=
-        (localTargetVY - fish.vy) *
-        leaderVelocityMatchWeight *
-        leaderVelocityMatchFactor;
+      if (separationSamples > 0) {
+        const avgSeparationX = separationX / separationSamples;
+        const avgSeparationY = separationY / separationSamples;
+        const separationLength =
+          Math.hypot(avgSeparationX, avgSeparationY) || 0;
+        if (separationLength > 0.0001) {
+          const desiredSeparationX =
+            (avgSeparationX / separationLength) * desiredSpeed;
+          const desiredSeparationY =
+            (avgSeparationY / separationLength) * desiredSpeed;
+          const separationSteer = limitVector(
+            desiredSeparationX - fish.vx,
+            desiredSeparationY - fish.vy,
+            boidMaxForce,
+          );
+          boidForceX += separationSteer.x * boidSeparationWeight;
+          boidForceY += separationSteer.y * boidSeparationWeight;
+        }
+      }
 
-      if (movementActive) {
-        fish.wanderAngle =
-          Number(fish.wanderAngle || 0) + (nextRandom() - 0.5) * 0.22 * dt;
-        fish.vx += Math.cos(fish.wanderAngle) * wanderWeight;
-        fish.vy += Math.sin(fish.wanderAngle) * wanderWeight * 0.65;
-      } else {
+      const netBoidForce = limitVector(
+        boidForceX,
+        boidForceY,
+        boidMaxForce * 2,
+      );
+      fish.vx += netBoidForce.x;
+      fish.vy += netBoidForce.y;
+
+      fish.vx += (leadX - fish.x) * boidLeaderPullWeight;
+      fish.vy += (leadY - fish.y) * boidLeaderPullWeight;
+
+      if (!movementActive) {
         fish.vx *= 0.982;
         fish.vy *= 0.982;
       }
@@ -1243,11 +1058,15 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
         const ratio = followerDynamicMaxSpeed / Math.max(0.0001, speed);
         fish.vx *= ratio;
         fish.vy *= ratio;
-      } else if (speed < followerMinSpeed && movementActive) {
+      } else if (
+        speed < followerMinSpeed &&
+        movementActive &&
+        boidEnforceMinSpeed
+      ) {
         const baseDirectionX =
-          Math.abs(fish.vx) > 0.02 ? fish.vx : originX - fish.x;
+          Math.abs(fish.vx) > 0.02 ? fish.vx : leadX - fish.x;
         const baseDirectionY =
-          Math.abs(fish.vy) > 0.02 ? fish.vy : (originY - fish.y) * 0.7;
+          Math.abs(fish.vy) > 0.02 ? fish.vy : (leadY - fish.y) * 0.7;
         const directionLength = Math.hypot(baseDirectionX, baseDirectionY) || 1;
         fish.vx = (baseDirectionX / directionLength) * followerMinSpeed;
         fish.vy = (baseDirectionY / directionLength) * followerMinSpeed;
@@ -1256,24 +1075,8 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
       fish.x += fish.vx * dt * followerTravelFactor;
       fish.y += fish.vy * dt * followerTravelFactor;
 
-      const forwardX = localForwardX;
-      const forwardY = localForwardY;
-
-      const relX = fish.x - originX;
-      const relY = fish.y - originY;
-      const aheadDistance = relX * forwardX + relY * forwardY;
-
-      if (movementActive) {
-        const forwardComponent = fish.vx * forwardX + fish.vy * forwardY;
-        if (forwardComponent < minForwardComponent) {
-          const correction = minForwardComponent - forwardComponent;
-          fish.vx += forwardX * correction * 0.28;
-          fish.vy += forwardY * correction * 0.28;
-        }
-      }
-
-      const fromLeadX = fish.x - originX;
-      const fromLeadY = fish.y - originY;
+      const fromLeadX = fish.x - leadX;
+      const fromLeadY = fish.y - leadY;
       const distanceFromLead = Math.hypot(fromLeadX, fromLeadY);
       if (distanceFromLead < leaderAvoidRadiusPx) {
         const safeDistance = Math.max(0.0001, distanceFromLead);
@@ -1284,8 +1087,8 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
 
       if (distanceFromLead > maxDistance) {
         const clampRatio = maxDistance / Math.max(1, distanceFromLead);
-        fish.x = originX + fromLeadX * clampRatio;
-        fish.y = originY + fromLeadY * clampRatio;
+        fish.x = leadX + fromLeadX * clampRatio;
+        fish.y = leadY + fromLeadY * clampRatio;
       }
 
       fish.y = Math.max(12, Math.min(canvas.height - spriteHeight - 8, fish.y));
@@ -1320,6 +1123,200 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
           fishB.y += ny * overlap;
         }
       }
+    }
+  }
+
+  function updateLeadFishWithBoids({
+    spriteWidth,
+    spriteHeight,
+    deltaMs,
+    movementActive,
+    speedMultiplier,
+    schoolConfig,
+  }) {
+    if (!fishSchoolFollowers.length) {
+      return;
+    }
+
+    const dt = Math.max(0.5, Math.min(1.15, deltaMs / 16.666));
+    const neighborRadius = Math.max(
+      spriteWidth,
+      Number(schoolConfig?.neighborRadiusPx ?? 90),
+    );
+    const separationRadius = Math.max(
+      spriteWidth * 0.4,
+      Number(schoolConfig?.separationRadiusPx ?? 30),
+    );
+    const boidNeighborRadius = Math.max(
+      neighborRadius,
+      Number(schoolConfig?.boidNeighborRadiusPx ?? neighborRadius),
+    );
+    const boidSeparationRadius = Math.max(
+      spriteWidth * 0.24,
+      Number(schoolConfig?.boidSeparationRadiusPx ?? separationRadius),
+    );
+    const boidMaxForceBase = Math.max(
+      0.001,
+      Number(schoolConfig?.boidMaxForce ?? 0.085),
+    );
+    const boidAlignmentWeight = Math.max(
+      0,
+      Number(schoolConfig?.boidAlignmentWeight ?? 0.9),
+    );
+    const boidCohesionWeight = Math.max(
+      0,
+      Number(schoolConfig?.boidCohesionWeight ?? 0.7),
+    );
+    const boidSeparationWeight = Math.max(
+      0,
+      Number(schoolConfig?.boidSeparationWeight ?? 1.4),
+    );
+    const minSpeed =
+      Math.max(0.05, Number(schoolConfig?.minSpeed ?? 0.2)) * speedMultiplier;
+    const maxSpeed =
+      Math.max(minSpeed + 0.05, Number(schoolConfig?.maxSpeed ?? 1.9)) *
+      speedMultiplier;
+
+    let alignX = 0;
+    let alignY = 0;
+    let cohesionX = 0;
+    let cohesionY = 0;
+    let separationX = 0;
+    let separationY = 0;
+    let separationSamples = 0;
+    let neighbors = 0;
+
+    for (let index = 0; index < fishSchoolFollowers.length; index += 1) {
+      const fish = fishSchoolFollowers[index];
+      const dx = Number(fish.x) - position.x;
+      const dy = Number(fish.y) - position.y;
+      const distance = Math.hypot(dx, dy) || 0.0001;
+
+      if (distance <= boidNeighborRadius) {
+        neighbors += 1;
+        alignX += Number(fish.vx || 0);
+        alignY += Number(fish.vy || 0);
+        cohesionX += Number(fish.x || 0);
+        cohesionY += Number(fish.y || 0);
+      }
+
+      if (distance <= boidSeparationRadius) {
+        separationX += (position.x - Number(fish.x || 0)) / distance;
+        separationY += (position.y - Number(fish.y || 0)) / distance;
+        separationSamples += 1;
+      }
+    }
+
+    if (!neighbors && !movementActive) {
+      velocity.x *= 0.985;
+      velocity.y *= 0.985;
+      return;
+    }
+
+    const limitVector = (valueX, valueY, maxMagnitude) => {
+      const magnitude = Math.hypot(valueX, valueY);
+      if (magnitude <= maxMagnitude || magnitude <= 0.0001) {
+        return { x: valueX, y: valueY };
+      }
+
+      const ratio = maxMagnitude / magnitude;
+      return { x: valueX * ratio, y: valueY * ratio };
+    };
+
+    const boidMaxForce = boidMaxForceBase * dt;
+    const leadSpeed = Math.hypot(velocity.x, velocity.y);
+    const desiredSpeed = Math.max(minSpeed, Math.min(maxSpeed, leadSpeed));
+    let boidForceX = 0;
+    let boidForceY = 0;
+
+    if (neighbors > 0) {
+      alignX /= neighbors;
+      alignY /= neighbors;
+      cohesionX = cohesionX / neighbors - position.x;
+      cohesionY = cohesionY / neighbors - position.y;
+
+      const alignLength = Math.hypot(alignX, alignY) || 0;
+      if (alignLength > 0.0001) {
+        const desiredAlignX = (alignX / alignLength) * desiredSpeed;
+        const desiredAlignY = (alignY / alignLength) * desiredSpeed;
+        const alignSteer = limitVector(
+          desiredAlignX - velocity.x,
+          desiredAlignY - velocity.y,
+          boidMaxForce,
+        );
+        boidForceX += alignSteer.x * boidAlignmentWeight;
+        boidForceY += alignSteer.y * boidAlignmentWeight;
+      }
+
+      const toCenterLength = Math.hypot(cohesionX, cohesionY) || 0;
+      if (toCenterLength > 0.0001) {
+        const desiredCohesionX = (cohesionX / toCenterLength) * desiredSpeed;
+        const desiredCohesionY = (cohesionY / toCenterLength) * desiredSpeed;
+        const cohesionSteer = limitVector(
+          desiredCohesionX - velocity.x,
+          desiredCohesionY - velocity.y,
+          boidMaxForce,
+        );
+        boidForceX += cohesionSteer.x * boidCohesionWeight;
+        boidForceY += cohesionSteer.y * boidCohesionWeight;
+      }
+    }
+
+    if (separationSamples > 0) {
+      const avgSeparationX = separationX / separationSamples;
+      const avgSeparationY = separationY / separationSamples;
+      const separationLength = Math.hypot(avgSeparationX, avgSeparationY) || 0;
+      if (separationLength > 0.0001) {
+        const desiredSeparationX =
+          (avgSeparationX / separationLength) * desiredSpeed;
+        const desiredSeparationY =
+          (avgSeparationY / separationLength) * desiredSpeed;
+        const separationSteer = limitVector(
+          desiredSeparationX - velocity.x,
+          desiredSeparationY - velocity.y,
+          boidMaxForce,
+        );
+        boidForceX += separationSteer.x * boidSeparationWeight;
+        boidForceY += separationSteer.y * boidSeparationWeight;
+      }
+    }
+
+    const netBoidForce = limitVector(boidForceX, boidForceY, boidMaxForce * 2);
+    velocity.x += netBoidForce.x;
+    velocity.y += netBoidForce.y;
+
+    velocity.x *= movementActive ? 0.994 : 0.985;
+    velocity.y *= movementActive ? 0.994 : 0.985;
+
+    const speed = Math.hypot(velocity.x, velocity.y);
+    if (speed > maxSpeed) {
+      const ratio = maxSpeed / Math.max(0.0001, speed);
+      velocity.x *= ratio;
+      velocity.y *= ratio;
+    } else if (movementActive && speed < minSpeed) {
+      const fallbackX =
+        Math.abs(velocity.x) > 0.02 ? velocity.x : (nextRandom() - 0.5) * 2;
+      const fallbackY =
+        Math.abs(velocity.y) > 0.02 ? velocity.y : (nextRandom() - 0.5) * 2;
+      const directionLength = Math.hypot(fallbackX, fallbackY) || 1;
+      velocity.x = (fallbackX / directionLength) * minSpeed;
+      velocity.y = (fallbackY / directionLength) * minSpeed;
+    }
+
+    position.x += velocity.x * dt;
+    position.y += velocity.y * dt;
+
+    const minX = -spriteWidth * 0.8;
+    const maxX = canvas.width - spriteWidth * 0.2;
+    const minY = 12;
+    const maxY = canvas.height - spriteHeight - 8;
+    if (position.x <= minX || position.x >= maxX) {
+      position.x = Math.max(minX, Math.min(maxX, position.x));
+      velocity.x *= -0.86;
+    }
+    if (position.y <= minY || position.y >= maxY) {
+      position.y = Math.max(minY, Math.min(maxY, position.y));
+      velocity.y *= -0.86;
     }
   }
 
@@ -2141,7 +2138,6 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
         fishSchoolTargetCount = 0;
         fishSchoolFollowers = [];
         fishFollowerTraceSeed = 0;
-        fishLeadPathHistory = [];
         fishVisualTiltRad = 0;
         fishPathTracePoints = [];
         fishPathTraceLastAt = 0;
@@ -2854,9 +2850,10 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
         allowMovementByEnvironment &&
         allowMovementByAnimation &&
         effectiveMovementIntent;
+      const isFishSelected = state.selectedPetId === "fish";
 
       const motionState = updateMotion(spriteWidth, spriteHeight, state, {
-        allowMovement: movementActive,
+        allowMovement: isFishSelected ? false : movementActive,
         speedMultiplier,
         profile: behaviorProfile,
         overrideTarget:
@@ -2897,13 +2894,12 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
           : Math.round(Math.sin(frame / 15) * bobScale);
       const shouldBlink = frame % 120 > 108;
 
-      const originX = Math.round(position.x);
-      const originY = Math.round(position.y + bob);
-      const schoolLeadX = Math.round(position.x);
-      const schoolLeadY = Math.round(position.y);
+      let originX = Math.round(position.x);
+      let originY = Math.round(position.y + bob);
+      let schoolLeadX = Math.round(position.x);
+      let schoolLeadY = Math.round(position.y);
 
       const fishSchoolConfig = behaviorProfile?.schooling || {};
-      const isFishSelected = state.selectedPetId === "fish";
       const fishPathTraceConfig = behaviorProfile?.effects?.pathTrace || {};
       const fishPathTraceEnabled =
         isFishSelected && fishPathTraceConfig.enabled !== false;
@@ -2916,24 +2912,30 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
           schoolConfig: fishSchoolConfig,
         });
 
-        updateFishLeadPathHistory({
-          x: schoolLeadX,
-          y: schoolLeadY,
-          vx: velocity.x,
-          vy: velocity.y,
-          schoolConfig: fishSchoolConfig,
-        });
-
-        updateFishSchoolFollowers({
-          originX: schoolLeadX,
-          originY: schoolLeadY,
+        updateLeadFishWithBoids({
           spriteWidth,
           spriteHeight,
           deltaMs,
           movementActive,
           speedMultiplier,
-          leaderVelocityX: velocity.x,
-          leaderVelocityY: velocity.y,
+          schoolConfig: fishSchoolConfig,
+        });
+
+        schoolLeadX = Math.round(position.x);
+        schoolLeadY = Math.round(position.y);
+        originX = schoolLeadX;
+        originY = Math.round(position.y + bob);
+
+        updateFishSchoolFollowers({
+          leadX: schoolLeadX,
+          leadY: schoolLeadY,
+          leadVX: velocity.x,
+          leadVY: velocity.y,
+          spriteWidth,
+          spriteHeight,
+          deltaMs,
+          movementActive,
+          speedMultiplier,
           schoolConfig: fishSchoolConfig,
         });
 
@@ -2957,10 +2959,6 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
         fishSchoolTargetCount = 0;
         fishSchoolFollowers = [];
         fishFollowerTraceSeed = 0;
-      }
-
-      if (!isFishSelected && fishLeadPathHistory.length) {
-        fishLeadPathHistory = [];
       }
 
       if (!isFishSelected && fishPathTracePoints.length) {
@@ -3251,30 +3249,6 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
         pivotDetected &&
         now >= fishTurnRippleCooldownUntil
       ) {
-        const fishSchoolConfig = behaviorProfile?.schooling || {};
-        const wallPivotAnchorThresholdPx = Math.max(
-          4,
-          Number(fishSchoolConfig?.wallPivotAnchorThresholdPx ?? 16),
-        );
-        const atLeftWall = schoolLeadX <= wallPivotAnchorThresholdPx;
-        const atRightWall =
-          schoolLeadX >=
-          canvas.width - spriteWidth - wallPivotAnchorThresholdPx;
-        if (atLeftWall || atRightWall) {
-          const wallAnchorPoints = Math.max(
-            0,
-            Math.round(Number(fishSchoolConfig?.wallPivotAnchorPoints ?? 7)),
-          );
-          updateFishLeadPathHistory({
-            x: schoolLeadX,
-            y: schoolLeadY,
-            vx: velocity.x,
-            vy: velocity.y,
-            schoolConfig: fishSchoolConfig,
-            anchorRepeat: wallAnchorPoints,
-          });
-        }
-
         emitSceneEffectBurst({
           count: Number(fishRippleConfig.count || 8),
           originX: originX + spriteWidth * 0.5,

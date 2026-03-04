@@ -3,6 +3,9 @@
   "private": true,
   "version": "2.1.0",
   "type": "module",
+  "featureFlags": {
+    "petSystemEnabled": false
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",

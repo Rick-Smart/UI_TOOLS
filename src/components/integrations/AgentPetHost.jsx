@@ -9,6 +9,7 @@ import {
 import "./AgentPetHost.css";
 
 function AgentPetHost() {
+  const isPetSystemEnabled = import.meta.env.VITE_PET_SYSTEM_ENABLED === true;
   const [petState, setPetState] = useState(getPetStateForCurrentAgent);
   const [checklistProgress, setChecklistProgress] = useState({
     completed: 0,
@@ -19,23 +20,28 @@ function AgentPetHost() {
   const isDevBuild = Boolean(import.meta.env?.DEV);
   const location = useLocation();
   const debugFlag = new URLSearchParams(location.search).get("petDebug");
-  const isDebugPetUi = !(
-    debugFlag === "0" ||
-    debugFlag === "false" ||
-    debugFlag === "off"
-  );
+  const isDebugPetUi =
+    isDevBuild && (debugFlag === "1" || debugFlag === "true");
   const selectedPetId = petState.profile.selectedPetId;
   const iframeSrc = isDebugPetUi
     ? `${getPetIframeUrl()}&debug=1`
     : getPetIframeUrl();
 
   useEffect(() => {
+    if (!isPetSystemEnabled) {
+      return;
+    }
+
     return subscribePetState((nextState) => {
       setPetState(nextState);
     });
-  }, []);
+  }, [isPetSystemEnabled]);
 
   useEffect(() => {
+    if (!isPetSystemEnabled) {
+      return;
+    }
+
     if (!iframeRef.current?.contentWindow) {
       return;
     }
@@ -67,9 +73,14 @@ function AgentPetHost() {
     petState.progress.totalPoints,
     petState.progress.qualifyingFiveStarCount,
     topSafeInset,
+    isPetSystemEnabled,
   ]);
 
   useEffect(() => {
+    if (!isPetSystemEnabled) {
+      return;
+    }
+
     const handleChecklistProgress = (event) => {
       setChecklistProgress({
         completed: Number(event?.detail?.completed || 0),
@@ -88,9 +99,13 @@ function AgentPetHost() {
         handleChecklistProgress,
       );
     };
-  }, []);
+  }, [isPetSystemEnabled]);
 
   useEffect(() => {
+    if (!isPetSystemEnabled || !isDebugPetUi) {
+      return;
+    }
+
     const handleWindowClick = (event) => {
       if (!iframeRef.current?.contentWindow || !iframeRef.current) {
         return;
@@ -128,7 +143,7 @@ function AgentPetHost() {
     return () => {
       window.removeEventListener("click", handleWindowClick, true);
     };
-  }, []);
+  }, [isPetSystemEnabled, isDebugPetUi]);
 
   function handleSimulateInteraction() {
     simulatePetRewardForTesting(5);
@@ -143,6 +158,10 @@ function AgentPetHost() {
       Simulate interaction
     </button>
   ) : null;
+
+  if (!isPetSystemEnabled) {
+    return null;
+  }
 
   if (!petState.profile.unlocked) {
     if (!isDevBuild) {

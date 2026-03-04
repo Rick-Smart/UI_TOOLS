@@ -19,11 +19,14 @@ function createTuningPanel() {
       sizeRange: [4, 7],
       followerScaleRange: [0.3, 0.5],
       followerMinVisualWidthPx: 15,
+      useBoids: true,
+      boidLeaderPullWeight: 0,
+      boidEnforceMinSpeed: false,
+      boidMaxForce: 0.085,
+      boidAlignmentWeight: 0.9,
+      boidCohesionWeight: 0.7,
+      boidSeparationWeight: 1.4,
       minSpeed: 0.68,
-      minForwardComponent: 0.8,
-      pathFollowWeight: 0.006,
-      pathVelocityWeight: 0.11,
-      pathSineAmplitudeRangePx: [16, 38],
     },
     effects: {
       pathTrace: {
@@ -292,38 +295,6 @@ function createTuningPanel() {
     tuningState.fishOverridesEnabled = fishEnableControl.input.checked;
   });
 
-  const fishFollowWeightControl = createFishRangeControl(
-    "Path Follow Weight",
-    "schooling.pathFollowWeight",
-    0.0002,
-    0.006,
-    0.0001,
-    0.006,
-  );
-  const fishVelocityWeightControl = createFishRangeControl(
-    "Path Velocity Weight",
-    "schooling.pathVelocityWeight",
-    0.01,
-    0.4,
-    0.01,
-    0.11,
-  );
-  const fishMainAmpMinControl = createFishRangeControl(
-    "Main Sine Amp Min",
-    "schooling.pathSineAmplitudeRangePx.0",
-    0,
-    80,
-    1,
-    16,
-  );
-  const fishMainAmpMaxControl = createFishRangeControl(
-    "Main Sine Amp Max",
-    "schooling.pathSineAmplitudeRangePx.1",
-    6,
-    120,
-    1,
-    38,
-  );
   const fishMinSpeedControl = createFishRangeControl(
     "Follower Min Speed",
     "schooling.minSpeed",
@@ -331,14 +302,6 @@ function createTuningPanel() {
     2.4,
     0.01,
     0.68,
-  );
-  const fishForwardFloorControl = createFishRangeControl(
-    "Forward Floor",
-    "schooling.minForwardComponent",
-    0,
-    0.8,
-    0.01,
-    0.8,
   );
   const fishScaleMinControl = createFishRangeControl(
     "Follower Scale Min",
@@ -416,54 +379,9 @@ function createTuningPanel() {
   });
 
   const applyFishControlValues = () => {
-    fishFollowWeightControl.setValue(
-      Number(
-        getPathValue(
-          tuningState.fishOverrides,
-          "schooling.pathFollowWeight",
-          0.006,
-        ),
-      ),
-    );
-    fishVelocityWeightControl.setValue(
-      Number(
-        getPathValue(
-          tuningState.fishOverrides,
-          "schooling.pathVelocityWeight",
-          0.11,
-        ),
-      ),
-    );
-    fishMainAmpMinControl.setValue(
-      Number(
-        getPathValue(
-          tuningState.fishOverrides,
-          "schooling.pathSineAmplitudeRangePx.0",
-          16,
-        ),
-      ),
-    );
-    fishMainAmpMaxControl.setValue(
-      Number(
-        getPathValue(
-          tuningState.fishOverrides,
-          "schooling.pathSineAmplitudeRangePx.1",
-          38,
-        ),
-      ),
-    );
     fishMinSpeedControl.setValue(
       Number(
         getPathValue(tuningState.fishOverrides, "schooling.minSpeed", 0.68),
-      ),
-    );
-    fishForwardFloorControl.setValue(
-      Number(
-        getPathValue(
-          tuningState.fishOverrides,
-          "schooling.minForwardComponent",
-          0.8,
-        ),
       ),
     );
     fishScaleMinControl.setValue(
@@ -516,12 +434,7 @@ function createTuningPanel() {
   fishActionsRow.appendChild(resetFishButton);
 
   fishDetails.appendChild(fishEnableControl.element);
-  fishDetails.appendChild(fishFollowWeightControl.element);
-  fishDetails.appendChild(fishVelocityWeightControl.element);
-  fishDetails.appendChild(fishMainAmpMinControl.element);
-  fishDetails.appendChild(fishMainAmpMaxControl.element);
   fishDetails.appendChild(fishMinSpeedControl.element);
-  fishDetails.appendChild(fishForwardFloorControl.element);
   fishDetails.appendChild(fishScaleMinControl.element);
   fishDetails.appendChild(fishScaleMaxControl.element);
   fishDetails.appendChild(fishMinVisualWidthControl.element);

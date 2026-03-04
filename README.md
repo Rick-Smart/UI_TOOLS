@@ -35,6 +35,15 @@ This repo includes an automated workflow at [deploy-pages.yml](.github/workflows
 - App routing uses `HashRouter` to work reliably on static hosting.
 - Vite base is set to `./` in [vite.config.js](vite.config.js) for portable Pages builds.
 
+## Pet system release flag
+
+- The pet system can be globally enabled/disabled via `package.json`:
+  - `featureFlags.petSystemEnabled: false` disables the iframe host in production and development.
+  - `featureFlags.petSystemEnabled: true` enables the pet host again.
+- Pet iframe interactivity is now debug-only via URL query in dev:
+  - `?petDebug=1` or `?petDebug=true` enables interactive iframe mode.
+  - Default behavior is click-through so the site remains fully usable.
+
 ## Native KB workflow
 
 This repo includes a starter KB pipeline under [kb/README.md](kb/README.md) to support recurring source refreshes.
