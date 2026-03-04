@@ -1,5 +1,6 @@
 const PET_SCHEMA_VERSION = 1;
 const AGENT_NAME_KEY = "azdes.callHandling.agentName";
+const LAST_AGENT_ID_KEY = "azdes.pet.v1.lastAgentId";
 const PET_STATE_UPDATED_EVENT = "azdes.pet.state-updated";
 const PET_REWARD_EVENT = "azdes.pet.reward.v1";
 const PET_UNLOCK_FIVE_STAR_REQUIRED = 3;
@@ -66,7 +67,25 @@ function getCurrentAgentId() {
   }
 
   const savedName = window.localStorage.getItem(AGENT_NAME_KEY) || "";
-  return normalizeAgentId(savedName);
+  const normalized = normalizeAgentId(savedName);
+  if (normalized !== "agent-default") {
+    try {
+      window.localStorage.setItem(LAST_AGENT_ID_KEY, normalized);
+    } catch {
+      return normalized;
+    }
+
+    return normalized;
+  }
+
+  const lastKnown = normalizeAgentId(
+    window.localStorage.getItem(LAST_AGENT_ID_KEY) || "",
+  );
+  if (lastKnown !== "agent-default") {
+    return lastKnown;
+  }
+
+  return "agent-default";
 }
 
 function buildKeys(agentId) {

@@ -1,7 +1,49 @@
 export const seagullBehavior = {
-  "driftX": 0.0009,
-  "driftY": 0.00065,
-  "maxSpeedX": 1.6,
-  "maxSpeedY": 1.15,
-  "checklistPull": 0.0015
+  driftX: 0.0009,
+  driftY: 0.00065,
+  maxSpeedX: 1.6,
+  maxSpeedY: 1.15,
+  checklistPull: 0.0015,
+  animationPools: {
+    movement: ["flap", "glide", "glide-2"],
+    idle: ["idle", "idle-2"],
+    interaction: ["flap", "glide"],
+    celebration: ["flap", "glide"],
+  },
+  playfulNature: {
+    intervalMs: [4600, 9000],
+    durationMs: [900, 1650],
+    activationChance: 0.7,
+    actionKeys: ["glide", "glide-2", "flap", "idle-2"],
+  },
+  taskCompletion: {
+    triggerChance: 0.93,
+    durationMs: [1100, 2100],
+    actionKeys: ["flap", "glide"],
+  },
+  stateMachine: {
+    minHoldMsByReason: {
+      idle: 1500,
+      movement: 900,
+      playful: 850,
+      celebration: 1150,
+      fallback: 1200,
+    },
+  },
+  effects: {
+    windTrail: {
+      enabled: true,
+      color: "#d8ecf7",
+      colorSecondary: "#bfe2f3",
+      count: 5,
+      intervalMs: [120, 200],
+    },
+    landingDust: {
+      enabled: true,
+      color: "#d9c9ad",
+      colorSecondary: "#efe1c9",
+      count: 7,
+      cooldownMs: 760,
+    },
+  },
 };

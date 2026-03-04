@@ -4,11 +4,7 @@ import { buildPetState, queryAgentId } from "./petState.js";
 function shouldShowDebugOverlay() {
   const params = new URLSearchParams(window.location.search);
   const debugFlag = params.get("debug");
-  return (
-    debugFlag === "1" ||
-    debugFlag === "true" ||
-    window.location.hostname === "localhost"
-  );
+  return debugFlag === "1" || debugFlag === "true";
 }
 
 function createTuningPanel() {
@@ -287,7 +283,6 @@ function createTuningPanel() {
         `scale: ${debugState.effectiveScale ?? 0}`,
         `shadow lift: ${debugState.shadowLift ?? 0}`,
         `moving: ${debugState.moving ? "yes" : "no"}`,
-        `emotion particles: ${debugState.emotionParticles ?? 0}`,
       ].join("\n");
 
       const safeInset = Number(debugState.topSafeInset || 0);
@@ -315,6 +310,123 @@ function createTuningPanel() {
   };
 }
 
+function createRuntimeDiagnosticsOverlay() {
+  const panel = document.createElement("div");
+  panel.id = "pet-runtime-diagnostics";
+  panel.style.position = "fixed";
+  panel.style.left = "12px";
+  panel.style.bottom = "12px";
+  panel.style.maxWidth = "min(560px, calc(100vw - 24px))";
+  panel.style.maxHeight = "38vh";
+  panel.style.overflow = "auto";
+  panel.style.zIndex = "9999";
+  panel.style.background = "rgba(127, 29, 29, 0.9)";
+  panel.style.color = "#fee2e2";
+  panel.style.border = "1px solid rgba(254, 202, 202, 0.5)";
+  panel.style.borderRadius = "8px";
+  panel.style.padding = "8px 10px";
+  panel.style.font =
+    "12px/1.35 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
+  panel.style.pointerEvents = "none";
+  panel.style.display = "none";
+
+  const heading = document.createElement("div");
+  heading.style.fontWeight = "700";
+  heading.style.marginBottom = "6px";
+  heading.textContent = "Pet Runtime Diagnostics";
+
+  const body = document.createElement("pre");
+  body.style.whiteSpace = "pre-wrap";
+  body.style.margin = "0";
+
+  panel.appendChild(heading);
+  panel.appendChild(body);
+  document.body.appendChild(panel);
+
+  const entries = [];
+  const keyCooldownUntil = new Map();
+  let hiddenSince = 0;
+
+  function render() {
+    if (!entries.length) {
+      panel.style.display = "none";
+      body.textContent = "";
+      return;
+    }
+
+    panel.style.display = "block";
+    const recent = entries.slice(-6);
+    body.textContent = recent
+      .map((entry) => {
+        const head = `[${entry.time}] [${entry.level}] ${entry.message}`;
+        return entry.detail ? `${head}\n${entry.detail}` : head;
+      })
+      .join("\n\n");
+  }
+
+  function log(level, message, detail = "", options = {}) {
+    const now = Date.now();
+    const dedupeKey = String(options.key || `${level}:${message}`);
+    const cooldownMs = Math.max(0, Number(options.cooldownMs || 0));
+
+    if (cooldownMs) {
+      const nextAllowedAt = Number(keyCooldownUntil.get(dedupeKey) || 0);
+      if (now < nextAllowedAt) {
+        return;
+      }
+      keyCooldownUntil.set(dedupeKey, now + cooldownMs);
+    }
+
+    entries.push({
+      level,
+      message: String(message || "Unknown runtime issue"),
+      detail: String(detail || "").slice(0, 1200),
+      time: new Date(now).toLocaleTimeString(),
+    });
+
+    if (entries.length > 24) {
+      entries.splice(0, entries.length - 24);
+    }
+
+    render();
+  }
+
+  function trackDebugFrame(debugState) {
+    if (!debugState) {
+      return;
+    }
+
+    if (debugState.sequenceHidden) {
+      if (!hiddenSince) {
+        hiddenSince = Date.now();
+      }
+
+      const hiddenDuration = Date.now() - hiddenSince;
+      if (hiddenDuration > 5200) {
+        log(
+          "WARN",
+          "Pet hidden stage exceeded 5.2s",
+          `sequence=${debugState.sequence || "n/a"} action=${debugState.action || "n/a"}`,
+          {
+            key: "hidden-stage-timeout",
+            cooldownMs: 7000,
+          },
+        );
+      }
+    } else {
+      hiddenSince = 0;
+    }
+  }
+
+  return {
+    logError: (message, detail, options) =>
+      log("ERROR", message, detail, options),
+    logWarning: (message, detail, options) =>
+      log("WARN", message, detail, options),
+    trackDebugFrame,
+  };
+}
+
 function init() {
   const agentId = queryAgentId();
   const canvas = document.getElementById("pet-canvas");
@@ -333,6 +445,7 @@ function init() {
 
   const showDebugOverlay = shouldShowDebugOverlay();
   const tuningPanel = showDebugOverlay ? createTuningPanel() : null;
+  const runtimeDiagnostics = createRuntimeDiagnosticsOverlay();
   let lastDebugAt = 0;
 
   const engine = createPetEngine(
@@ -341,7 +454,19 @@ function init() {
     () => currentContext,
     {
       getTuning: () => (tuningPanel ? tuningPanel.getTuning() : {}),
+      onRuntimeError: (payload) => {
+        runtimeDiagnostics.logError(
+          payload?.message || "Pet runtime error",
+          payload?.detail || "Unknown render failure",
+          {
+            key: `engine-runtime:${payload?.message || "unknown"}`,
+            cooldownMs: 1200,
+          },
+        );
+      },
       onDebugFrame: (debugState) => {
+        runtimeDiagnostics.trackDebugFrame(debugState);
+
         if (!tuningPanel) {
           return;
         }
@@ -373,52 +498,89 @@ function init() {
   }
 
   function handleMessage(event) {
-    if (event.source !== window.parent) {
-      return;
-    }
-
-    if (event.origin !== window.location.origin) {
-      return;
-    }
-
-    if (event?.data?.type === "azdes.pet.refresh") {
-      syncDom();
-      return;
-    }
-
-    if (event?.data?.type === "azdes.pet.context") {
-      const nextContext = event.data.context || {};
-      currentContext = {
-        pathname: String(nextContext.pathname || ""),
-        checklistCompleted: Math.max(
-          0,
-          Number(nextContext.checklistCompleted || 0),
-        ),
-        checklistTotal: Math.max(0, Number(nextContext.checklistTotal || 0)),
-        topSafeInset: Math.max(0, Number(nextContext.topSafeInset || 8)),
-      };
-      return;
-    }
-
-    if (event?.data?.type === "azdes.pet.click") {
-      const clickX = Number(event.data.x);
-      const clickY = Number(event.data.y);
-      if (!Number.isFinite(clickX) || !Number.isFinite(clickY)) {
+    try {
+      if (event.source !== window.parent) {
         return;
       }
-      engine.handleViewportClick(clickX, clickY);
+
+      if (event.origin !== window.location.origin) {
+        return;
+      }
+
+      if (event?.data?.type === "azdes.pet.refresh") {
+        syncDom();
+        return;
+      }
+
+      if (event?.data?.type === "azdes.pet.context") {
+        const nextContext = event.data.context || {};
+        currentContext = {
+          pathname: String(nextContext.pathname || ""),
+          checklistCompleted: Math.max(
+            0,
+            Number(nextContext.checklistCompleted || 0),
+          ),
+          checklistTotal: Math.max(0, Number(nextContext.checklistTotal || 0)),
+          topSafeInset: Math.max(0, Number(nextContext.topSafeInset || 8)),
+        };
+        return;
+      }
+
+      if (event?.data?.type === "azdes.pet.click") {
+        const clickX = Number(event.data.x);
+        const clickY = Number(event.data.y);
+        if (!Number.isFinite(clickX) || !Number.isFinite(clickY)) {
+          return;
+        }
+        engine.handleViewportClick(clickX, clickY);
+      }
+    } catch (error) {
+      runtimeDiagnostics.logError(
+        "Message handling failure",
+        error?.stack || String(error),
+        { key: "message-handler", cooldownMs: 1000 },
+      );
     }
+  }
+
+  function handleWindowError(event) {
+    const message = event?.message || "Unhandled runtime error";
+    const location = [event?.filename, event?.lineno, event?.colno]
+      .filter(Boolean)
+      .join(":");
+    const detail = [location, event?.error?.stack].filter(Boolean).join("\n");
+
+    runtimeDiagnostics.logError(message, detail, {
+      key: `window-error:${message}`,
+      cooldownMs: 1200,
+    });
+  }
+
+  function handleUnhandledRejection(event) {
+    const reason = event?.reason;
+    runtimeDiagnostics.logError(
+      "Unhandled promise rejection",
+      reason?.stack || String(reason || "Unknown rejection"),
+      {
+        key: "unhandled-rejection",
+        cooldownMs: 1200,
+      },
+    );
   }
 
   syncDom();
 
   window.addEventListener("storage", handleStorage);
   window.addEventListener("message", handleMessage);
+  window.addEventListener("error", handleWindowError);
+  window.addEventListener("unhandledrejection", handleUnhandledRejection);
 
   window.addEventListener("beforeunload", () => {
     engine.stop();
     window.removeEventListener("storage", handleStorage);
     window.removeEventListener("message", handleMessage);
+    window.removeEventListener("error", handleWindowError);
+    window.removeEventListener("unhandledrejection", handleUnhandledRejection);
   });
 }
 

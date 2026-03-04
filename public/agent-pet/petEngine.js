@@ -1,23 +1,43 @@
 import { PET_CATALOG } from "./petCatalog.js";
 import { getPetBehaviorProfile } from "./pets/index.js";
+import { drawAtlasFrame, drawPixelSprite } from "./core/rendering.js";
 import {
-  drawAtlasFrame,
-  drawHeart,
-  drawPixelSprite,
-  drawSparkle,
-} from "./core/rendering.js";
+  getEnvironmentAllowedKeys,
+  getEnvironmentConfig,
+  normalizeEnvironmentKey,
+  resolveDesiredEnvironment,
+  resolveEnvironmentTransitionSpec,
+} from "./core/environmentFSM.js";
+import {
+  pickAnimationChoice,
+  resolveAnimationState,
+} from "./core/animationSelector.js";
+import {
+  drawSceneEffectParticles as drawSceneEffectParticlesCore,
+  emitSceneEffectBurst as emitSceneEffectBurstCore,
+  updateSceneEffectParticles as updateSceneEffectParticlesCore,
+} from "./core/effectsSystem.js";
+import { updateMotionState } from "./core/motionController.js";
+import {
+  buildSequenceRuntime,
+  getRuleForPet,
+  isSequenceOnlyAnimationKey,
+  isSequenceStageEnvironmentValid,
+  PET_SEQUENCE_RULES,
+  resolveRelocateStageDurationMs as resolveSequenceRelocateStageDurationMs,
+  SEQUENCE_STAGE_TICK_MS,
+} from "./core/sequenceManager.js";
 import { PET_ROUTE_ZONES, resolveRouteZone } from "./behaviors/zones.js";
 
 const CHECKLIST_MILESTONES = [3, 6, 10];
 const DEFAULT_PET_ID = Object.keys(PET_CATALOG)[0];
 const BASE_PET_SPEED_MULTIPLIER = 0.5;
 const DEFAULT_ATLAS_SCALE = 1.5;
-const SEQUENCE_STAGE_TICK_MS = 1000 / 60;
-const EMOTION_SHEET_SRC =
-  "/agent-pet/imports/emotions/emotionIcons_PaperPluto_demo.png";
+const PET_SIZE_MULTIPLIER = 1.5;
+const LAZY_MOVEMENT_MULTIPLIER = 0.5;
+const MAX_SEQUENCE_HIDDEN_STAGE_MS = 5200;
 const ATLAS_IMAGE_CACHE = new Map();
 const ATLAS_FRAME_METRICS_CACHE = new Map();
-const EMOTION_ICON_REGIONS_CACHE = new Map();
 const MOVEMENT_ACTIONS = new Set([
   "movement",
   "walk",
@@ -29,48 +49,6 @@ const MOVEMENT_ACTIONS = new Set([
   "dash",
   "swim",
 ]);
-const PET_SEQUENCE_RULES = {
-  ferret: {
-    id: "burrow-hop",
-    startChance: 0.64,
-    checkWindowMs: [1800, 3000],
-    cooldownMs: [6500, 10500],
-    stages: [
-      { name: "dig", animationKey: "dig", loops: [2, 3] },
-      { name: "disappear", animationKey: "disappear", loops: 1 },
-      { name: "travel", hidden: true, holdMs: [320, 780], relocate: true },
-      { name: "emerge", animationKey: "emerge", loops: [1, 2] },
-    ],
-  },
-  chameleon: {
-    id: "camo-shift",
-    startChance: 0.3,
-    checkWindowMs: [3800, 6200],
-    cooldownMs: [14500, 23500],
-    stages: [
-      { name: "disappear", animationKey: "disappear", loops: 1 },
-      { name: "travel", hidden: true, holdMs: [520, 1500], relocate: true },
-      { name: "reappear", animationKey: "reappear", loops: [1, 1] },
-    ],
-  },
-  beaver: {
-    id: "dive-hop",
-    startChance: 0.24,
-    checkWindowMs: [5200, 8600],
-    cooldownMs: [18500, 32000],
-    stages: [
-      { name: "dive", animationKey: "dive", loops: [2, 3] },
-      { name: "travel", hidden: true, holdMs: [700, 1700], relocate: true },
-      { name: "ascent", animationKey: "ascent", loops: [2, 3] },
-    ],
-  },
-};
-
-const EMOTION_THEME_GROUPS = {
-  positive: [0, 1, 2, 3],
-  neutral: [3, 4, 5],
-  negative: [6, 7, 8],
-};
 
 function clamp01(value) {
   return Math.max(0, Math.min(1, Number(value) || 0));
@@ -88,10 +66,23 @@ function toActionKey(actionName) {
     .replace(/-+/g, "-");
 }
 
-function resolveFrameIndexByTicks(frames, tickCount, defaultDuration = 6) {
+function getFishSpeciesKey(actionKey) {
+  const normalized = toActionKey(actionKey);
+  const match = normalized.match(/^(.+)-(movement|barrel-roll|death)$/);
+  return match ? match[1] : "";
+}
+
+function resolveFrameIndexByTicks(
+  frames,
+  tickCount,
+  defaultDuration = 6,
+  options = {},
+) {
   if (!Array.isArray(frames) || !frames.length) {
     return 0;
   }
+
+  const holdOnLastFrame = Boolean(options.holdOnLastFrame);
 
   const totalTicks = frames.reduce(
     (sum, frameRect) =>
@@ -101,6 +92,10 @@ function resolveFrameIndexByTicks(frames, tickCount, defaultDuration = 6) {
 
   if (!totalTicks) {
     return 0;
+  }
+
+  if (holdOnLastFrame && tickCount >= totalTicks) {
+    return frames.length - 1;
   }
 
   const pointer = tickCount % totalTicks;
@@ -130,127 +125,6 @@ function getAtlasImage(src) {
   image.src = src;
   ATLAS_IMAGE_CACHE.set(src, image);
   return image;
-}
-
-function detectEmotionIconRegions(image, src) {
-  if (!image?.complete || !src) {
-    return [];
-  }
-
-  const cached = EMOTION_ICON_REGIONS_CACHE.get(src);
-  if (cached) {
-    return cached;
-  }
-
-  const width = Math.max(1, Number(image.naturalWidth || image.width || 0));
-  const height = Math.max(1, Number(image.naturalHeight || image.height || 0));
-  const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
-  const context = canvas.getContext("2d", { willReadFrequently: true });
-  if (!context) {
-    return [];
-  }
-
-  context.clearRect(0, 0, width, height);
-  context.drawImage(image, 0, 0, width, height);
-
-  const imageData = context.getImageData(0, 0, width, height).data;
-  const visited = new Uint8Array(width * height);
-  const regions = [];
-  const alphaThreshold = 18;
-
-  function indexAt(x, y) {
-    return y * width + x;
-  }
-
-  for (let y = 0; y < height; y += 1) {
-    for (let x = 0; x < width; x += 1) {
-      const baseIndex = indexAt(x, y);
-      if (visited[baseIndex]) {
-        continue;
-      }
-
-      const alpha = imageData[baseIndex * 4 + 3];
-      if (alpha < alphaThreshold) {
-        visited[baseIndex] = 1;
-        continue;
-      }
-
-      const stack = [[x, y]];
-      visited[baseIndex] = 1;
-
-      let minX = x;
-      let minY = y;
-      let maxX = x;
-      let maxY = y;
-      let pixelCount = 0;
-
-      while (stack.length) {
-        const [cx, cy] = stack.pop();
-        pixelCount += 1;
-        if (cx < minX) {
-          minX = cx;
-        }
-        if (cy < minY) {
-          minY = cy;
-        }
-        if (cx > maxX) {
-          maxX = cx;
-        }
-        if (cy > maxY) {
-          maxY = cy;
-        }
-
-        const neighbors = [
-          [cx - 1, cy],
-          [cx + 1, cy],
-          [cx, cy - 1],
-          [cx, cy + 1],
-        ];
-
-        for (const [nx, ny] of neighbors) {
-          if (nx < 0 || ny < 0 || nx >= width || ny >= height) {
-            continue;
-          }
-
-          const neighborIndex = indexAt(nx, ny);
-          if (visited[neighborIndex]) {
-            continue;
-          }
-
-          visited[neighborIndex] = 1;
-          const neighborAlpha = imageData[neighborIndex * 4 + 3];
-          if (neighborAlpha >= alphaThreshold) {
-            stack.push([nx, ny]);
-          }
-        }
-      }
-
-      const regionWidth = maxX - minX + 1;
-      const regionHeight = maxY - minY + 1;
-      if (pixelCount < 20 || regionWidth < 4 || regionHeight < 4) {
-        continue;
-      }
-
-      regions.push({
-        x: minX,
-        y: minY,
-        w: regionWidth,
-        h: regionHeight,
-        area: regionWidth * regionHeight,
-        pixelCount,
-      });
-    }
-  }
-
-  const topRegions = regions
-    .sort((a, b) => b.pixelCount - a.pixelCount)
-    .slice(0, 9)
-    .sort((a, b) => (a.y === b.y ? a.x - b.x : a.y - b.y));
-
-  EMOTION_ICON_REGIONS_CACHE.set(src, topRegions);
-  return topRegions;
 }
 
 let frameMetricsCanvas = null;
@@ -415,48 +289,6 @@ function estimateAnimationDurationMs(animation, loops) {
   return totalTicks * SEQUENCE_STAGE_TICK_MS * loopCount;
 }
 
-function pickAnimationChoice(pet, animations, options = {}) {
-  if (!animations) {
-    return { key: null, reason: "no-animations" };
-  }
-
-  const keys = Object.keys(animations).filter(
-    (key) =>
-      Array.isArray(animations[key]?.frames) && animations[key].frames.length,
-  );
-  if (!keys.length) {
-    return { key: null, reason: "no-animation-keys" };
-  }
-
-  const defaults = pet?.defaultAnimationKeys || {};
-  const allTenStepsCompleted = Boolean(options.allTenStepsCompleted);
-  const isMilestoneBoost = Boolean(options.isMilestoneBoost);
-  const isPetting = Boolean(options.isPetting);
-  const wantsMovement = Boolean(options.wantsMovement);
-
-  if (isPetting && defaults.interaction && animations[defaults.interaction]) {
-    return { key: defaults.interaction, reason: "petting" };
-  }
-
-  if (
-    (allTenStepsCompleted || isMilestoneBoost) &&
-    defaults.celebration &&
-    animations[defaults.celebration]
-  ) {
-    return { key: defaults.celebration, reason: "celebration" };
-  }
-
-  if (wantsMovement && defaults.movement && animations[defaults.movement]) {
-    return { key: defaults.movement, reason: "movement" };
-  }
-
-  if (!wantsMovement && defaults.idle && animations[defaults.idle]) {
-    return { key: defaults.idle, reason: "idle" };
-  }
-
-  return { key: keys[0], reason: "fallback" };
-}
-
 export function createPetEngine(canvas, getState, getContext, options = {}) {
   const ctx = canvas.getContext("2d", { alpha: true });
   if (!ctx) {
@@ -481,18 +313,50 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
   let activeAnimationTick = 0;
   let shadowLift = 0;
   let sequenceState = null;
+  let sequenceHiddenStartedAt = 0;
   let sequenceCooldownUntil = 0;
   let nextSequenceCheckAt = 0;
   let currentPetId = "";
   let randomState = 0x9e3779b9;
-  let emotionParticles = [];
-  let nextIdleEmotionAt = 0;
-  let wasPettingLastFrame = false;
-  let lastNegativeBurstAnimationKey = "";
+  let sceneEffectParticles = [];
+  let beaverDiveSplashCooldownUntil = 0;
+  let ferretDirtNextAt = 0;
+  let birdWindNextAt = 0;
+  let birdLandingDustCooldownUntil = 0;
+  let fishBubbleNextAt = 0;
+  let fishTurnRippleCooldownUntil = 0;
+  let fishVariantSpeciesKey = "";
+  let fishSchoolTargetCount = 0;
+  let fishSchoolFollowers = [];
+  let sleepZNextAt = 0;
+  let previousActionKey = "";
+  let previousVelocityX = 0;
+  let playfulActionKey = "";
+  let playfulUntil = 0;
+  let nextPlayfulAt = 0;
   let pendingMilestoneEmotionBursts = 0;
+  let animationStateReason = "fallback";
+  let animationStatePriority = 0;
+  let animationStateUntil = 0;
+  let beaverLogCyclePhase = "";
+  let beaverLogCycleNextAt = 0;
+  let beaverLogCyclePhaseUntil = 0;
+  let beaverLogCycleTarget = null;
+  let beaverLogCycleDepartTarget = null;
+  let beaverLogCycleActionKey = "";
+  let beaverLogCycleProp = null;
+  let beaverLogCycleFadeStartedAt = 0;
+  let environmentState = "";
+  let environmentDesiredState = "";
+  let environmentTransitionState = null;
+  const animationPoolStateByPet = new Map();
   let lastFrameAt = performance.now();
   const onDebugFrame =
     typeof options.onDebugFrame === "function" ? options.onDebugFrame : null;
+  const onRuntimeError =
+    typeof options.onRuntimeError === "function"
+      ? options.onRuntimeError
+      : null;
   const getTuning =
     typeof options.getTuning === "function" ? options.getTuning : null;
 
@@ -508,6 +372,489 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
     return resolveValueRange(value, nextRandom());
   }
 
+  function hasAnimationFrames(animationSet, key) {
+    return Boolean(
+      animationSet &&
+      key &&
+      animationSet[key] &&
+      Array.isArray(animationSet[key]?.frames) &&
+      animationSet[key].frames.length,
+    );
+  }
+
+  function pickAnimationKeyFromCandidates(animationSet, candidateKeys = []) {
+    const normalized = Array.from(
+      new Set(
+        (Array.isArray(candidateKeys) ? candidateKeys : [])
+          .map((key) => String(key || "").trim())
+          .filter(Boolean),
+      ),
+    );
+
+    const valid = normalized.filter((key) =>
+      hasAnimationFrames(animationSet, key),
+    );
+    if (!valid.length) {
+      return "";
+    }
+
+    const index = Math.floor(nextRandom() * valid.length);
+    return valid[index] || valid[0] || "";
+  }
+
+  function isAnimationSelectableOutsideSequence({ petId, key, sequenceState }) {
+    if (!key) {
+      return false;
+    }
+
+    if (!isSequenceOnlyAnimationKey(petId, key)) {
+      return true;
+    }
+
+    if (!sequenceState) {
+      return false;
+    }
+
+    const activeStage = sequenceState.stages?.[sequenceState.stageIndex];
+    return activeStage?.animationKey === key;
+  }
+
+  function scheduleNextPlayfulBeat(profile, now) {
+    const playfulConfig = profile?.playfulNature || {};
+    const delayMs = Math.max(
+      1200,
+      Math.round(pickInRange(playfulConfig.intervalMs || [5500, 12000])),
+    );
+    nextPlayfulAt = now + delayMs;
+  }
+
+  function scheduleNextBeaverLogCycle(profile, now) {
+    const forage = profile?.logForage || {};
+    const delayMs = Math.max(
+      6000,
+      Math.round(pickInRange(forage.intervalMs || [20000, 36000])),
+    );
+    beaverLogCycleNextAt = now + delayMs;
+  }
+
+  function resetBeaverLogCycle(profile, now) {
+    beaverLogCyclePhase = "";
+    beaverLogCyclePhaseUntil = 0;
+    beaverLogCycleTarget = null;
+    beaverLogCycleDepartTarget = null;
+    beaverLogCycleActionKey = "";
+    beaverLogCycleProp = null;
+    beaverLogCycleFadeStartedAt = 0;
+    scheduleNextBeaverLogCycle(profile, now);
+  }
+
+  function ensureFishSchoolFollowers({
+    originX,
+    originY,
+    spriteWidth,
+    schoolConfig,
+  }) {
+    const sizeRange = Array.isArray(schoolConfig?.sizeRange)
+      ? schoolConfig.sizeRange
+      : [3, 6];
+    const minTotal = Math.max(1, Math.round(Number(sizeRange[0] ?? 3)));
+    const maxTotal = Math.max(minTotal, Math.round(Number(sizeRange[1] ?? 6)));
+    if (fishSchoolTargetCount < minTotal || fishSchoolTargetCount > maxTotal) {
+      fishSchoolTargetCount =
+        minTotal +
+        Math.floor(nextRandom() * Math.max(1, maxTotal - minTotal + 1));
+    }
+
+    const totalCount = fishSchoolTargetCount;
+    const desiredFollowers = Math.max(0, totalCount - 1);
+
+    if (fishSchoolFollowers.length === desiredFollowers) {
+      return;
+    }
+
+    const radius = Math.max(spriteWidth * 1.4, 40);
+
+    while (fishSchoolFollowers.length < desiredFollowers) {
+      const index = fishSchoolFollowers.length;
+      const angle = (Math.PI * 2 * (index + 1)) / Math.max(1, desiredFollowers);
+      const distance = radius * (0.55 + nextRandom() * 0.45);
+      fishSchoolFollowers.push({
+        x: originX + Math.cos(angle) * distance,
+        y: originY + Math.sin(angle) * distance * 0.55,
+        vx: (nextRandom() - 0.5) * 0.45,
+        vy: (nextRandom() - 0.5) * 0.3,
+        frameOffset: Math.floor(nextRandom() * 24),
+        scale: 0.72 + nextRandom() * 0.2,
+        wanderAngle: nextRandom() * Math.PI * 2,
+        bubbleNextAt: 0,
+      });
+    }
+
+    if (fishSchoolFollowers.length > desiredFollowers) {
+      fishSchoolFollowers.length = desiredFollowers;
+    }
+  }
+
+  function updateFishSchoolFollowers({
+    originX,
+    originY,
+    spriteWidth,
+    spriteHeight,
+    deltaMs,
+    movementActive,
+    speedMultiplier,
+    leaderVelocityX,
+    leaderVelocityY,
+    schoolConfig,
+  }) {
+    if (!fishSchoolFollowers.length) {
+      return;
+    }
+
+    const dt = Math.max(0.5, Math.min(1.15, deltaMs / 16.666));
+    const maxDistance = Math.max(
+      spriteWidth * 2.5,
+      Number(schoolConfig?.maxDistanceFromLeadPx ?? 180),
+    );
+    const minSpacingPx = Math.max(
+      spriteWidth * 0.34,
+      Number(schoolConfig?.minSpacingPx ?? 30),
+    );
+    const leaderAvoidRadiusPx = Math.max(
+      spriteWidth * 0.22,
+      Number(schoolConfig?.leaderAvoidRadiusPx ?? 24),
+    );
+    const neighborRadius = Math.max(
+      spriteWidth,
+      Number(schoolConfig?.neighborRadiusPx ?? 90),
+    );
+    const separationRadius = Math.max(
+      spriteWidth * 0.4,
+      Number(schoolConfig?.separationRadiusPx ?? 30),
+    );
+    const cohesionWeight =
+      Number(schoolConfig?.cohesionWeight ?? 0.0014) * dt * 0.8;
+    const alignmentWeight =
+      Number(schoolConfig?.alignmentWeight ?? 0.028) * dt * 0.55;
+    const separationWeight =
+      Number(schoolConfig?.separationWeight ?? 0.012) * dt * 0.8;
+    const leaderPullWeight =
+      Number(schoolConfig?.leaderPullWeight ?? 0.002) * dt * 0.9;
+    const wanderWeight =
+      Number(schoolConfig?.wanderWeight ?? 0.004) * dt * 0.28;
+    const minSpeed =
+      Math.max(0.05, Number(schoolConfig?.minSpeed ?? 0.2)) * speedMultiplier;
+    const maxSpeed =
+      Math.max(minSpeed + 0.05, Number(schoolConfig?.maxSpeed ?? 1.9)) *
+      speedMultiplier;
+
+    for (let index = 0; index < fishSchoolFollowers.length; index += 1) {
+      const fish = fishSchoolFollowers[index];
+      let alignX = 0;
+      let alignY = 0;
+      let cohesionX = 0;
+      let cohesionY = 0;
+      let separationX = 0;
+      let separationY = 0;
+      let neighbors = 0;
+
+      for (
+        let otherIndex = 0;
+        otherIndex < fishSchoolFollowers.length;
+        otherIndex += 1
+      ) {
+        if (index === otherIndex) {
+          continue;
+        }
+
+        const other = fishSchoolFollowers[otherIndex];
+        const dx = other.x - fish.x;
+        const dy = other.y - fish.y;
+        const distance = Math.hypot(dx, dy) || 0.0001;
+
+        if (distance <= neighborRadius) {
+          neighbors += 1;
+          alignX += other.vx;
+          alignY += other.vy;
+          cohesionX += other.x;
+          cohesionY += other.y;
+        }
+
+        if (distance <= separationRadius) {
+          const push = (separationRadius - distance) / separationRadius;
+          separationX -= (dx / distance) * push;
+          separationY -= (dy / distance) * push;
+        }
+      }
+
+      if (neighbors > 0) {
+        alignX /= neighbors;
+        alignY /= neighbors;
+        cohesionX = cohesionX / neighbors - fish.x;
+        cohesionY = cohesionY / neighbors - fish.y;
+      }
+
+      fish.vx += (alignX - fish.vx) * alignmentWeight;
+      fish.vy += (alignY - fish.vy) * alignmentWeight;
+      fish.vx += cohesionX * cohesionWeight;
+      fish.vy += cohesionY * cohesionWeight;
+      fish.vx += separationX * separationWeight;
+      fish.vy += separationY * separationWeight;
+
+      fish.vx += (originX - fish.x) * leaderPullWeight;
+      fish.vy += (originY - fish.y) * leaderPullWeight;
+
+      fish.vx += (leaderVelocityX - fish.vx) * 0.015 * dt;
+      fish.vy += (leaderVelocityY - fish.vy) * 0.015 * dt;
+
+      if (movementActive) {
+        fish.wanderAngle =
+          Number(fish.wanderAngle || 0) + (nextRandom() - 0.5) * 0.22 * dt;
+        fish.vx += Math.cos(fish.wanderAngle) * wanderWeight;
+        fish.vy += Math.sin(fish.wanderAngle) * wanderWeight * 0.65;
+      } else {
+        fish.vx *= 0.982;
+        fish.vy *= 0.982;
+      }
+
+      fish.vx *= 0.992;
+      fish.vy *= 0.992;
+
+      const speed = Math.hypot(fish.vx, fish.vy);
+      if (speed > maxSpeed) {
+        const ratio = maxSpeed / Math.max(0.0001, speed);
+        fish.vx *= ratio;
+        fish.vy *= ratio;
+      } else if (speed < minSpeed && movementActive) {
+        const baseDirectionX =
+          Math.abs(fish.vx) > 0.02 ? fish.vx : originX - fish.x;
+        const baseDirectionY =
+          Math.abs(fish.vy) > 0.02 ? fish.vy : (originY - fish.y) * 0.7;
+        const directionLength = Math.hypot(baseDirectionX, baseDirectionY) || 1;
+        fish.vx = (baseDirectionX / directionLength) * minSpeed;
+        fish.vy = (baseDirectionY / directionLength) * minSpeed;
+      }
+
+      fish.x += fish.vx * dt * 1.3;
+      fish.y += fish.vy * dt * 1.3;
+
+      const fromLeadX = fish.x - originX;
+      const fromLeadY = fish.y - originY;
+      const distanceFromLead = Math.hypot(fromLeadX, fromLeadY);
+      if (distanceFromLead < leaderAvoidRadiusPx) {
+        const safeDistance = Math.max(0.0001, distanceFromLead);
+        const push = (leaderAvoidRadiusPx - safeDistance) * 0.55;
+        fish.x += (fromLeadX / safeDistance) * push;
+        fish.y += (fromLeadY / safeDistance) * push;
+      }
+
+      if (distanceFromLead > maxDistance) {
+        const clampRatio = maxDistance / Math.max(1, distanceFromLead);
+        fish.x = originX + fromLeadX * clampRatio;
+        fish.y = originY + fromLeadY * clampRatio;
+      }
+
+      fish.y = Math.max(12, Math.min(canvas.height - spriteHeight - 8, fish.y));
+      fish.x = Math.max(
+        -spriteWidth * 0.8,
+        Math.min(canvas.width - spriteWidth * 0.2, fish.x),
+      );
+    }
+
+    for (let index = 0; index < fishSchoolFollowers.length; index += 1) {
+      for (
+        let otherIndex = index + 1;
+        otherIndex < fishSchoolFollowers.length;
+        otherIndex += 1
+      ) {
+        const fishA = fishSchoolFollowers[index];
+        const fishB = fishSchoolFollowers[otherIndex];
+        const dx = fishB.x - fishA.x;
+        const dy = fishB.y - fishA.y;
+        const distance = Math.hypot(dx, dy) || 0.0001;
+        if (distance >= minSpacingPx) {
+          continue;
+        }
+
+        const overlap = (minSpacingPx - distance) * 0.52;
+        const nx = dx / distance;
+        const ny = dy / distance;
+        fishA.x -= nx * overlap;
+        fishA.y -= ny * overlap;
+        fishB.x += nx * overlap;
+        fishB.y += ny * overlap;
+      }
+    }
+  }
+
+  function startBeaverLogCycle({ profile, now, topSafeInset }) {
+    const forage = profile?.logForage || {};
+    const frame = forage.propFrame || { x: 32, y: 160, w: 32, h: 32 };
+    const edgeInsetX = Math.max(20, Number(forage.edgeInsetX || 36));
+    const edgeBandWidth = Math.max(56, Number(forage.edgeBandWidth || 120));
+    const spawnBottomBandHeight = Math.max(
+      40,
+      Number(forage.bottomBandHeight || 96),
+    );
+    const bottomUiClearancePx = Math.max(
+      0,
+      Number(forage.bottomUiClearancePx || 74),
+    );
+    const spriteProbeWidth = Math.max(24, Number(lastBounds.width) || 64);
+    const spriteProbeHeight = Math.max(24, Number(lastBounds.height) || 64);
+
+    const minX = edgeInsetX;
+    const maxX = Math.max(minX, canvas.width - edgeInsetX - frame.w);
+    const leftBandMax = Math.min(maxX, edgeInsetX + edgeBandWidth);
+    const rightBandMin = Math.max(minX, maxX - edgeBandWidth);
+    const spawnBandMinY = Math.max(
+      topSafeInset + 16,
+      canvas.height - spawnBottomBandHeight - bottomUiClearancePx,
+    );
+    const spawnBandMaxY = Math.max(spawnBandMinY, canvas.height - 24 - frame.h);
+
+    const useLeftBand = nextRandom() < 0.5;
+    const logX = useLeftBand
+      ? minX + nextRandom() * Math.max(0, leftBandMax - minX)
+      : rightBandMin + nextRandom() * Math.max(0, maxX - rightBandMin);
+    const logY =
+      spawnBandMinY + nextRandom() * Math.max(0, spawnBandMaxY - spawnBandMinY);
+
+    const departX = useLeftBand
+      ? Math.max(minX, rightBandMin - spriteProbeWidth * 0.5)
+      : Math.min(maxX, leftBandMax + spriteProbeWidth * 0.5);
+    const departY = Math.max(
+      topSafeInset + 12,
+      Math.min(canvas.height - spriteProbeHeight - 12, logY - 8),
+    );
+
+    const fadeInDurationMs = Math.max(
+      120,
+      Math.round(pickInRange(forage.fadeInMs || [220, 460])),
+    );
+
+    beaverLogCycleProp = {
+      frame,
+      x: logX,
+      y: logY,
+      alpha: 0,
+      fadeInStartedAt: now,
+      fadeInUntil: now + fadeInDurationMs,
+    };
+    beaverLogCycleTarget = {
+      x: logX,
+      y: logY,
+    };
+    beaverLogCycleDepartTarget = {
+      x: departX,
+      y: departY,
+    };
+    beaverLogCyclePhase = "approach";
+    beaverLogCycleActionKey = "movement-water";
+    beaverLogCycleFadeStartedAt = 0;
+    beaverLogCyclePhaseUntil =
+      now +
+      Math.max(
+        2200,
+        Math.round(pickInRange(forage.approachTimeoutMs || [3200, 5200])),
+      );
+  }
+
+  function pickAnimationPoolVariant(petId, poolName, keys) {
+    const normalizedKeys = Array.isArray(keys)
+      ? keys.map((key) => String(key || "").trim()).filter(Boolean)
+      : [];
+
+    if (!normalizedKeys.length) {
+      return "";
+    }
+
+    if (normalizedKeys.length === 1) {
+      return normalizedKeys[0];
+    }
+
+    const petBucket = animationPoolStateByPet.get(petId) || new Map();
+    const poolState = petBucket.get(poolName) || {
+      index: -1,
+      lastKey: "",
+    };
+
+    let nextIndex = (poolState.index + 1) % normalizedKeys.length;
+    let candidate = normalizedKeys[nextIndex];
+    if (candidate === poolState.lastKey) {
+      nextIndex = (nextIndex + 1) % normalizedKeys.length;
+      candidate = normalizedKeys[nextIndex];
+    }
+
+    petBucket.set(poolName, {
+      index: nextIndex,
+      lastKey: candidate,
+    });
+    animationPoolStateByPet.set(petId, petBucket);
+
+    return candidate;
+  }
+
+  function resolveAnimationLocomotion({
+    selectedAnimation,
+    selectedAnimationKey,
+    currentCategory,
+    currentAction,
+    profile,
+  }) {
+    if (typeof selectedAnimation?.locomotion === "boolean") {
+      return selectedAnimation.locomotion;
+    }
+
+    const locomotionConfig = profile?.locomotion || {};
+    const forceAllow = new Set(
+      Array.isArray(locomotionConfig.forceAllowKeys)
+        ? locomotionConfig.forceAllowKeys.map((key) => toActionKey(key))
+        : [],
+    );
+    const forceDeny = new Set(
+      Array.isArray(locomotionConfig.forceDenyKeys)
+        ? locomotionConfig.forceDenyKeys.map((key) => toActionKey(key))
+        : [],
+    );
+
+    const normalizedKey = toActionKey(selectedAnimationKey);
+    const normalizedAction = toActionKey(currentAction);
+    const normalizedCategory = toActionKey(currentCategory);
+
+    if (forceDeny.has(normalizedKey) || forceDeny.has(normalizedAction)) {
+      return false;
+    }
+
+    if (forceAllow.has(normalizedKey) || forceAllow.has(normalizedAction)) {
+      return true;
+    }
+
+    if (normalizedCategory === "interaction") {
+      return false;
+    }
+
+    if (normalizedCategory === "idle") {
+      return false;
+    }
+
+    if (/movement|walk|run|swim|dash|flight|flap|glide/.test(normalizedKey)) {
+      return true;
+    }
+
+    if (
+      /movement|walk|run|swim|dash|flight|flap|glide/.test(normalizedAction)
+    ) {
+      return true;
+    }
+
+    if (/movement/.test(normalizedCategory)) {
+      return true;
+    }
+
+    return false;
+  }
+
   function reseedForPet(petId) {
     randomState =
       (hashStringSeed(`${petId}|${Date.now()}`) || 0x9e3779b9) >>> 0;
@@ -515,198 +862,34 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
 
   function clearSequence() {
     sequenceState = null;
+    sequenceHiddenStartedAt = 0;
   }
 
-  function pickEmotionRegion(regions, theme) {
-    if (!regions.length) {
-      return null;
-    }
-
-    const configuredIndices = EMOTION_THEME_GROUPS[theme] || [];
-    const validConfigured = configuredIndices.filter(
-      (index) => index >= 0 && index < regions.length,
-    );
-    const candidateIndices = validConfigured.length
-      ? validConfigured
-      : regions.map((_, index) => index);
-    const pickIndex =
-      candidateIndices[Math.floor(nextRandom() * candidateIndices.length)] || 0;
-    return regions[pickIndex] || regions[0];
+  function abortSequenceWithCooldown(now, fallbackCooldownMs = 1800) {
+    const cooldownMs = Math.max(900, Number(fallbackCooldownMs) || 1800);
+    sequenceCooldownUntil = now + cooldownMs;
+    nextSequenceCheckAt = sequenceCooldownUntil;
+    clearSequence();
   }
 
-  function emitEmotionBurst(theme, originX, originY, options = {}) {
-    const emotionImage = getAtlasImage(EMOTION_SHEET_SRC);
-    if (!emotionImage?.complete) {
-      return;
-    }
-
-    const regions = detectEmotionIconRegions(emotionImage, EMOTION_SHEET_SRC);
-    if (!regions.length) {
-      return;
-    }
-
-    const intensity = Math.max(1, Number(options.intensity || 1));
-    const burstCount = Math.max(
-      4,
-      Math.round((options.count || 10) * intensity),
-    );
-
-    for (let index = 0; index < burstCount; index += 1) {
-      const region = pickEmotionRegion(regions, theme);
-      if (!region) {
-        continue;
-      }
-
-      const size =
-        resolveValueRange(options.sizeRange || [8, 14], nextRandom()) *
-        (0.75 + nextRandom() * 0.4);
-      const speed = resolveValueRange(
-        options.speedRange || [36, 96],
-        nextRandom(),
-      );
-      const angle = resolveValueRange(
-        options.angleRange || [-Math.PI * 0.9, -Math.PI * 0.1],
-        nextRandom(),
-      );
-      const spreadX = resolveValueRange(
-        options.spreadX || [-20, 20],
-        nextRandom(),
-      );
-      const spreadY = resolveValueRange(
-        options.spreadY || [-8, 8],
-        nextRandom(),
-      );
-      const lifetimeMs = Math.round(
-        resolveValueRange(options.lifeRange || [1200, 2400], nextRandom()),
-      );
-
-      emotionParticles.push({
-        region,
-        x: originX + spreadX,
-        y: originY + spreadY,
-        vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed,
-        gravity: resolveValueRange(
-          options.gravityRange || [70, 150],
-          nextRandom(),
-        ),
-        drag: resolveValueRange(options.dragRange || [0.9, 0.96], nextRandom()),
-        rotation: resolveValueRange([-0.7, 0.7], nextRandom()),
-        spin: resolveValueRange([-2.8, 2.8], nextRandom()),
-        ageMs: 0,
-        lifeMs: lifetimeMs,
-        size,
-      });
-    }
-
-    if (emotionParticles.length > 180) {
-      emotionParticles = emotionParticles.slice(emotionParticles.length - 180);
-    }
-  }
-
-  function updateEmotionParticles(deltaMs) {
-    if (!emotionParticles.length) {
-      return;
-    }
-
-    const dt = Math.max(0, deltaMs) / 1000;
-    emotionParticles = emotionParticles.filter((particle) => {
-      particle.ageMs += deltaMs;
-      if (particle.ageMs >= particle.lifeMs) {
-        return false;
-      }
-
-      particle.vx *= particle.drag;
-      particle.vy = particle.vy * particle.drag + particle.gravity * dt;
-      particle.x += particle.vx * dt;
-      particle.y += particle.vy * dt;
-      particle.rotation += particle.spin * dt;
-
-      return true;
+  function emitSceneEffectBurst(options = {}) {
+    sceneEffectParticles = emitSceneEffectBurstCore({
+      sceneEffectParticles,
+      options,
+      nextRandom,
+      resolveValueRange,
     });
   }
 
-  function drawEmotionParticles(ctx) {
-    if (!emotionParticles.length) {
-      return;
-    }
-
-    const emotionImage = getAtlasImage(EMOTION_SHEET_SRC);
-    if (!emotionImage?.complete) {
-      return;
-    }
-
-    for (const particle of emotionParticles) {
-      const lifeProgress = clamp01(
-        particle.ageMs / Math.max(1, particle.lifeMs),
-      );
-      const fade = lifeProgress < 0.75 ? 1 : 1 - (lifeProgress - 0.75) / 0.25;
-      if (fade <= 0.01) {
-        continue;
-      }
-
-      ctx.save();
-      ctx.globalAlpha = clamp01(fade);
-      ctx.translate(particle.x, particle.y);
-      ctx.rotate(particle.rotation);
-      const half = particle.size / 2;
-      ctx.drawImage(
-        emotionImage,
-        particle.region.x,
-        particle.region.y,
-        particle.region.w,
-        particle.region.h,
-        -half,
-        -half,
-        particle.size,
-        particle.size,
-      );
-      ctx.restore();
-    }
-  }
-
-  function canRunRule(rule, animationSet) {
-    if (!rule || !animationSet) {
-      return false;
-    }
-
-    return rule.stages.every((stage) => {
-      if (!stage.animationKey) {
-        return true;
-      }
-      const animation = animationSet[stage.animationKey];
-      return Boolean(animation?.frames?.length);
+  function updateSceneEffectParticles(deltaMs) {
+    sceneEffectParticles = updateSceneEffectParticlesCore({
+      sceneEffectParticles,
+      deltaMs,
     });
   }
 
-  function buildSequenceRuntime(rule, animationSet, now) {
-    const stages = rule.stages.map((stage) => {
-      const loopsRaw = pickInRange(stage.loops || 1);
-      const loops = Math.max(1, Math.round(loopsRaw));
-      const animation = stage.animationKey
-        ? animationSet[stage.animationKey]
-        : null;
-      const holdMs = Math.max(0, Math.round(pickInRange(stage.holdMs || 0)));
-      const animationMs = animation
-        ? Math.round(estimateAnimationDurationMs(animation, loops))
-        : 0;
-      const durationMs = Math.max(80, animationMs + holdMs);
-
-      return {
-        ...stage,
-        loops,
-        durationMs,
-      };
-    });
-
-    return {
-      ruleId: rule.id,
-      stageIndex: 0,
-      startedAt: now,
-      stageStartedAt: now,
-      stageEndsAt: now + stages[0].durationMs,
-      stages,
-    };
+  function drawSceneEffectParticles(ctx) {
+    drawSceneEffectParticlesCore({ ctx, sceneEffectParticles, clamp01 });
   }
 
   function relocateDuringSequence(topSafeInset) {
@@ -739,19 +922,29 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
     position.y = bestY;
     velocity.x = 0;
     velocity.y = 0;
+    return bestDistance > 0 ? bestDistance : 0;
   }
 
-  function getRuleForPet(petId, animationSet) {
-    const rule = PET_SEQUENCE_RULES[petId];
-    if (!rule) {
-      return null;
+  function advanceSequence(
+    now,
+    topSafeInset,
+    environmentState,
+    environmentDesiredState,
+  ) {
+    if (!sequenceState) {
+      return;
     }
 
-    return canRunRule(rule, animationSet) ? rule : null;
-  }
-
-  function advanceSequence(now, topSafeInset) {
-    if (!sequenceState) {
+    const activeStage = sequenceState.stages?.[sequenceState.stageIndex];
+    if (
+      activeStage &&
+      !isSequenceStageEnvironmentValid({
+        stage: activeStage,
+        currentEnvironment: environmentState,
+        desiredEnvironment: environmentDesiredState,
+      })
+    ) {
+      abortSequenceWithCooldown(now, 2200);
       return;
     }
 
@@ -762,21 +955,37 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
         const cooldownMs = rule
           ? Math.max(1200, Math.round(pickInRange(rule.cooldownMs || 12000)))
           : 12000;
-        sequenceCooldownUntil = now + cooldownMs;
-        nextSequenceCheckAt = sequenceCooldownUntil;
-        clearSequence();
+        abortSequenceWithCooldown(now, cooldownMs);
         return;
       }
 
       sequenceState.stageIndex = nextIndex;
       sequenceState.stageStartedAt = now;
-      sequenceState.stageEndsAt =
-        now + sequenceState.stages[nextIndex].durationMs;
-
       const stage = sequenceState.stages[nextIndex];
-      if (stage.relocate) {
-        relocateDuringSequence(topSafeInset);
+      if (
+        !isSequenceStageEnvironmentValid({
+          stage,
+          currentEnvironment: environmentState,
+          desiredEnvironment: environmentDesiredState,
+        })
+      ) {
+        abortSequenceWithCooldown(now, 2200);
+        return;
       }
+
+      let stageDurationMs = Math.max(80, Number(stage?.durationMs) || 80);
+      if (stage.relocate) {
+        const relocateDistance = relocateDuringSequence(topSafeInset);
+        stageDurationMs = resolveSequenceRelocateStageDurationMs({
+          petId: currentPetId,
+          stage,
+          baseDurationMs: stageDurationMs,
+          distance: relocateDistance,
+          profile: getPetBehaviorProfile(currentPetId),
+        });
+      }
+      sequenceState.stageEndsAt = now + stageDurationMs;
+      sequenceHiddenStartedAt = stage?.hidden ? now : 0;
     }
   }
 
@@ -789,6 +998,9 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
     movementIntentByContext,
     currentSpeed,
     topSafeInset,
+    routeZone,
+    environmentState,
+    environmentDesiredState,
   }) {
     if (!animationSet) {
       return;
@@ -800,11 +1012,20 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
     }
 
     if (sequenceState) {
-      advanceSequence(now, topSafeInset);
+      advanceSequence(
+        now,
+        topSafeInset,
+        environmentState,
+        environmentDesiredState,
+      );
       return;
     }
 
     if (isPetting || movementIntentByContext || currentSpeed > 0.2) {
+      return;
+    }
+
+    if (routeZone === PET_ROUTE_ZONES.LEFT_ASSIST) {
       return;
     }
 
@@ -828,10 +1049,37 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
       return;
     }
 
-    sequenceState = buildSequenceRuntime(rule, animationSet, now);
+    sequenceState = buildSequenceRuntime({
+      rule,
+      animationSet,
+      now,
+      petId,
+      pickInRange,
+      estimateAnimationDurationMs,
+    });
     const stage = sequenceState.stages[sequenceState.stageIndex];
+    if (
+      !isSequenceStageEnvironmentValid({
+        stage,
+        currentEnvironment: environmentState,
+        desiredEnvironment: environmentDesiredState,
+      })
+    ) {
+      abortSequenceWithCooldown(now, 2200);
+      return;
+    }
+
+    sequenceHiddenStartedAt = stage?.hidden ? now : 0;
     if (stage?.relocate) {
-      relocateDuringSequence(topSafeInset);
+      const relocateDistance = relocateDuringSequence(topSafeInset);
+      const stageDurationMs = resolveSequenceRelocateStageDurationMs({
+        petId,
+        stage,
+        baseDurationMs: Math.max(80, Number(stage?.durationMs) || 80),
+        distance: relocateDistance,
+        profile: getPetBehaviorProfile(petId),
+      });
+      sequenceState.stageEndsAt = now + stageDurationMs;
     }
   }
 
@@ -845,136 +1093,31 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
   }
 
   function updateMotion(spriteWidth, spriteHeight, state, options = {}) {
-    const allowMovement = options.allowMovement !== false;
-    const speedMultiplier = Math.max(0.1, Number(options.speedMultiplier || 1));
-    const behavior = getContext() || {};
-    const profile = getPetBehaviorProfile(state.selectedPetId);
-    const topSafeInset = Math.max(0, Number(behavior.topSafeInset || 0));
-    const routeZone = resolveRouteZone(behavior.pathname);
-    const checklistCompleted = Number(behavior.checklistCompleted || 0);
-    const checklistTotal = Number(behavior.checklistTotal || 0);
-    const checklistIncomplete = checklistTotal > checklistCompleted;
-    const allTenStepsCompleted =
-      checklistTotal >= 10 && checklistCompleted >= 10;
+    const motion = updateMotionState({
+      spriteWidth,
+      spriteHeight,
+      state,
+      options,
+      frame,
+      canvas,
+      position,
+      velocity,
+      lastChecklistCompleted,
+      milestoneBoostUntil,
+      pendingMilestoneEmotionBursts,
+      getContext,
+      getPetBehaviorProfile,
+      resolveRouteZone,
+      petRouteZones: PET_ROUTE_ZONES,
+      checklistMilestones: CHECKLIST_MILESTONES,
+    });
 
-    if (checklistCompleted > lastChecklistCompleted) {
-      const hitMilestone = CHECKLIST_MILESTONES.some(
-        (milestone) =>
-          checklistCompleted >= milestone && lastChecklistCompleted < milestone,
-      );
-
-      if (hitMilestone) {
-        milestoneBoostUntil = Date.now() + 1800;
-        pendingMilestoneEmotionBursts += 1;
-      }
-    }
-
-    lastChecklistCompleted = checklistCompleted;
-
-    if (!allowMovement) {
-      velocity.x *= 0.78;
-      velocity.y *= 0.78;
-      return {
-        allTenStepsCompleted,
-      };
-    }
-
-    if (routeZone === PET_ROUTE_ZONES.LEFT_ASSIST && checklistIncomplete) {
-      const targetX = 70 + Math.sin(frame / 70) * 28;
-      const minTargetY = Math.max(24, topSafeInset + 18);
-      const targetY = Math.max(
-        minTargetY,
-        Math.min(
-          canvas.height - spriteHeight - 24,
-          130 + Math.sin(frame / 62) * 40,
-        ),
-      );
-      velocity.x += (targetX - position.x) * profile.checklistPull;
-      velocity.y +=
-        (targetY - position.y) *
-        (profile.checklistPull * 0.7 * speedMultiplier);
-    } else if (routeZone === PET_ROUTE_ZONES.BOTTOM_ROAM) {
-      const targetY = Math.max(
-        topSafeInset + 22,
-        canvas.height - spriteHeight - 26,
-      );
-      const targetX =
-        canvas.width * 0.5 +
-        Math.sin(frame / 80) * Math.min(260, canvas.width * 0.26);
-      velocity.x += (targetX - position.x) * (0.0012 * speedMultiplier);
-      velocity.y += (targetY - position.y) * (0.0021 * speedMultiplier);
-    } else if (routeZone === PET_ROUTE_ZONES.RIGHT_SUMMARY) {
-      const targetX = Math.max(
-        80,
-        canvas.width - spriteWidth - 120 + Math.sin(frame / 95) * 22,
-      );
-      const targetY = Math.max(
-        topSafeInset + 24,
-        Math.min(canvas.height - spriteHeight - 30, canvas.height * 0.56),
-      );
-      velocity.x += (targetX - position.x) * (0.0015 * speedMultiplier);
-      velocity.y += (targetY - position.y) * (0.0013 * speedMultiplier);
-    } else if (routeZone === PET_ROUTE_ZONES.HEADER_PERCH) {
-      const targetY = Math.max(
-        topSafeInset + 18,
-        30 + Math.sin(frame / 75) * 8,
-      );
-      const targetX =
-        canvas.width * 0.5 +
-        Math.sin(frame / 105) * Math.min(220, canvas.width * 0.2);
-      velocity.x += (targetX - position.x) * (0.0013 * speedMultiplier);
-      velocity.y += (targetY - position.y) * (0.002 * speedMultiplier);
-    } else {
-      velocity.x += Math.sin(frame / 130) * profile.driftX * speedMultiplier;
-      velocity.y += Math.cos(frame / 150) * profile.driftY * speedMultiplier;
-    }
-
-    if (allTenStepsCompleted) {
-      velocity.x += Math.sin(frame / 16) * (0.012 * speedMultiplier);
-      velocity.y += Math.cos(frame / 18) * (0.01 * speedMultiplier);
-    }
-
-    if (Date.now() < milestoneBoostUntil) {
-      velocity.x += Math.sin(frame / 12) * (0.009 * speedMultiplier);
-      velocity.y += Math.cos(frame / 14) * (0.008 * speedMultiplier);
-    }
-
-    position.x += velocity.x;
-    position.y += velocity.y;
-
-    const minX = 6;
-    const minY = Math.max(6, topSafeInset + 6);
-    const maxX = Math.max(minX, canvas.width - spriteWidth - 6);
-    const maxY = Math.max(minY, canvas.height - spriteHeight - 6);
-
-    if (position.x <= minX || position.x >= maxX) {
-      velocity.x *= -1;
-      position.x = Math.max(minX, Math.min(maxX, position.x));
-    }
-
-    if (position.y <= minY || position.y >= maxY) {
-      velocity.y *= -1;
-      position.y = Math.max(minY, Math.min(maxY, position.y));
-    }
-
-    const celebrationBoost = allTenStepsCompleted ? 1.2 : 1;
-    velocity.x = Math.max(
-      -profile.maxSpeedX * celebrationBoost * speedMultiplier,
-      Math.min(
-        profile.maxSpeedX * celebrationBoost * speedMultiplier,
-        velocity.x,
-      ),
-    );
-    velocity.y = Math.max(
-      -profile.maxSpeedY * celebrationBoost * speedMultiplier,
-      Math.min(
-        profile.maxSpeedY * celebrationBoost * speedMultiplier,
-        velocity.y,
-      ),
-    );
+    lastChecklistCompleted = motion.lastChecklistCompleted;
+    milestoneBoostUntil = motion.milestoneBoostUntil;
+    pendingMilestoneEmotionBursts = motion.pendingMilestoneEmotionBursts;
 
     return {
-      allTenStepsCompleted,
+      allTenStepsCompleted: motion.allTenStepsCompleted,
     };
   }
 
@@ -986,480 +1129,1402 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
     resizeCanvas();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const nowPerf = performance.now();
-    const deltaMs = Math.min(60, Math.max(8, nowPerf - lastFrameAt));
-    lastFrameAt = nowPerf;
-    updateEmotionParticles(deltaMs);
+    try {
+      const nowPerf = performance.now();
+      const deltaMs = Math.min(60, Math.max(8, nowPerf - lastFrameAt));
+      lastFrameAt = nowPerf;
+      updateSceneEffectParticles(deltaMs);
 
-    const state = getState();
-    if (state.selectedPetId !== currentPetId) {
-      currentPetId = state.selectedPetId;
-      reseedForPet(currentPetId);
-      sequenceCooldownUntil = 0;
-      nextSequenceCheckAt = 0;
-      nextIdleEmotionAt = Date.now() + Math.round(pickInRange([3500, 8500]));
-      pendingMilestoneEmotionBursts = 0;
-      emotionParticles = [];
-      clearSequence();
-    }
-
-    const tuning = getTuning ? getTuning() || {} : {};
-    const speedMultiplier =
-      Math.max(0.1, Number(tuning.speedMultiplier || 1)) *
-      BASE_PET_SPEED_MULTIPLIER;
-    const scaleMultiplier = Math.max(0.5, Number(tuning.scaleMultiplier || 1));
-    const shadowOffsetAdjust = Number(tuning.shadowOffsetAdjust || 0);
-    const shadowAlpha = Math.max(
-      0.05,
-      Math.min(1, Number(tuning.shadowAlpha || 0.18)),
-    );
-    const highContrastShadow = Boolean(tuning.highContrastShadow);
-    const forceFreeze = Boolean(tuning.freezeMotion);
-    const forcedAnimationKey = String(tuning.forceAnimationKey || "").trim();
-    const normalizedForcedActionKey = toActionKey(forcedAnimationKey);
-
-    if (forceFreeze) {
-      velocity.x = 0;
-      velocity.y = 0;
-    }
-
-    const pet = PET_CATALOG[state.selectedPetId] || PET_CATALOG[DEFAULT_PET_ID];
-    const atlasEnabled = Boolean(
-      pet?.atlas?.src &&
-      Array.isArray(pet?.frames) &&
-      typeof pet.frames[0] === "object",
-    );
-
-    const frameDuration = pet.frameDuration || 18;
-    const animationSet = resolveAnimationSet(pet);
-    const behavior = getContext() || {};
-    const topSafeInset = Math.max(0, Number(behavior.topSafeInset || 0));
-    const routeZone = resolveRouteZone(behavior.pathname);
-    const checklistCompleted = Number(behavior.checklistCompleted || 0);
-    const checklistTotal = Number(behavior.checklistTotal || 0);
-    const checklistIncomplete = checklistTotal > checklistCompleted;
-    const allTenStepsCompleted =
-      checklistTotal >= 10 && checklistCompleted >= 10;
-    const movementIntentByContext =
-      routeZone === PET_ROUTE_ZONES.BOTTOM_ROAM ||
-      routeZone === PET_ROUTE_ZONES.RIGHT_SUMMARY ||
-      routeZone === PET_ROUTE_ZONES.HEADER_PERCH ||
-      (routeZone === PET_ROUTE_ZONES.LEFT_ASSIST && checklistIncomplete);
-    const isPetting = Date.now() < pettingUntil;
-    const currentSpeed = Math.hypot(velocity.x, velocity.y);
-    const currentlyMoving = currentSpeed > 0.12;
-    const wantsMovement =
-      !isPetting && (movementIntentByContext || currentlyMoving);
-
-    const now = Date.now();
-    maybeStartSequence({
-      now,
-      petId: state.selectedPetId,
-      animationSet,
-      forcedAnimationKey,
-      isPetting,
-      movementIntentByContext,
-      currentSpeed,
-      topSafeInset,
-    });
-    const activeStage = sequenceState
-      ? sequenceState.stages[sequenceState.stageIndex]
-      : null;
-    const sequenceAnimationKey = String(activeStage?.animationKey || "");
-    const sequenceHiddenStage = Boolean(activeStage?.hidden);
-    const canForceSequenceAnimation =
-      Boolean(sequenceAnimationKey) &&
-      Boolean(animationSet?.[sequenceAnimationKey]?.frames?.length);
-
-    const animationChoice = pickAnimationChoice(pet, animationSet, {
-      allTenStepsCompleted,
-      isMilestoneBoost: Date.now() < milestoneBoostUntil,
-      isPetting: Date.now() < pettingUntil,
-      wantsMovement,
-    });
-
-    const fallbackAnimationKeys = Array.from(
-      new Set(
-        (Array.isArray(pet?.frames) ? pet.frames : [])
-          .map((item) => toActionKey(item?.action))
-          .filter(Boolean),
-      ),
-    );
-    const canForceFromFrames =
-      Boolean(normalizedForcedActionKey) &&
-      fallbackAnimationKeys.includes(normalizedForcedActionKey);
-
-    const selectedAnimationKey =
-      forcedAnimationKey && animationSet?.[forcedAnimationKey]
-        ? forcedAnimationKey
-        : canForceSequenceAnimation
-          ? sequenceAnimationKey
-          : canForceFromFrames
-            ? normalizedForcedActionKey
-            : animationChoice.key;
-    const animationReason =
-      forcedAnimationKey && animationSet?.[forcedAnimationKey]
-        ? "forced"
-        : canForceSequenceAnimation
-          ? `sequence:${sequenceState?.ruleId || "unknown"}:${activeStage?.name || "stage"}`
-          : canForceFromFrames
-            ? "forced-frame-action"
-            : animationChoice.reason;
-
-    const selectedAnimation =
-      selectedAnimationKey && animationSet
-        ? animationSet[selectedAnimationKey]
-        : null;
-
-    const nextAnimationKey = selectedAnimationKey || "__fallback__";
-    if (nextAnimationKey !== activeAnimationKey) {
-      activeAnimationKey = nextAnimationKey;
-      activeAnimationTick = 0;
-    }
-
-    const frameSource = selectedAnimation?.frames?.length
-      ? selectedAnimation.frames
-      : canForceFromFrames
-        ? pet.frames.filter(
-            (frameItem) =>
-              toActionKey(frameItem?.action) === selectedAnimationKey,
-          )
-        : pet.frames;
-    const frameSourceKind = selectedAnimation?.frames?.length
-      ? "selected-animation"
-      : canForceFromFrames
-        ? "forced-frame-action"
-        : "pet-frames";
-
-    const animationKeys = getAvailableAnimationKeys(animationSet);
-    const fallbackAnimationFrames = animationKeys.length
-      ? animationSet[animationKeys[0]]?.frames || []
-      : [];
-    const safeFrameSource =
-      Array.isArray(frameSource) && frameSource.length
-        ? frameSource
-        : Array.isArray(pet?.frames) && pet.frames.length
-          ? pet.frames
-          : fallbackAnimationFrames;
-    const safeFrameSourceKind =
-      Array.isArray(frameSource) && frameSource.length
-        ? frameSourceKind
-        : Array.isArray(pet?.frames) && pet.frames.length
-          ? "fallback-pet-frames"
-          : "fallback-animation-frames";
-
-    if (!safeFrameSource.length) {
-      if (!forceFreeze) {
-        frame += 1;
+      const state = getState();
+      if (state.selectedPetId !== currentPetId) {
+        currentPetId = state.selectedPetId;
+        reseedForPet(currentPetId);
+        sequenceCooldownUntil = 0;
+        nextSequenceCheckAt = 0;
+        pendingMilestoneEmotionBursts = 0;
+        sceneEffectParticles = [];
+        beaverDiveSplashCooldownUntil = 0;
+        ferretDirtNextAt = 0;
+        birdWindNextAt = 0;
+        birdLandingDustCooldownUntil = 0;
+        fishBubbleNextAt = 0;
+        fishTurnRippleCooldownUntil = 0;
+        fishVariantSpeciesKey = "";
+        fishSchoolTargetCount = 0;
+        fishSchoolFollowers = [];
+        sleepZNextAt = 0;
+        previousActionKey = "";
+        previousVelocityX = velocity.x;
+        playfulActionKey = "";
+        playfulUntil = 0;
+        nextPlayfulAt = 0;
+        animationStateReason = "fallback";
+        animationStatePriority = 0;
+        animationStateUntil = 0;
+        beaverLogCycleFadeStartedAt = 0;
+        environmentState = "";
+        environmentDesiredState = "";
+        environmentTransitionState = null;
+        resetBeaverLogCycle(getPetBehaviorProfile(currentPetId), Date.now());
+        if (!animationPoolStateByPet.has(currentPetId)) {
+          animationPoolStateByPet.set(currentPetId, new Map());
+        }
+        clearSequence();
       }
-      rafId = window.requestAnimationFrame(render);
-      return;
-    }
 
-    const frameIndex = atlasEnabled
-      ? resolveFrameIndexByTicks(
-          safeFrameSource,
-          activeAnimationTick,
-          frameDuration,
+      const tuning = getTuning ? getTuning() || {} : {};
+      const speedMultiplier =
+        Math.max(0.1, Number(tuning.speedMultiplier || 1)) *
+        BASE_PET_SPEED_MULTIPLIER *
+        LAZY_MOVEMENT_MULTIPLIER;
+      const scaleMultiplier = Math.max(
+        0.5,
+        Number(tuning.scaleMultiplier || 1),
+      );
+      const shadowOffsetAdjust = Number(tuning.shadowOffsetAdjust || 0);
+      const shadowAlpha = Math.max(
+        0.05,
+        Math.min(1, Number(tuning.shadowAlpha || 0.18)),
+      );
+      const highContrastShadow = Boolean(tuning.highContrastShadow);
+      const forceFreeze = Boolean(tuning.freezeMotion);
+      const forcedAnimationKey = String(tuning.forceAnimationKey || "").trim();
+      const normalizedForcedActionKey = toActionKey(forcedAnimationKey);
+
+      if (forceFreeze) {
+        velocity.x = 0;
+        velocity.y = 0;
+      }
+
+      const pet =
+        PET_CATALOG[state.selectedPetId] || PET_CATALOG[DEFAULT_PET_ID];
+      const atlasEnabled = Boolean(
+        pet?.atlas?.src &&
+        Array.isArray(pet?.frames) &&
+        typeof pet.frames[0] === "object",
+      );
+
+      let frameDuration = pet.frameDuration || 18;
+      const animationSet = resolveAnimationSet(pet);
+      let behaviorProfile = getPetBehaviorProfile(state.selectedPetId);
+      const animationFrameDurationMultiplier = Math.max(
+        0.75,
+        Number(behaviorProfile?.animationFrameDurationMultiplier || 1),
+      );
+      frameDuration = Math.max(
+        1,
+        Math.round(frameDuration * animationFrameDurationMultiplier),
+      );
+      const behavior = getContext() || {};
+      const topSafeInset = Math.max(0, Number(behavior.topSafeInset || 0));
+      const routeZone = resolveRouteZone(behavior.pathname);
+      const checklistCompleted = Number(behavior.checklistCompleted || 0);
+      const checklistTotal = Number(behavior.checklistTotal || 0);
+      const checklistIncomplete = checklistTotal > checklistCompleted;
+      const allTenStepsCompleted =
+        checklistTotal >= 10 && checklistCompleted >= 10;
+      const movementIntentByContext =
+        routeZone === PET_ROUTE_ZONES.BOTTOM_ROAM ||
+        routeZone === PET_ROUTE_ZONES.RIGHT_SUMMARY ||
+        routeZone === PET_ROUTE_ZONES.HEADER_PERCH ||
+        (routeZone === PET_ROUTE_ZONES.LEFT_ASSIST && checklistIncomplete);
+      const isPetting = Date.now() < pettingUntil;
+      const currentSpeed = Math.hypot(velocity.x, velocity.y);
+      const currentlyMoving = currentSpeed > 0.12;
+      const wantsMovement =
+        !isPetting && (movementIntentByContext || currentlyMoving);
+
+      const fishPetSelected = state.selectedPetId === "fish";
+      if (!fishPetSelected) {
+        fishVariantSpeciesKey = "";
+        fishSchoolTargetCount = 0;
+        fishSchoolFollowers = [];
+      } else {
+        const baseMovementPool = Array.isArray(
+          behaviorProfile?.animationPools?.movement,
         )
-      : Math.floor(frame / frameDuration) % safeFrameSource.length;
-    const sprite = safeFrameSource[frameIndex] || safeFrameSource[0];
+          ? behaviorProfile.animationPools.movement
+          : [];
+        const validMovementPool = baseMovementPool.filter((key) =>
+          hasAnimationFrames(animationSet, key),
+        );
 
-    const scale = atlasEnabled ? DEFAULT_ATLAS_SCALE : 4;
-    const tunedScale = scale * scaleMultiplier;
-    const spriteHeight = atlasEnabled
-      ? (Number(sprite?.h) || 16) * tunedScale
-      : sprite.length * tunedScale;
-    const spriteWidth = atlasEnabled
-      ? (Number(sprite?.w) || 16) * tunedScale
-      : (sprite[0]?.length || 0) * tunedScale;
+        const validSpecies = validMovementPool
+          .map((key) => getFishSpeciesKey(key))
+          .filter(Boolean);
 
-    const currentAction = String(
-      sprite?.action || selectedAnimation?.title || "",
-    ).toLowerCase();
-    const currentActionKey = toActionKey(currentAction);
-    const currentCategory = String(
-      sprite?.category || selectedAnimation?.category || "",
-    ).toLowerCase();
-    const allowMovement = atlasEnabled
-      ? MOVEMENT_ACTIONS.has(currentAction) ||
-        MOVEMENT_ACTIONS.has(currentCategory)
-      : true;
+        if (
+          !fishVariantSpeciesKey ||
+          !validSpecies.includes(fishVariantSpeciesKey)
+        ) {
+          const previousSpeciesKey = fishVariantSpeciesKey;
+          const pickedMovementKey =
+            validMovementPool[
+              Math.floor(nextRandom() * validMovementPool.length)
+            ] ||
+            validMovementPool[0] ||
+            "";
+          fishVariantSpeciesKey = getFishSpeciesKey(pickedMovementKey);
 
-    const movementActive = allowMovement && !forceFreeze && !sequenceState;
+          if (fishVariantSpeciesKey !== previousSpeciesKey) {
+            fishSchoolTargetCount = 0;
+            fishSchoolFollowers = [];
+          }
+        }
 
-    const motionState = updateMotion(spriteWidth, spriteHeight, state, {
-      allowMovement: movementActive,
-      speedMultiplier,
-    });
+        if (fishVariantSpeciesKey) {
+          const keepScopedKeys = (keys = []) =>
+            Array.from(
+              new Set(
+                (Array.isArray(keys) ? keys : []).filter(
+                  (key) =>
+                    getFishSpeciesKey(key) === fishVariantSpeciesKey &&
+                    hasAnimationFrames(animationSet, key),
+                ),
+              ),
+            );
 
-    const shadow = pet.shadow || {};
-    const airborneActions = Array.isArray(shadow.airborneActions)
-      ? shadow.airborneActions.map((action) => toActionKey(action))
-      : [];
-    const isAirborneAction =
-      airborneActions.includes(currentActionKey) ||
-      /flight|flap|glide|ascent|dive|hover/.test(currentActionKey);
-    const isJumpAction = /jump/.test(currentActionKey);
+          const scopedRollKey = `${fishVariantSpeciesKey}-barrel-roll`;
+          const hasScopedRoll = hasAnimationFrames(animationSet, scopedRollKey);
+          const scopedPools = behaviorProfile?.animationPools || {};
 
-    const hasCelebration =
-      motionState.allTenStepsCompleted || Date.now() < milestoneBoostUntil;
-    const hasPetting = Date.now() < pettingUntil;
-    const hasDynamicBob =
-      movementActive ||
-      isAirborneAction ||
-      isJumpAction ||
-      hasCelebration ||
-      hasPetting;
-    const bobScale = hasCelebration
-      ? 5
-      : hasPetting
-        ? 4
-        : movementActive
-          ? 2
-          : 0;
-    const bob =
-      forceFreeze || !hasDynamicBob
-        ? 0
-        : Math.round(Math.sin(frame / 15) * bobScale);
-    const shouldBlink = frame % 120 > 108;
+          behaviorProfile = {
+            ...behaviorProfile,
+            animationPools: {
+              ...scopedPools,
+              movement: keepScopedKeys(scopedPools.movement),
+              idle: keepScopedKeys(scopedPools.idle),
+              interaction: Array.from(
+                new Set([
+                  ...keepScopedKeys(scopedPools.interaction),
+                  ...(hasScopedRoll ? [scopedRollKey] : []),
+                ]),
+              ),
+              celebration: Array.from(
+                new Set([
+                  ...keepScopedKeys(scopedPools.celebration),
+                  ...(hasScopedRoll ? [scopedRollKey] : []),
+                ]),
+              ),
+            },
+            playfulNature: {
+              ...(behaviorProfile?.playfulNature || {}),
+              actionKeys: Array.from(
+                new Set([
+                  ...keepScopedKeys(behaviorProfile?.playfulNature?.actionKeys),
+                  ...(hasScopedRoll ? [scopedRollKey] : []),
+                ]),
+              ),
+            },
+            taskCompletion: {
+              ...(behaviorProfile?.taskCompletion || {}),
+              actionKeys: Array.from(
+                new Set([
+                  ...keepScopedKeys(
+                    behaviorProfile?.taskCompletion?.actionKeys,
+                  ),
+                  ...(hasScopedRoll ? [scopedRollKey] : []),
+                ]),
+              ),
+            },
+          };
+        }
+      }
 
-    const originX = Math.round(position.x);
-    const originY = Math.round(position.y + bob);
-
-    if (pendingMilestoneEmotionBursts > 0) {
-      emitEmotionBurst("positive", originX + spriteWidth * 0.5, originY - 6, {
-        count: 10,
-        intensity: Math.min(1.7, pendingMilestoneEmotionBursts),
-        sizeRange: [8, 13],
-        speedRange: [34, 96],
-        lifeRange: [1200, 2100],
-        spreadX: [-24, 24],
-      });
-      pendingMilestoneEmotionBursts = 0;
-    }
-
-    const isCurrentlyPetting = Date.now() < pettingUntil;
-    if (isCurrentlyPetting && !wasPettingLastFrame) {
-      emitEmotionBurst("positive", originX + spriteWidth * 0.5, originY - 2, {
-        count: 5,
-        sizeRange: [8, 12],
-        speedRange: [30, 72],
-        lifeRange: [900, 1600],
-        spreadX: [-18, 18],
-      });
-    }
-    wasPettingLastFrame = isCurrentlyPetting;
-
-    const isNegativeAction = /damage|death|hurt|cry|sad/.test(currentActionKey);
-    if (
-      isNegativeAction &&
-      activeAnimationKey !== lastNegativeBurstAnimationKey
-    ) {
-      emitEmotionBurst("negative", originX + spriteWidth * 0.5, originY + 4, {
-        count: 5,
-        sizeRange: [8, 12],
-        speedRange: [22, 56],
-        angleRange: [-Math.PI * 0.75, -Math.PI * 0.25],
-        lifeRange: [850, 1500],
-        gravityRange: [85, 170],
-        spreadX: [-14, 14],
-      });
-      lastNegativeBurstAnimationKey = activeAnimationKey;
-    }
-
-    if (!isNegativeAction) {
-      lastNegativeBurstAnimationKey = "";
-    }
-
-    const idleEmotionEligible =
-      !isPetting &&
-      !sequenceState &&
-      !movementIntentByContext &&
-      !movementActive &&
-      !isNegativeAction;
-    if (idleEmotionEligible && now >= nextIdleEmotionAt) {
-      emitEmotionBurst("neutral", originX + spriteWidth * 0.5, originY - 4, {
-        count: 4,
-        sizeRange: [7, 11],
-        speedRange: [20, 44],
-        lifeRange: [900, 1500],
-        gravityRange: [60, 125],
-        spreadX: [-16, 16],
-      });
-      nextIdleEmotionAt = now + Math.round(pickInRange([9000, 17000]));
-    }
-
-    if (velocity.x > 0.08) {
-      facingDirection = "right";
-    } else if (velocity.x < -0.08) {
-      facingDirection = "left";
-    }
-
-    lastBounds = {
-      x: originX,
-      y: originY,
-      width: spriteWidth,
-      height: spriteHeight,
-    };
-
-    const atlasImage = atlasEnabled ? getAtlasImage(pet?.atlas?.src) : null;
-    const frameMetrics =
-      atlasEnabled && atlasImage?.complete
-        ? getAtlasFrameMetrics(atlasImage, sprite, pet?.atlas?.src)
+      const now = Date.now();
+      const isBeaverSelected = state.selectedPetId === "beaver";
+      const beaverForage = isBeaverSelected
+        ? behaviorProfile?.logForage || null
         : null;
+      const environmentConfig = getEnvironmentConfig(behaviorProfile);
 
-    let targetLift = isAirborneAction ? 1 : 0;
-    if (isJumpAction) {
-      const jumpSpan = Math.max(1, safeFrameSource.length - 1);
-      const jumpPhase = (frameIndex % (jumpSpan + 1)) / jumpSpan;
-      const jumpArc = Math.sin(jumpPhase * Math.PI);
-      targetLift = Math.max(targetLift, jumpArc);
-    }
+      if (!isBeaverSelected || !beaverForage?.enabled) {
+        beaverLogCyclePhase = "";
+        beaverLogCycleActionKey = "";
+        beaverLogCycleProp = null;
+        beaverLogCycleTarget = null;
+        beaverLogCycleDepartTarget = null;
+        beaverLogCycleFadeStartedAt = 0;
+      } else {
+        if (!beaverLogCycleNextAt) {
+          scheduleNextBeaverLogCycle(behaviorProfile, now);
+        }
 
-    if (forceFreeze) {
-      targetLift = shadowLift;
-    }
+        const cycleBlocked =
+          forceFreeze ||
+          Boolean(forcedAnimationKey) ||
+          isPetting ||
+          Boolean(sequenceState);
 
-    const transitionSpeed = clamp01(shadow.transitionSpeed ?? 0.18);
-    shadowLift = lerp(shadowLift, targetLift, transitionSpeed || 0.18);
+        if (
+          !beaverLogCyclePhase &&
+          !cycleBlocked &&
+          now >= beaverLogCycleNextAt
+        ) {
+          startBeaverLogCycle({
+            profile: behaviorProfile,
+            now,
+            topSafeInset,
+          });
+        }
 
-    const groundOffset = Number(shadow.groundOffset ?? 1);
-    const airborneOffset = Number(shadow.airborneOffset ?? 14);
-    const groundWidthPad = Number(shadow.groundWidthPad ?? 14);
-    const airborneWidthPad = Number(shadow.airborneWidthPad ?? 4);
+        if (beaverLogCyclePhase && beaverLogCycleTarget) {
+          const spriteProbeWidth = Math.max(24, Number(lastBounds.width) || 64);
+          const spriteProbeHeight = Math.max(
+            24,
+            Number(lastBounds.height) || 64,
+          );
+          const spriteCenterX = position.x + spriteProbeWidth * 0.5;
+          const spriteCenterY = position.y + spriteProbeHeight * 0.5;
+          const distanceToLog = Math.hypot(
+            beaverLogCycleTarget.x - spriteCenterX,
+            beaverLogCycleTarget.y - spriteCenterY,
+          );
+          const approachReachPx = Math.max(
+            8,
+            Number(beaverForage.approachReachPx || 12),
+          );
 
-    const visibleWidth = frameMetrics
-      ? frameMetrics.visibleWidth * tunedScale
-      : spriteWidth;
-    const visibleBottom = frameMetrics
-      ? (frameMetrics.maxY + 1) * tunedScale
-      : spriteHeight;
-    const visibleCenterX = frameMetrics
-      ? (frameMetrics.minX + frameMetrics.visibleWidth * 0.5) * tunedScale
-      : spriteWidth * 0.5;
+          if (beaverLogCycleProp && beaverLogCyclePhase !== "fade") {
+            const fadeInStartedAt = Number(
+              beaverLogCycleProp.fadeInStartedAt || 0,
+            );
+            const fadeInUntil = Number(beaverLogCycleProp.fadeInUntil || 0);
+            const fadeInDuration = Math.max(1, fadeInUntil - fadeInStartedAt);
 
-    const groundedWidth = Math.max(14, visibleWidth - groundWidthPad);
-    const airborneWidthRaw = Math.max(10, visibleWidth - airborneWidthPad);
-    const airborneWidth = Math.min(airborneWidthRaw, groundedWidth * 0.75);
+            if (fadeInUntil > fadeInStartedAt && now < fadeInUntil) {
+              const fadeInElapsed = Math.max(0, now - fadeInStartedAt);
+              beaverLogCycleProp.alpha = clamp01(
+                fadeInElapsed / fadeInDuration,
+              );
+            } else {
+              beaverLogCycleProp.alpha = 1;
+            }
+          }
 
-    const shadowOffset = lerp(groundOffset, airborneOffset, shadowLift);
-    const shadowWidth = lerp(groundedWidth, airborneWidth, shadowLift);
-    const shadowX = Math.round(originX + visibleCenterX - shadowWidth / 2);
-    const shadowY = Math.round(
-      originY + visibleBottom + shadowOffset + shadowOffsetAdjust,
-    );
+          if (beaverLogCyclePhase === "approach") {
+            beaverLogCycleActionKey = "movement-water";
+            if (distanceToLog <= approachReachPx) {
+              beaverLogCyclePhase = "collect";
+              beaverLogCycleActionKey = "idle-water";
+              beaverLogCyclePhaseUntil =
+                now +
+                Math.max(
+                  600,
+                  Math.round(
+                    pickInRange(beaverForage.collectHoldMs || [900, 1600]),
+                  ),
+                );
+            } else if (now >= beaverLogCyclePhaseUntil) {
+              beaverLogCyclePhaseUntil =
+                now +
+                Math.max(
+                  900,
+                  Math.round(
+                    pickInRange(beaverForage.approachRetryMs || [900, 1600]),
+                  ),
+                );
+            }
+          } else if (beaverLogCyclePhase === "collect") {
+            beaverLogCycleActionKey = "idle-water";
+            if (now >= beaverLogCyclePhaseUntil) {
+              beaverLogCyclePhase = "depart";
+              beaverLogCycleActionKey = "movement-water-with-stick";
+              beaverLogCyclePhaseUntil =
+                now +
+                Math.max(
+                  1800,
+                  Math.round(
+                    pickInRange(beaverForage.departTimeoutMs || [2600, 4200]),
+                  ),
+                );
+            }
+          } else if (beaverLogCyclePhase === "depart") {
+            beaverLogCycleActionKey = "movement-water-with-stick";
+            const departDistance = beaverLogCycleDepartTarget
+              ? Math.hypot(
+                  beaverLogCycleDepartTarget.x - spriteCenterX,
+                  beaverLogCycleDepartTarget.y - spriteCenterY,
+                )
+              : 999;
 
-    if (!sequenceHiddenStage) {
-      ctx.fillStyle = highContrastShadow
-        ? `rgba(255, 255, 255, ${shadowAlpha})`
-        : `rgba(2, 6, 23, ${shadowAlpha})`;
-      ctx.fillRect(shadowX, shadowY, shadowWidth, 4);
+            if (departDistance <= 28 || now >= beaverLogCyclePhaseUntil) {
+              beaverLogCyclePhase = "fade";
+              beaverLogCycleActionKey = "movement-water-with-stick";
+              beaverLogCycleFadeStartedAt = now;
+              beaverLogCyclePhaseUntil =
+                now +
+                Math.max(
+                  800,
+                  Math.round(pickInRange(beaverForage.fadeMs || [1300, 2200])),
+                );
+            }
+          } else if (beaverLogCyclePhase === "fade") {
+            const fadeDuration = Math.max(
+              1,
+              beaverLogCyclePhaseUntil - beaverLogCycleFadeStartedAt,
+            );
+            if (beaverLogCycleProp) {
+              const elapsed = Math.max(0, now - beaverLogCycleFadeStartedAt);
+              beaverLogCycleProp.alpha = clamp01(1 - elapsed / fadeDuration);
+            }
 
-      if (atlasEnabled) {
-        const defaultFacing = String(
-          pet?.atlas?.facing || "right",
-        ).toLowerCase();
-        const flipHorizontal =
-          (defaultFacing === "right" && facingDirection === "left") ||
-          (defaultFacing === "left" && facingDirection === "right");
-        if (atlasImage?.complete) {
-          drawAtlasFrame(
-            ctx,
+            if (now >= beaverLogCyclePhaseUntil) {
+              resetBeaverLogCycle(behaviorProfile, now);
+            }
+          }
+        }
+      }
+
+      if (!environmentConfig?.enabled) {
+        environmentState = "";
+        environmentDesiredState = "";
+        environmentTransitionState = null;
+      } else {
+        const spriteProbeHeight = Math.max(24, Number(lastBounds.height) || 64);
+        const centerY = position.y + spriteProbeHeight * 0.5;
+        const initialEnvironment =
+          normalizeEnvironmentKey(environmentState) ||
+          normalizeEnvironmentKey(environmentConfig.initial);
+
+        environmentDesiredState = resolveDesiredEnvironment({
+          config: environmentConfig,
+          currentEnvironment: environmentState,
+          fallbackEnvironment: initialEnvironment,
+          centerY,
+          canvasHeight: canvas.height,
+          beaverLogCyclePhase,
+        });
+
+        if (!environmentState) {
+          environmentState = environmentDesiredState || initialEnvironment;
+        }
+
+        if (
+          environmentTransitionState &&
+          now >= Number(environmentTransitionState.endsAt || 0)
+        ) {
+          environmentState = environmentTransitionState.to;
+          environmentTransitionState = null;
+        }
+
+        if (
+          !environmentTransitionState &&
+          environmentDesiredState &&
+          environmentState &&
+          environmentDesiredState !== environmentState &&
+          !forceFreeze &&
+          !forcedAnimationKey &&
+          !isPetting &&
+          !sequenceState
+        ) {
+          const transitionSpec = resolveEnvironmentTransitionSpec(
+            environmentConfig,
+            environmentState,
+            environmentDesiredState,
+          );
+          const transitionAnimationKey = toActionKey(transitionSpec?.key);
+          const transitionDurationMs = Math.max(
+            280,
+            Math.round(pickInRange(transitionSpec?.durationMs || [420, 760])),
+          );
+
+          const canUseTransitionAnimation =
+            transitionAnimationKey &&
+            hasAnimationFrames(animationSet, transitionAnimationKey) &&
+            isAnimationSelectableOutsideSequence({
+              petId: state.selectedPetId,
+              key: transitionAnimationKey,
+              sequenceState: null,
+            });
+
+          if (canUseTransitionAnimation) {
+            environmentTransitionState = {
+              from: environmentState,
+              to: environmentDesiredState,
+              key: transitionAnimationKey,
+              endsAt: now + transitionDurationMs,
+              forceMovement: Boolean(transitionSpec?.forceMovement),
+            };
+          } else {
+            environmentState = environmentDesiredState;
+          }
+        }
+      }
+
+      if (!nextPlayfulAt) {
+        scheduleNextPlayfulBeat(behaviorProfile, now);
+      }
+
+      if (
+        playfulActionKey &&
+        (now >= playfulUntil || forceFreeze || isPetting || sequenceState)
+      ) {
+        playfulActionKey = "";
+        playfulUntil = 0;
+      }
+
+      if (
+        !playfulActionKey &&
+        !forceFreeze &&
+        !isPetting &&
+        !sequenceState &&
+        !forcedAnimationKey &&
+        !beaverLogCyclePhase &&
+        now >= nextPlayfulAt
+      ) {
+        const playfulConfig = behaviorProfile?.playfulNature || {};
+        const triggerChance = clamp01(
+          Number(playfulConfig.activationChance ?? 0.65),
+        );
+
+        if (nextRandom() <= triggerChance) {
+          const nextPlayfulKey = pickAnimationKeyFromCandidates(
+            animationSet,
+            playfulConfig.actionKeys,
+          );
+          if (
+            nextPlayfulKey &&
+            isAnimationSelectableOutsideSequence({
+              petId: state.selectedPetId,
+              key: nextPlayfulKey,
+              sequenceState,
+            })
+          ) {
+            playfulActionKey = nextPlayfulKey;
+            playfulUntil =
+              now +
+              Math.max(
+                500,
+                Math.round(
+                  pickInRange(playfulConfig.durationMs || [900, 1700]),
+                ),
+              );
+          }
+        }
+
+        scheduleNextPlayfulBeat(behaviorProfile, now);
+      }
+
+      if (!beaverLogCyclePhase) {
+        maybeStartSequence({
+          now,
+          petId: state.selectedPetId,
+          animationSet,
+          forcedAnimationKey,
+          isPetting,
+          movementIntentByContext:
+            movementIntentByContext || Boolean(environmentTransitionState),
+          currentSpeed,
+          topSafeInset,
+          routeZone,
+          environmentState,
+          environmentDesiredState,
+        });
+      }
+
+      if (sequenceState) {
+        const currentStage = sequenceState.stages?.[sequenceState.stageIndex];
+        if (currentStage?.hidden) {
+          if (!sequenceHiddenStartedAt) {
+            sequenceHiddenStartedAt = now;
+          }
+
+          if (now - sequenceHiddenStartedAt > MAX_SEQUENCE_HIDDEN_STAGE_MS) {
+            abortSequenceWithCooldown(now, 1800);
+          }
+        } else {
+          sequenceHiddenStartedAt = 0;
+        }
+      }
+
+      const activeStage = sequenceState
+        ? sequenceState.stages[sequenceState.stageIndex]
+        : null;
+      const sequenceAnimationKey = String(activeStage?.animationKey || "");
+      const sequenceHiddenStage = Boolean(activeStage?.hidden);
+      const sequenceStageEnvironmentValid =
+        !activeStage ||
+        isSequenceStageEnvironmentValid({
+          stage: activeStage,
+          currentEnvironment: environmentState,
+          desiredEnvironment: environmentDesiredState,
+        });
+      const canForceSequenceAnimation =
+        sequenceStageEnvironmentValid &&
+        Boolean(sequenceAnimationKey) &&
+        Boolean(animationSet?.[sequenceAnimationKey]?.frames?.length);
+      const environmentAllowedKeys = getEnvironmentAllowedKeys(
+        environmentConfig,
+        environmentState,
+        toActionKey,
+      );
+      const transitionAnimationKey = toActionKey(
+        environmentTransitionState?.key,
+      );
+      const canForceEnvironmentTransition =
+        Boolean(transitionAnimationKey) &&
+        hasAnimationFrames(animationSet, transitionAnimationKey) &&
+        isAnimationSelectableOutsideSequence({
+          petId: state.selectedPetId,
+          key: transitionAnimationKey,
+          sequenceState: null,
+        });
+      const environmentTransitionLockKey = canForceEnvironmentTransition
+        ? transitionAnimationKey
+        : "";
+
+      const animationChoice = pickAnimationChoice(pet, animationSet, {
+        toActionKey,
+        allTenStepsCompleted,
+        isMilestoneBoost: Date.now() < milestoneBoostUntil,
+        isPetting: Date.now() < pettingUntil,
+        wantsMovement,
+        playfulActionKey: beaverLogCycleActionKey || playfulActionKey,
+        animationPools: behaviorProfile?.animationPools || {},
+        pickPoolKey: (poolName, keys) =>
+          pickAnimationPoolVariant(state.selectedPetId, poolName, keys),
+        isAnimationAllowed: (key) =>
+          isAnimationSelectableOutsideSequence({
+            petId: state.selectedPetId,
+            key,
+            sequenceState,
+          }) &&
+          (environmentTransitionLockKey
+            ? key === environmentTransitionLockKey
+            : !environmentAllowedKeys ||
+              environmentAllowedKeys.has(toActionKey(key))),
+      });
+
+      const fallbackAnimationKeys = Array.from(
+        new Set(
+          (Array.isArray(pet?.frames) ? pet.frames : [])
+            .map((item) => toActionKey(item?.action))
+            .filter(Boolean),
+        ),
+      );
+      const canForceFromFrames =
+        Boolean(normalizedForcedActionKey) &&
+        fallbackAnimationKeys.includes(normalizedForcedActionKey);
+
+      const candidateAnimationKey =
+        forcedAnimationKey && animationSet?.[forcedAnimationKey]
+          ? forcedAnimationKey
+          : canForceSequenceAnimation
+            ? sequenceAnimationKey
+            : canForceEnvironmentTransition
+              ? transitionAnimationKey
+              : canForceFromFrames
+                ? normalizedForcedActionKey
+                : animationChoice.key;
+      const candidateAnimationReason =
+        forcedAnimationKey && animationSet?.[forcedAnimationKey]
+          ? "forced"
+          : canForceSequenceAnimation
+            ? `sequence:${sequenceState?.ruleId || "unknown"}:${activeStage?.name || "stage"}`
+            : canForceEnvironmentTransition
+              ? "environment-transition"
+              : canForceFromFrames
+                ? "forced-frame-action"
+                : animationChoice.reason;
+
+      const guardedCandidateAnimationKey =
+        canForceSequenceAnimation ||
+        isAnimationSelectableOutsideSequence({
+          petId: state.selectedPetId,
+          key: candidateAnimationKey,
+          sequenceState,
+        })
+          ? candidateAnimationKey
+          : animationChoice.key;
+
+      const resolvedAnimationState = resolveAnimationState({
+        now,
+        candidateKey: guardedCandidateAnimationKey,
+        candidateReason: candidateAnimationReason,
+        animationSet,
+        profile: behaviorProfile,
+        pettingUntil,
+        playfulUntil,
+        activeAnimationKey,
+        animationStateReason,
+        animationStatePriority,
+        animationStateUntil,
+        hasAnimationFrames,
+        toActionKey,
+        estimateAnimationDurationMs,
+      });
+      animationStateReason = resolvedAnimationState.nextState.reason;
+      animationStatePriority = resolvedAnimationState.nextState.priority;
+      animationStateUntil = resolvedAnimationState.nextState.until;
+      const selectedAnimationKey = resolvedAnimationState.key;
+      const animationReason = resolvedAnimationState.reason;
+
+      const selectedAnimation =
+        selectedAnimationKey && animationSet
+          ? animationSet[selectedAnimationKey]
+          : null;
+
+      const nextAnimationKey = selectedAnimationKey || "__fallback__";
+      if (nextAnimationKey !== activeAnimationKey) {
+        activeAnimationKey = nextAnimationKey;
+        activeAnimationTick = 0;
+      }
+
+      const frameSource = selectedAnimation?.frames?.length
+        ? selectedAnimation.frames
+        : canForceFromFrames
+          ? pet.frames.filter(
+              (frameItem) =>
+                toActionKey(frameItem?.action) === selectedAnimationKey,
+            )
+          : pet.frames;
+      const frameSourceKind = selectedAnimation?.frames?.length
+        ? "selected-animation"
+        : canForceFromFrames
+          ? "forced-frame-action"
+          : "pet-frames";
+
+      const animationKeys = getAvailableAnimationKeys(animationSet);
+      const fallbackAnimationFrames = animationKeys.length
+        ? animationSet[animationKeys[0]]?.frames || []
+        : [];
+      const safeFrameSource =
+        Array.isArray(frameSource) && frameSource.length
+          ? frameSource
+          : Array.isArray(pet?.frames) && pet.frames.length
+            ? pet.frames
+            : fallbackAnimationFrames;
+      const safeFrameSourceKind =
+        Array.isArray(frameSource) && frameSource.length
+          ? frameSourceKind
+          : Array.isArray(pet?.frames) && pet.frames.length
+            ? "fallback-pet-frames"
+            : "fallback-animation-frames";
+
+      if (!safeFrameSource.length) {
+        if (!forceFreeze) {
+          frame += 1;
+        }
+        rafId = window.requestAnimationFrame(render);
+        return;
+      }
+
+      const frameIndex = atlasEnabled
+        ? resolveFrameIndexByTicks(
+            safeFrameSource,
+            activeAnimationTick,
+            frameDuration,
+            {
+              holdOnLastFrame: Boolean(selectedAnimation?.holdOnLastFrame),
+            },
+          )
+        : Math.floor(frame / frameDuration) % safeFrameSource.length;
+      const sprite = safeFrameSource[frameIndex] || safeFrameSource[0];
+
+      const scale = atlasEnabled ? DEFAULT_ATLAS_SCALE : 4;
+      const tunedScale = scale * scaleMultiplier * PET_SIZE_MULTIPLIER;
+      const spriteHeight = atlasEnabled
+        ? (Number(sprite?.h) || 16) * tunedScale
+        : sprite.length * tunedScale;
+      const spriteWidth = atlasEnabled
+        ? (Number(sprite?.w) || 16) * tunedScale
+        : (sprite[0]?.length || 0) * tunedScale;
+
+      const currentAction = String(
+        sprite?.action || selectedAnimation?.title || "",
+      ).toLowerCase();
+      const currentActionKey = toActionKey(currentAction);
+      const currentCategory = String(
+        sprite?.category || selectedAnimation?.category || "",
+      ).toLowerCase();
+      const allowMovementByAnimation = atlasEnabled
+        ? resolveAnimationLocomotion({
+            selectedAnimation,
+            selectedAnimationKey,
+            currentCategory,
+            currentAction,
+            profile: behaviorProfile,
+          })
+        : true;
+
+      const currentEnvironmentConfig =
+        environmentConfig?.environments?.[environmentState] || null;
+      const allowMovementByEnvironment =
+        !environmentConfig?.enabled ||
+        Boolean(environmentTransitionState?.forceMovement) ||
+        currentEnvironmentConfig?.allowLocomotion !== false;
+
+      const beaverCycleWantsMovement =
+        beaverLogCyclePhase === "approach" ||
+        beaverLogCyclePhase === "collect" ||
+        beaverLogCyclePhase === "depart" ||
+        beaverLogCyclePhase === "fade";
+      const effectiveMovementIntent =
+        wantsMovement ||
+        beaverCycleWantsMovement ||
+        Boolean(environmentTransitionState?.forceMovement);
+
+      const movementActive =
+        !forceFreeze &&
+        !sequenceState &&
+        allowMovementByEnvironment &&
+        allowMovementByAnimation &&
+        effectiveMovementIntent;
+
+      const motionState = updateMotion(spriteWidth, spriteHeight, state, {
+        allowMovement: movementActive,
+        speedMultiplier,
+        profile: behaviorProfile,
+        overrideTarget:
+          beaverLogCyclePhase === "approach" ||
+          beaverLogCyclePhase === "collect"
+            ? {
+                x: beaverLogCycleTarget.x - spriteWidth * 0.5,
+                y: beaverLogCycleTarget.y - spriteHeight * 0.5,
+              }
+            : beaverLogCyclePhase === "depart" || beaverLogCyclePhase === "fade"
+              ? {
+                  x: beaverLogCycleDepartTarget.x - spriteWidth * 0.5,
+                  y: beaverLogCycleDepartTarget.y - spriteHeight * 0.5,
+                }
+              : null,
+        overrideTargetPull:
+          beaverLogCyclePhase === "approach" ? 0.0062 : 0.0038,
+      });
+
+      const shadow = pet.shadow || {};
+      const airborneActions = Array.isArray(shadow.airborneActions)
+        ? shadow.airborneActions.map((action) => toActionKey(action))
+        : [];
+      const isAirborneAction =
+        airborneActions.includes(currentActionKey) ||
+        /flight|flap|glide|ascent|dive|hover/.test(currentActionKey);
+      const isJumpAction = /jump/.test(currentActionKey);
+
+      const hasCelebration =
+        motionState.allTenStepsCompleted || Date.now() < milestoneBoostUntil;
+      const hasPetting = Date.now() < pettingUntil;
+      const hasDynamicBob =
+        movementActive || isAirborneAction || isJumpAction || hasPetting;
+      const bobScale = hasPetting ? 4 : movementActive ? 2 : 0;
+      const bob =
+        forceFreeze || !hasDynamicBob
+          ? 0
+          : Math.round(Math.sin(frame / 15) * bobScale);
+      const shouldBlink = frame % 120 > 108;
+
+      const originX = Math.round(position.x);
+      const originY = Math.round(position.y + bob);
+      const schoolLeadX = Math.round(position.x);
+      const schoolLeadY = Math.round(position.y);
+
+      const fishSchoolConfig = behaviorProfile?.schooling || {};
+      const isFishSelected = state.selectedPetId === "fish";
+      if (isFishSelected) {
+        ensureFishSchoolFollowers({
+          originX: schoolLeadX,
+          originY: schoolLeadY,
+          spriteWidth,
+          spriteHeight,
+          schoolConfig: fishSchoolConfig,
+        });
+
+        updateFishSchoolFollowers({
+          originX: schoolLeadX,
+          originY: schoolLeadY,
+          spriteWidth,
+          spriteHeight,
+          deltaMs,
+          movementActive,
+          speedMultiplier,
+          leaderVelocityX: velocity.x,
+          leaderVelocityY: velocity.y,
+          schoolConfig: fishSchoolConfig,
+        });
+      } else if (fishSchoolFollowers.length) {
+        fishSchoolTargetCount = 0;
+        fishSchoolFollowers = [];
+      }
+
+      const beaverDiveSplashConfig = behaviorProfile?.effects?.diveSplash || {};
+      const sleepZConfig = behaviorProfile?.effects?.sleepZ || {};
+      const isSleepAction = /(^|-)sleep($|-)|snooze|nap/.test(currentActionKey);
+      if (
+        sleepZConfig.enabled !== false &&
+        isSleepAction &&
+        !movementActive &&
+        now >= sleepZNextAt
+      ) {
+        emitSceneEffectBurst({
+          count: Number(sleepZConfig.count || 2),
+          originX: originX + spriteWidth * 0.5,
+          originY: originY + spriteHeight * 0.12,
+          color: String(sleepZConfig.color || "#8a6fe8"),
+          colorSecondary: String(sleepZConfig.colorSecondary || "#c5b8f8"),
+          glyphs: Array.isArray(sleepZConfig.glyphs)
+            ? sleepZConfig.glyphs
+            : ["z", "Z"],
+          speedRange: sleepZConfig.speedRange || [8, 22],
+          sizeRange: sleepZConfig.sizeRange || [4, 7],
+          lifeRange: sleepZConfig.lifeRange || [760, 1560],
+          gravityRange: sleepZConfig.gravityRange || [-22, -8],
+          dragRange: sleepZConfig.dragRange || [0.95, 0.985],
+          spreadX: sleepZConfig.spreadX || [-8, 8],
+          spreadY: sleepZConfig.spreadY || [-4, 2],
+          angleRange: sleepZConfig.angleRange || [
+            -Math.PI * 0.7,
+            -Math.PI * 0.3,
+          ],
+        });
+
+        sleepZNextAt =
+          now +
+          Math.max(
+            150,
+            Math.round(pickInRange(sleepZConfig.intervalMs || [460, 820])),
+          );
+      }
+
+      if (
+        state.selectedPetId === "beaver" &&
+        beaverDiveSplashConfig.enabled !== false &&
+        currentActionKey === "dive" &&
+        activeAnimationTick <= 1 &&
+        now >= beaverDiveSplashCooldownUntil
+      ) {
+        const splashOriginYOffsetRatio = Math.max(
+          0,
+          Math.min(
+            1.4,
+            Number(beaverDiveSplashConfig.originYOffsetRatio ?? 0.82),
+          ),
+        );
+        emitSceneEffectBurst({
+          count: Number(beaverDiveSplashConfig.count || 14),
+          originX: originX + spriteWidth * 0.5,
+          originY: originY + spriteHeight * splashOriginYOffsetRatio,
+          color: String(beaverDiveSplashConfig.color || "#5da8c6"),
+          colorSecondary: String(
+            beaverDiveSplashConfig.colorSecondary || "#9ad0e4",
+          ),
+          speedRange: beaverDiveSplashConfig.speedRange || [34, 94],
+          sizeRange: beaverDiveSplashConfig.sizeRange || [2, 5],
+          lifeRange: beaverDiveSplashConfig.lifeRange || [360, 860],
+          gravityRange: beaverDiveSplashConfig.gravityRange || [160, 280],
+          dragRange: beaverDiveSplashConfig.dragRange || [0.88, 0.95],
+          spreadX: beaverDiveSplashConfig.spreadX || [-14, 14],
+          spreadY: beaverDiveSplashConfig.spreadY || [-3, 5],
+          angleRange: beaverDiveSplashConfig.angleRange || [
+            -Math.PI * 0.95,
+            -Math.PI * 0.05,
+          ],
+        });
+        beaverDiveSplashCooldownUntil =
+          now + Math.max(220, Number(beaverDiveSplashConfig.cooldownMs || 560));
+      }
+
+      const ferretDirtConfig = behaviorProfile?.effects?.digDirt || {};
+      if (
+        state.selectedPetId === "ferret" &&
+        ferretDirtConfig.enabled !== false &&
+        /dig|disappear|emerge/.test(currentActionKey) &&
+        now >= ferretDirtNextAt
+      ) {
+        emitSceneEffectBurst({
+          count: Number(ferretDirtConfig.count || 7),
+          originX: originX + spriteWidth * 0.5,
+          originY: originY + spriteHeight * 0.86,
+          color: String(ferretDirtConfig.color || "#8d6b4e"),
+          colorSecondary: String(ferretDirtConfig.colorSecondary || "#b3906f"),
+          speedRange: ferretDirtConfig.speedRange || [24, 76],
+          sizeRange: ferretDirtConfig.sizeRange || [2.2, 5.8],
+          lifeRange: ferretDirtConfig.lifeRange || [420, 1020],
+          gravityRange: ferretDirtConfig.gravityRange || [200, 330],
+          dragRange: ferretDirtConfig.dragRange || [0.9, 0.96],
+          spreadX: ferretDirtConfig.spreadX || [-10, 10],
+          spreadY: ferretDirtConfig.spreadY || [-2, 4],
+          angleRange: ferretDirtConfig.angleRange || [
+            -Math.PI * 0.9,
+            -Math.PI * 0.1,
+          ],
+        });
+
+        ferretDirtNextAt =
+          now +
+          Math.max(
+            80,
+            Math.round(pickInRange(ferretDirtConfig.intervalMs || [120, 220])),
+          );
+      }
+
+      const isBirdSelected =
+        state.selectedPetId === "seagull" || state.selectedPetId === "pidgeon";
+      const birdWindConfig = behaviorProfile?.effects?.windTrail || {};
+      const birdLandingConfig = behaviorProfile?.effects?.landingDust || {};
+      const isBirdAirborneAction = /flight|flap|glide/.test(currentActionKey);
+      const wasBirdAirborneAction = /flight|flap|glide/.test(previousActionKey);
+      const isBirdIdleAction = /^idle($|-)/.test(currentActionKey);
+
+      if (
+        isBirdSelected &&
+        birdWindConfig.enabled !== false &&
+        isBirdAirborneAction &&
+        movementActive &&
+        now >= birdWindNextAt
+      ) {
+        const directionSign = facingDirection === "left" ? 1 : -1;
+        emitSceneEffectBurst({
+          count: Number(birdWindConfig.count || 5),
+          originX: originX + spriteWidth * (directionSign < 0 ? 0.18 : 0.82),
+          originY: originY + spriteHeight * 0.45,
+          color: String(birdWindConfig.color || "#d8ecf7"),
+          colorSecondary: String(birdWindConfig.colorSecondary || "#bfe2f3"),
+          speedRange: birdWindConfig.speedRange || [16, 42],
+          sizeRange: birdWindConfig.sizeRange || [1.8, 3.6],
+          lifeRange: birdWindConfig.lifeRange || [220, 520],
+          gravityRange: birdWindConfig.gravityRange || [18, 60],
+          dragRange: birdWindConfig.dragRange || [0.9, 0.96],
+          spreadX: birdWindConfig.spreadX || [-6, 6],
+          spreadY: birdWindConfig.spreadY || [-4, 4],
+          angleRange:
+            directionSign < 0
+              ? [-Math.PI * 0.05, Math.PI * 0.18]
+              : [Math.PI * 0.82, Math.PI * 1.05],
+        });
+
+        birdWindNextAt =
+          now +
+          Math.max(
+            80,
+            Math.round(pickInRange(birdWindConfig.intervalMs || [120, 200])),
+          );
+      }
+
+      if (
+        isBirdSelected &&
+        birdLandingConfig.enabled !== false &&
+        now >= birdLandingDustCooldownUntil &&
+        wasBirdAirborneAction &&
+        isBirdIdleAction &&
+        activeAnimationTick <= 1
+      ) {
+        emitSceneEffectBurst({
+          count: Number(birdLandingConfig.count || 7),
+          originX: originX + spriteWidth * 0.5,
+          originY: originY + spriteHeight * 0.92,
+          color: String(birdLandingConfig.color || "#d9c9ad"),
+          colorSecondary: String(birdLandingConfig.colorSecondary || "#efe1c9"),
+          speedRange: birdLandingConfig.speedRange || [20, 56],
+          sizeRange: birdLandingConfig.sizeRange || [1.8, 4.2],
+          lifeRange: birdLandingConfig.lifeRange || [280, 760],
+          gravityRange: birdLandingConfig.gravityRange || [180, 290],
+          dragRange: birdLandingConfig.dragRange || [0.9, 0.96],
+          spreadX: birdLandingConfig.spreadX || [-10, 10],
+          spreadY: birdLandingConfig.spreadY || [-2, 2],
+          angleRange: birdLandingConfig.angleRange || [
+            -Math.PI * 0.95,
+            -Math.PI * 0.05,
+          ],
+        });
+
+        birdLandingDustCooldownUntil =
+          now + Math.max(300, Number(birdLandingConfig.cooldownMs || 760));
+      }
+
+      const fishEffects = behaviorProfile?.effects || {};
+      const fishBubbleConfig = fishEffects.bubbleTrail || {};
+      const fishRippleConfig = fishEffects.turnRipple || {};
+      const isFishMovementAction = /movement/.test(currentActionKey);
+
+      if (
+        isFishSelected &&
+        fishBubbleConfig.enabled !== false &&
+        movementActive &&
+        isFishMovementAction &&
+        now >= fishBubbleNextAt
+      ) {
+        emitSceneEffectBurst({
+          count: Number(fishBubbleConfig.count || 4),
+          originX: originX + spriteWidth * 0.35,
+          originY: originY + spriteHeight * 0.68,
+          color: String(fishBubbleConfig.color || "#9dd8ea"),
+          colorSecondary: String(fishBubbleConfig.colorSecondary || "#d3f0fb"),
+          speedRange: fishBubbleConfig.speedRange || [12, 30],
+          sizeRange: fishBubbleConfig.sizeRange || [1.4, 3],
+          lifeRange: fishBubbleConfig.lifeRange || [520, 1200],
+          gravityRange: fishBubbleConfig.gravityRange || [-45, -15],
+          dragRange: fishBubbleConfig.dragRange || [0.92, 0.98],
+          spreadX: fishBubbleConfig.spreadX || [-8, 8],
+          spreadY: fishBubbleConfig.spreadY || [-2, 3],
+          angleRange: fishBubbleConfig.angleRange || [
+            -Math.PI * 0.7,
+            -Math.PI * 0.3,
+          ],
+        });
+
+        fishBubbleNextAt =
+          now +
+          Math.max(
+            80,
+            Math.round(pickInRange(fishBubbleConfig.intervalMs || [130, 220])),
+          );
+
+        const followerBubbleInterval = fishBubbleConfig.followerIntervalMs || [
+          260, 520,
+        ];
+        const followerBubbleCount = Math.max(
+          1,
+          Math.round(Number(fishBubbleConfig.followerCount || 2)),
+        );
+
+        for (const follower of fishSchoolFollowers) {
+          if (now < Number(follower?.bubbleNextAt || 0)) {
+            continue;
+          }
+
+          const followerScale = Math.max(0.55, Number(follower?.scale || 0.78));
+          emitSceneEffectBurst({
+            count: followerBubbleCount,
+            originX:
+              Number(follower?.x || originX) +
+              spriteWidth * followerScale * 0.35,
+            originY:
+              Number(follower?.y || originY) +
+              spriteHeight * followerScale * 0.68,
+            color: String(fishBubbleConfig.color || "#9dd8ea"),
+            colorSecondary: String(
+              fishBubbleConfig.colorSecondary || "#d3f0fb",
+            ),
+            speedRange: fishBubbleConfig.followerSpeedRange || [10, 24],
+            sizeRange: fishBubbleConfig.followerSizeRange || [1.1, 2.3],
+            lifeRange: fishBubbleConfig.followerLifeRange || [460, 980],
+            gravityRange: fishBubbleConfig.gravityRange || [-45, -15],
+            dragRange: fishBubbleConfig.dragRange || [0.92, 0.98],
+            spreadX: fishBubbleConfig.followerSpreadX || [-6, 6],
+            spreadY: fishBubbleConfig.followerSpreadY || [-2, 2],
+            angleRange: fishBubbleConfig.angleRange || [
+              -Math.PI * 0.7,
+              -Math.PI * 0.3,
+            ],
+          });
+
+          follower.bubbleNextAt =
+            now +
+            Math.max(140, Math.round(pickInRange(followerBubbleInterval)));
+        }
+      }
+
+      const pivotDetected =
+        Math.abs(previousVelocityX) > 0.08 &&
+        Math.abs(velocity.x) > 0.08 &&
+        Math.sign(previousVelocityX) !== Math.sign(velocity.x);
+
+      if (
+        isFishSelected &&
+        fishRippleConfig.enabled !== false &&
+        pivotDetected &&
+        now >= fishTurnRippleCooldownUntil
+      ) {
+        emitSceneEffectBurst({
+          count: Number(fishRippleConfig.count || 8),
+          originX: originX + spriteWidth * 0.5,
+          originY: originY + spriteHeight * 0.56,
+          color: String(fishRippleConfig.color || "#7ec7de"),
+          colorSecondary: String(fishRippleConfig.colorSecondary || "#b5e3f2"),
+          speedRange: fishRippleConfig.speedRange || [18, 52],
+          sizeRange: fishRippleConfig.sizeRange || [1.6, 3.8],
+          lifeRange: fishRippleConfig.lifeRange || [260, 620],
+          gravityRange: fishRippleConfig.gravityRange || [0, 24],
+          dragRange: fishRippleConfig.dragRange || [0.9, 0.96],
+          spreadX: fishRippleConfig.spreadX || [-6, 6],
+          spreadY: fishRippleConfig.spreadY || [-3, 3],
+          angleRange:
+            previousVelocityX > 0
+              ? [Math.PI * 0.65, Math.PI * 1.1]
+              : [-Math.PI * 0.1, Math.PI * 0.35],
+        });
+
+        fishTurnRippleCooldownUntil =
+          now + Math.max(220, Number(fishRippleConfig.cooldownMs || 520));
+      }
+
+      if (pendingMilestoneEmotionBursts > 0) {
+        if (!isPetting && !sequenceState && !forceFreeze) {
+          const taskCompletionConfig = behaviorProfile?.taskCompletion || {};
+          const triggerChance = clamp01(
+            Number(taskCompletionConfig.triggerChance ?? 0.9),
+          );
+
+          if (nextRandom() <= triggerChance) {
+            const taskActionKey = pickAnimationKeyFromCandidates(
+              animationSet,
+              taskCompletionConfig.actionKeys,
+            );
+
+            if (
+              taskActionKey &&
+              isAnimationSelectableOutsideSequence({
+                petId: state.selectedPetId,
+                key: taskActionKey,
+                sequenceState,
+              })
+            ) {
+              playfulActionKey = taskActionKey;
+              playfulUntil =
+                now +
+                Math.max(
+                  700,
+                  Math.round(
+                    pickInRange(
+                      taskCompletionConfig.durationMs || [1100, 2200],
+                    ),
+                  ),
+                );
+              scheduleNextPlayfulBeat(behaviorProfile, now);
+            }
+          }
+        }
+
+        pendingMilestoneEmotionBursts = 0;
+      }
+
+      if (velocity.x > 0.08) {
+        facingDirection = "right";
+      } else if (velocity.x < -0.08) {
+        facingDirection = "left";
+      }
+
+      lastBounds = {
+        x: originX,
+        y: originY,
+        width: spriteWidth,
+        height: spriteHeight,
+      };
+
+      const atlasImage = atlasEnabled ? getAtlasImage(pet?.atlas?.src) : null;
+      const frameMetrics =
+        atlasEnabled && atlasImage?.complete
+          ? getAtlasFrameMetrics(atlasImage, sprite, pet?.atlas?.src)
+          : null;
+
+      let targetLift = isAirborneAction ? 1 : 0;
+      if (isJumpAction) {
+        const jumpSpan = Math.max(1, safeFrameSource.length - 1);
+        const jumpPhase = (frameIndex % (jumpSpan + 1)) / jumpSpan;
+        const jumpArc = Math.sin(jumpPhase * Math.PI);
+        targetLift = Math.max(targetLift, jumpArc);
+      }
+
+      if (forceFreeze) {
+        targetLift = shadowLift;
+      }
+
+      const transitionSpeed = clamp01(shadow.transitionSpeed ?? 0.18);
+      shadowLift = lerp(shadowLift, targetLift, transitionSpeed || 0.18);
+
+      const groundOffset = Number(shadow.groundOffset ?? 1);
+      const airborneOffset = Number(shadow.airborneOffset ?? 14);
+      const groundWidthPad = Number(shadow.groundWidthPad ?? 14);
+      const airborneWidthPad = Number(shadow.airborneWidthPad ?? 4);
+
+      const visibleWidth = frameMetrics
+        ? frameMetrics.visibleWidth * tunedScale
+        : spriteWidth;
+      const visibleBottom = frameMetrics
+        ? (frameMetrics.maxY + 1) * tunedScale
+        : spriteHeight;
+      const visibleCenterX = frameMetrics
+        ? (frameMetrics.minX + frameMetrics.visibleWidth * 0.5) * tunedScale
+        : spriteWidth * 0.5;
+
+      const groundedWidth = Math.max(14, visibleWidth - groundWidthPad);
+      const airborneWidthRaw = Math.max(10, visibleWidth - airborneWidthPad);
+      const airborneWidth = Math.min(airborneWidthRaw, groundedWidth * 0.75);
+
+      const shadowOffset = lerp(groundOffset, airborneOffset, shadowLift);
+      const shadowWidth = lerp(groundedWidth, airborneWidth, shadowLift);
+      const shadowX = Math.round(originX + visibleCenterX - shadowWidth / 2);
+      const shadowY = Math.round(
+        originY + visibleBottom + shadowOffset + shadowOffsetAdjust,
+      );
+
+      if (!sequenceHiddenStage) {
+        ctx.fillStyle = highContrastShadow
+          ? `rgba(255, 255, 255, ${shadowAlpha})`
+          : `rgba(2, 6, 23, ${shadowAlpha})`;
+        ctx.fillRect(shadowX, shadowY, shadowWidth, 4);
+
+        if (
+          isBeaverSelected &&
+          beaverLogCycleProp &&
+          beaverLogCycleProp.alpha > 0.01 &&
+          atlasImage?.complete
+        ) {
+          const frameRect = beaverLogCycleProp.frame || {
+            x: 32,
+            y: 160,
+            w: 32,
+            h: 32,
+          };
+          const propScale = tunedScale * 0.95;
+          const propW = (Number(frameRect.w) || 32) * propScale;
+          const propH = (Number(frameRect.h) || 32) * propScale;
+
+          ctx.save();
+          ctx.globalAlpha = clamp01(beaverLogCycleProp.alpha);
+          ctx.drawImage(
             atlasImage,
+            Number(frameRect.x) || 32,
+            Number(frameRect.y) || 160,
+            Number(frameRect.w) || 32,
+            Number(frameRect.h) || 32,
+            Math.round(beaverLogCycleProp.x - propW / 2),
+            Math.round(beaverLogCycleProp.y - propH / 2),
+            propW,
+            propH,
+          );
+          ctx.restore();
+        }
+
+        if (atlasEnabled) {
+          const defaultFacing = String(
+            pet?.atlas?.facing || "right",
+          ).toLowerCase();
+          const flipHorizontal =
+            (defaultFacing === "right" && facingDirection === "left") ||
+            (defaultFacing === "left" && facingDirection === "right");
+          if (atlasImage?.complete) {
+            drawAtlasFrame(
+              ctx,
+              atlasImage,
+              sprite,
+              originX,
+              originY,
+              tunedScale,
+              flipHorizontal,
+            );
+
+            if (isFishSelected && fishSchoolFollowers.length) {
+              const schoolRenderOrder = fishSchoolFollowers
+                .slice()
+                .sort((left, right) => left.y - right.y);
+              for (const follower of schoolRenderOrder) {
+                const followerFrameIndex = resolveFrameIndexByTicks(
+                  safeFrameSource,
+                  activeAnimationTick + follower.frameOffset,
+                  frameDuration,
+                );
+                const followerSprite =
+                  safeFrameSource[followerFrameIndex] || safeFrameSource[0];
+                const followerFacingDirection =
+                  follower.vx < -0.04
+                    ? "left"
+                    : follower.vx > 0.04
+                      ? "right"
+                      : facingDirection;
+                const followerFlip =
+                  (defaultFacing === "right" &&
+                    followerFacingDirection === "left") ||
+                  (defaultFacing === "left" &&
+                    followerFacingDirection === "right");
+                const followerScale = tunedScale * follower.scale;
+
+                drawAtlasFrame(
+                  ctx,
+                  atlasImage,
+                  followerSprite,
+                  Math.round(follower.x),
+                  Math.round(
+                    follower.y +
+                      Math.sin((frame + follower.frameOffset) / 14) * 1.6,
+                  ),
+                  followerScale,
+                  followerFlip,
+                );
+              }
+            }
+          }
+        } else {
+          drawPixelSprite(
+            ctx,
             sprite,
+            pet.palette,
             originX,
             originY,
             tunedScale,
-            flipHorizontal,
+            shouldBlink,
           );
         }
-      } else {
-        drawPixelSprite(
-          ctx,
-          sprite,
-          pet.palette,
-          originX,
-          originY,
-          tunedScale,
-          shouldBlink,
-        );
       }
-    }
 
-    drawEmotionParticles(ctx);
+      drawSceneEffectParticles(ctx);
 
-    if (motionState.allTenStepsCompleted || Date.now() < milestoneBoostUntil) {
-      const pulse = frame % 22 < 11;
-      drawSparkle(
-        ctx,
-        originX - (pulse ? 10 : 4),
-        originY + (pulse ? 8 : 2),
-        2,
-      );
-      drawSparkle(
-        ctx,
-        originX + spriteWidth + (pulse ? 4 : -2),
-        originY + (pulse ? 16 : 10),
-        2,
-      );
+      if (onDebugFrame) {
+        const availableAnimationKeys = animationSet
+          ? getAvailableAnimationKeys(animationSet)
+          : fallbackAnimationKeys;
 
-      if (
-        motionState.allTenStepsCompleted ||
-        Date.now() < milestoneBoostUntil
-      ) {
-        drawSparkle(ctx, originX + spriteWidth / 2 - 6, originY - 16, 2);
-        drawSparkle(ctx, originX + spriteWidth / 2 + 10, originY - 8, 2);
+        onDebugFrame({
+          petId: state.selectedPetId,
+          animationKey: activeAnimationKey,
+          action: currentAction,
+          category: currentCategory,
+          routeZone,
+          topSafeInset,
+          reason: animationReason,
+          shadowLift: Number(shadowLift.toFixed(3)),
+          frameIndex,
+          frameCount: safeFrameSource.length,
+          speed: Number(currentSpeed.toFixed(3)),
+          moving: movementActive,
+          availableAnimationKeys,
+          frameSourceKind: safeFrameSourceKind,
+          forcedAnimationKey: forcedAnimationKey || null,
+          baseSpeedMultiplier: BASE_PET_SPEED_MULTIPLIER,
+          baseAtlasScale: DEFAULT_ATLAS_SCALE,
+          effectiveSpeedMultiplier: Number(speedMultiplier.toFixed(3)),
+          effectiveScale: Number(tunedScale.toFixed(3)),
+          sequence: sequenceState
+            ? `${sequenceState.ruleId}:${activeStage?.name || "stage"}`
+            : "none",
+          environment: {
+            current: environmentState || null,
+            desired: environmentDesiredState || null,
+            transition: environmentTransitionState
+              ? {
+                  from: environmentTransitionState.from,
+                  to: environmentTransitionState.to,
+                  key: environmentTransitionState.key,
+                }
+              : null,
+          },
+          sequenceHidden: sequenceHiddenStage,
+          position: {
+            x: Math.round(position.x),
+            y: Math.round(position.y),
+          },
+        });
       }
-    }
 
-    if (Date.now() < pettingUntil) {
-      drawHeart(ctx, originX + 14, originY - 16, 2);
-      drawHeart(ctx, originX + spriteWidth - 26, originY - 12, 2);
-    }
+      if (!forceFreeze) {
+        activeAnimationTick += 1;
+      }
+      previousActionKey = currentActionKey;
+      previousVelocityX = velocity.x;
+      frame += 1;
+      rafId = window.requestAnimationFrame(render);
+    } catch (error) {
+      if (onRuntimeError) {
+        onRuntimeError({
+          message: "Pet render loop failure",
+          detail: error?.stack || String(error),
+          petId: currentPetId || null,
+        });
+      }
 
-    if (onDebugFrame) {
-      const availableAnimationKeys = animationSet
-        ? getAvailableAnimationKeys(animationSet)
-        : fallbackAnimationKeys;
-
-      onDebugFrame({
-        petId: state.selectedPetId,
-        animationKey: activeAnimationKey,
-        action: currentAction,
-        category: currentCategory,
-        routeZone,
-        topSafeInset,
-        reason: animationReason,
-        shadowLift: Number(shadowLift.toFixed(3)),
-        frameIndex,
-        frameCount: safeFrameSource.length,
-        speed: Number(currentSpeed.toFixed(3)),
-        moving: movementActive,
-        availableAnimationKeys,
-        frameSourceKind: safeFrameSourceKind,
-        forcedAnimationKey: forcedAnimationKey || null,
-        baseSpeedMultiplier: BASE_PET_SPEED_MULTIPLIER,
-        baseAtlasScale: DEFAULT_ATLAS_SCALE,
-        effectiveSpeedMultiplier: Number(speedMultiplier.toFixed(3)),
-        effectiveScale: Number(tunedScale.toFixed(3)),
-        sequence: sequenceState
-          ? `${sequenceState.ruleId}:${activeStage?.name || "stage"}`
-          : "none",
-        sequenceHidden: sequenceHiddenStage,
-        emotionParticles: emotionParticles.length,
-        position: {
-          x: Math.round(position.x),
-          y: Math.round(position.y),
-        },
-      });
+      rafId = window.requestAnimationFrame(render);
     }
-
-    if (!forceFreeze) {
-      activeAnimationTick += 1;
-    }
-    frame += 1;
-    rafId = window.requestAnimationFrame(render);
   }
 
   function start() {
@@ -1469,9 +2534,6 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
 
     running = true;
     lastFrameAt = performance.now();
-    if (!nextIdleEmotionAt) {
-      nextIdleEmotionAt = Date.now() + Math.round(pickInRange([3000, 7000]));
-    }
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
     rafId = window.requestAnimationFrame(render);

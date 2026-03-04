@@ -1,9 +1,3 @@
-export function drawSparkle(ctx, x, y, size) {
-  ctx.fillStyle = "#facc15";
-  ctx.fillRect(x + size, y, size, size * 3);
-  ctx.fillRect(x, y + size, size * 3, size);
-}
-
 export function drawPixelSprite(
   ctx,
   spriteRows,
@@ -30,15 +24,6 @@ export function drawPixelSprite(
       ctx.fillRect(originX + x * scale, originY + y * scale, scale, scale);
     }
   }
-}
-
-export function drawHeart(ctx, x, y, size) {
-  ctx.fillStyle = "#fb7185";
-  ctx.fillRect(x + size, y, size, size);
-  ctx.fillRect(x + size * 3, y, size, size);
-  ctx.fillRect(x, y + size, size * 5, size);
-  ctx.fillRect(x + size, y + size * 2, size * 3, size);
-  ctx.fillRect(x + size * 2, y + size * 3, size, size);
 }
 
 export function drawAtlasFrame(

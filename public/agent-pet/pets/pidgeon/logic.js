@@ -1,7 +1,49 @@
 export const pidgeonBehavior = {
-  "driftX": 0.00085,
-  "driftY": 0.0006,
-  "maxSpeedX": 1.55,
-  "maxSpeedY": 1.1,
-  "checklistPull": 0.0015
+  driftX: 0.00085,
+  driftY: 0.0006,
+  maxSpeedX: 1.55,
+  maxSpeedY: 1.1,
+  checklistPull: 0.0015,
+  animationPools: {
+    movement: ["movement", "flight"],
+    idle: ["idle"],
+    interaction: ["peck"],
+    celebration: ["flight", "movement"],
+  },
+  playfulNature: {
+    intervalMs: [4800, 9400],
+    durationMs: [900, 1600],
+    activationChance: 0.68,
+    actionKeys: ["peck", "idle", "flight"],
+  },
+  taskCompletion: {
+    triggerChance: 0.9,
+    durationMs: [1050, 1900],
+    actionKeys: ["peck", "flight"],
+  },
+  stateMachine: {
+    minHoldMsByReason: {
+      idle: 1600,
+      movement: 900,
+      playful: 900,
+      celebration: 1200,
+      fallback: 1250,
+    },
+  },
+  effects: {
+    windTrail: {
+      enabled: true,
+      color: "#d6eaf6",
+      colorSecondary: "#c8e3f2",
+      count: 5,
+      intervalMs: [120, 210],
+    },
+    landingDust: {
+      enabled: true,
+      color: "#d8c3a1",
+      colorSecondary: "#eedec1",
+      count: 6,
+      cooldownMs: 760,
+    },
+  },
 };
