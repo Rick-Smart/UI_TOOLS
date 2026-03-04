@@ -19,8 +19,11 @@ function AgentPetHost() {
   const isDevBuild = Boolean(import.meta.env?.DEV);
   const location = useLocation();
   const debugFlag = new URLSearchParams(location.search).get("petDebug");
-  const isDebugPetUi =
-    isDevBuild && (debugFlag === "1" || debugFlag === "true");
+  const isDebugPetUi = !(
+    debugFlag === "0" ||
+    debugFlag === "false" ||
+    debugFlag === "off"
+  );
   const selectedPetId = petState.profile.selectedPetId;
   const iframeSrc = isDebugPetUi
     ? `${getPetIframeUrl()}&debug=1`

@@ -2,12 +2,36 @@ import { createPetEngine } from "./petEngine.js";
 import { buildPetState, queryAgentId } from "./petState.js";
 
 function shouldShowDebugOverlay() {
-  const params = new URLSearchParams(window.location.search);
-  const debugFlag = params.get("debug");
-  return debugFlag === "1" || debugFlag === "true";
+  return false;
 }
 
 function createTuningPanel() {
+  const cloneValue = (value) => {
+    if (typeof structuredClone === "function") {
+      return structuredClone(value);
+    }
+
+    return JSON.parse(JSON.stringify(value));
+  };
+
+  const DEFAULT_FISH_OVERRIDES = {
+    schooling: {
+      sizeRange: [4, 7],
+      followerScaleRange: [0.3, 0.5],
+      followerMinVisualWidthPx: 15,
+      minSpeed: 0.68,
+      minForwardComponent: 0.8,
+      pathFollowWeight: 0.006,
+      pathVelocityWeight: 0.11,
+      pathSineAmplitudeRangePx: [16, 38],
+    },
+    effects: {
+      pathTrace: {
+        enabled: true,
+      },
+    },
+  };
+
   const tuningState = {
     forceAnimationKey: "",
     speedMultiplier: 1,
@@ -16,6 +40,8 @@ function createTuningPanel() {
     shadowAlpha: 0.18,
     highContrastShadow: false,
     freezeMotion: false,
+    fishOverridesEnabled: true,
+    fishOverrides: cloneValue(DEFAULT_FISH_OVERRIDES),
   };
 
   const panel = document.createElement("div");
@@ -33,6 +59,8 @@ function createTuningPanel() {
   panel.style.font =
     "12px/1.35 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
   panel.style.pointerEvents = "auto";
+  panel.style.maxHeight = "calc(100vh - 20px)";
+  panel.style.overflow = "auto";
 
   const heading = document.createElement("div");
   heading.style.fontWeight = "700";
@@ -110,6 +138,67 @@ function createTuningPanel() {
     };
   }
 
+  function setPathValue(target, path, value) {
+    const keys = path.split(".");
+    let cursor = target;
+    for (let index = 0; index < keys.length - 1; index += 1) {
+      const key = keys[index];
+      if (!cursor[key] || typeof cursor[key] !== "object") {
+        cursor[key] = {};
+      }
+      cursor = cursor[key];
+    }
+    cursor[keys[keys.length - 1]] = value;
+  }
+
+  function getPathValue(target, path, fallback) {
+    const keys = path.split(".");
+    let cursor = target;
+    for (let index = 0; index < keys.length; index += 1) {
+      const key = keys[index];
+      if (!cursor || typeof cursor !== "object" || !(key in cursor)) {
+        return fallback;
+      }
+      cursor = cursor[key];
+    }
+
+    return cursor;
+  }
+
+  function createFishRangeControl(label, path, min, max, step, fallback) {
+    const initialValue = Number(
+      getPathValue(tuningState.fishOverrides, path, fallback),
+    );
+    return createRangeControl(label, min, max, step, initialValue, (value) => {
+      setPathValue(tuningState.fishOverrides, path, value);
+    });
+  }
+
+  function createFishCheckControl(label, path, fallback = false) {
+    const wrapper = document.createElement("label");
+    wrapper.style.display = "block";
+    wrapper.style.marginTop = "6px";
+    const input = document.createElement("input");
+    input.type = "checkbox";
+    input.style.marginRight = "6px";
+    input.checked = Boolean(
+      getPathValue(tuningState.fishOverrides, path, fallback),
+    );
+    input.addEventListener("change", () => {
+      setPathValue(tuningState.fishOverrides, path, input.checked);
+    });
+    wrapper.appendChild(input);
+    wrapper.appendChild(document.createTextNode(label));
+    return {
+      element: wrapper,
+      input,
+      setValue: (nextValue) => {
+        input.checked = Boolean(nextValue);
+        setPathValue(tuningState.fishOverrides, path, input.checked);
+      },
+    };
+  }
+
   const speedControl = createRangeControl(
     "Speed Mult",
     0.4,
@@ -180,6 +269,266 @@ function createTuningPanel() {
     document.createTextNode("High contrast shadow"),
   );
 
+  const fishDetails = document.createElement("details");
+  fishDetails.open = true;
+  fishDetails.style.marginTop = "10px";
+  fishDetails.style.border = "1px solid rgba(148, 163, 184, 0.35)";
+  fishDetails.style.borderRadius = "6px";
+  fishDetails.style.padding = "6px 8px";
+
+  const fishSummary = document.createElement("summary");
+  fishSummary.textContent = "Fish Pathing Tuner";
+  fishSummary.style.cursor = "pointer";
+  fishSummary.style.fontWeight = "700";
+  fishDetails.appendChild(fishSummary);
+
+  const fishEnableControl = createFishCheckControl(
+    "Enable fish overrides",
+    "enabled",
+    true,
+  );
+  fishEnableControl.input.checked = tuningState.fishOverridesEnabled;
+  fishEnableControl.input.addEventListener("change", () => {
+    tuningState.fishOverridesEnabled = fishEnableControl.input.checked;
+  });
+
+  const fishFollowWeightControl = createFishRangeControl(
+    "Path Follow Weight",
+    "schooling.pathFollowWeight",
+    0.0002,
+    0.006,
+    0.0001,
+    0.006,
+  );
+  const fishVelocityWeightControl = createFishRangeControl(
+    "Path Velocity Weight",
+    "schooling.pathVelocityWeight",
+    0.01,
+    0.4,
+    0.01,
+    0.11,
+  );
+  const fishMainAmpMinControl = createFishRangeControl(
+    "Main Sine Amp Min",
+    "schooling.pathSineAmplitudeRangePx.0",
+    0,
+    80,
+    1,
+    16,
+  );
+  const fishMainAmpMaxControl = createFishRangeControl(
+    "Main Sine Amp Max",
+    "schooling.pathSineAmplitudeRangePx.1",
+    6,
+    120,
+    1,
+    38,
+  );
+  const fishMinSpeedControl = createFishRangeControl(
+    "Follower Min Speed",
+    "schooling.minSpeed",
+    0.02,
+    2.4,
+    0.01,
+    0.68,
+  );
+  const fishForwardFloorControl = createFishRangeControl(
+    "Forward Floor",
+    "schooling.minForwardComponent",
+    0,
+    0.8,
+    0.01,
+    0.8,
+  );
+  const fishScaleMinControl = createFishRangeControl(
+    "Follower Scale Min",
+    "schooling.followerScaleRange.0",
+    0.08,
+    0.9,
+    0.01,
+    0.3,
+  );
+  const fishScaleMaxControl = createFishRangeControl(
+    "Follower Scale Max",
+    "schooling.followerScaleRange.1",
+    0.1,
+    1,
+    0.01,
+    0.5,
+  );
+  const fishMinVisualWidthControl = createFishRangeControl(
+    "Follower Min Width Px",
+    "schooling.followerMinVisualWidthPx",
+    4,
+    24,
+    1,
+    15,
+  );
+  const fishTraceEnabledControl = createFishCheckControl(
+    "Trace Enabled",
+    "effects.pathTrace.enabled",
+    true,
+  );
+
+  const fishActionsRow = document.createElement("div");
+  fishActionsRow.style.display = "grid";
+  fishActionsRow.style.gridTemplateColumns = "1fr 1fr";
+  fishActionsRow.style.gap = "6px";
+  fishActionsRow.style.marginTop = "8px";
+
+  const copyFishButton = document.createElement("button");
+  copyFishButton.type = "button";
+  copyFishButton.textContent = "Copy fish JSON";
+  copyFishButton.style.border = "1px solid rgba(148,163,184,0.5)";
+  copyFishButton.style.background = "rgba(15,23,42,0.9)";
+  copyFishButton.style.color = "#e2e8f0";
+  copyFishButton.style.borderRadius = "6px";
+  copyFishButton.style.padding = "6px 8px";
+
+  const resetFishButton = document.createElement("button");
+  resetFishButton.type = "button";
+  resetFishButton.textContent = "Reset fish";
+  resetFishButton.style.border = "1px solid rgba(148,163,184,0.5)";
+  resetFishButton.style.background = "rgba(15,23,42,0.9)";
+  resetFishButton.style.color = "#e2e8f0";
+  resetFishButton.style.borderRadius = "6px";
+  resetFishButton.style.padding = "6px 8px";
+
+  const fishStatus = document.createElement("div");
+  fishStatus.style.marginTop = "6px";
+  fishStatus.style.color = "#93c5fd";
+  fishStatus.style.minHeight = "16px";
+
+  copyFishButton.addEventListener("click", async () => {
+    const payload = JSON.stringify(tuningState.fishOverrides, null, 2);
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(payload);
+        fishStatus.textContent = "Copied fish override JSON.";
+      } else {
+        fishStatus.textContent = "Clipboard unavailable; open console JSON.";
+        console.log("Fish override JSON:\n", payload);
+      }
+    } catch {
+      fishStatus.textContent = "Copy failed; see console JSON.";
+      console.log("Fish override JSON:\n", payload);
+    }
+  });
+
+  const applyFishControlValues = () => {
+    fishFollowWeightControl.setValue(
+      Number(
+        getPathValue(
+          tuningState.fishOverrides,
+          "schooling.pathFollowWeight",
+          0.006,
+        ),
+      ),
+    );
+    fishVelocityWeightControl.setValue(
+      Number(
+        getPathValue(
+          tuningState.fishOverrides,
+          "schooling.pathVelocityWeight",
+          0.11,
+        ),
+      ),
+    );
+    fishMainAmpMinControl.setValue(
+      Number(
+        getPathValue(
+          tuningState.fishOverrides,
+          "schooling.pathSineAmplitudeRangePx.0",
+          16,
+        ),
+      ),
+    );
+    fishMainAmpMaxControl.setValue(
+      Number(
+        getPathValue(
+          tuningState.fishOverrides,
+          "schooling.pathSineAmplitudeRangePx.1",
+          38,
+        ),
+      ),
+    );
+    fishMinSpeedControl.setValue(
+      Number(
+        getPathValue(tuningState.fishOverrides, "schooling.minSpeed", 0.68),
+      ),
+    );
+    fishForwardFloorControl.setValue(
+      Number(
+        getPathValue(
+          tuningState.fishOverrides,
+          "schooling.minForwardComponent",
+          0.8,
+        ),
+      ),
+    );
+    fishScaleMinControl.setValue(
+      Number(
+        getPathValue(
+          tuningState.fishOverrides,
+          "schooling.followerScaleRange.0",
+          0.3,
+        ),
+      ),
+    );
+    fishScaleMaxControl.setValue(
+      Number(
+        getPathValue(
+          tuningState.fishOverrides,
+          "schooling.followerScaleRange.1",
+          0.5,
+        ),
+      ),
+    );
+    fishMinVisualWidthControl.setValue(
+      Number(
+        getPathValue(
+          tuningState.fishOverrides,
+          "schooling.followerMinVisualWidthPx",
+          15,
+        ),
+      ),
+    );
+    fishTraceEnabledControl.setValue(
+      Boolean(
+        getPathValue(
+          tuningState.fishOverrides,
+          "effects.pathTrace.enabled",
+          true,
+        ),
+      ),
+    );
+  };
+
+  resetFishButton.addEventListener("click", () => {
+    tuningState.fishOverrides = cloneValue(DEFAULT_FISH_OVERRIDES);
+    tuningState.fishOverridesEnabled = true;
+    fishEnableControl.input.checked = true;
+    applyFishControlValues();
+    fishStatus.textContent = "Fish overrides reset.";
+  });
+
+  fishActionsRow.appendChild(copyFishButton);
+  fishActionsRow.appendChild(resetFishButton);
+
+  fishDetails.appendChild(fishEnableControl.element);
+  fishDetails.appendChild(fishFollowWeightControl.element);
+  fishDetails.appendChild(fishVelocityWeightControl.element);
+  fishDetails.appendChild(fishMainAmpMinControl.element);
+  fishDetails.appendChild(fishMainAmpMaxControl.element);
+  fishDetails.appendChild(fishMinSpeedControl.element);
+  fishDetails.appendChild(fishForwardFloorControl.element);
+  fishDetails.appendChild(fishScaleMinControl.element);
+  fishDetails.appendChild(fishScaleMaxControl.element);
+  fishDetails.appendChild(fishMinVisualWidthControl.element);
+  fishDetails.appendChild(fishTraceEnabledControl.element);
+  fishDetails.appendChild(fishActionsRow);
+  fishDetails.appendChild(fishStatus);
+
   const resetButton = document.createElement("button");
   resetButton.type = "button";
   resetButton.style.marginTop = "10px";
@@ -198,13 +547,17 @@ function createTuningPanel() {
     tuningState.shadowAlpha = 0.18;
     tuningState.highContrastShadow = false;
     tuningState.freezeMotion = false;
+    tuningState.fishOverridesEnabled = true;
+    tuningState.fishOverrides = cloneValue(DEFAULT_FISH_OVERRIDES);
     animationSelect.value = "";
     freezeInput.checked = false;
     contrastShadowInput.checked = false;
+    fishEnableControl.input.checked = true;
     speedControl.setValue(1);
     scaleControl.setValue(1);
     shadowControl.setValue(0);
     shadowAlphaControl.setValue(0.18);
+    applyFishControlValues();
   });
 
   panel.appendChild(heading);
@@ -216,6 +569,7 @@ function createTuningPanel() {
   panel.appendChild(shadowAlphaControl.element);
   panel.appendChild(freezeLabel);
   panel.appendChild(contrastShadowLabel);
+  panel.appendChild(fishDetails);
   panel.appendChild(resetButton);
 
   document.body.appendChild(panel);
@@ -258,7 +612,11 @@ function createTuningPanel() {
   }
 
   return {
-    getTuning: () => ({ ...tuningState }),
+    getTuning: () => ({
+      ...tuningState,
+      fishOverridesEnabled: Boolean(tuningState.fishOverridesEnabled),
+      fishOverrides: cloneValue(tuningState.fishOverrides),
+    }),
     render: (debugState) => {
       if (!debugState) {
         return;
