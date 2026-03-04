@@ -85,7 +85,12 @@ function PetSpritePreview({ petId }) {
 
     async function loadCatalog() {
       try {
-        const module = await import("/agent-pet/petCatalog.js");
+        const appBasePath =
+          typeof window !== "undefined"
+            ? window.location.pathname.replace(/[^/]*$/, "")
+            : "/";
+        const moduleUrl = `${appBasePath}agent-pet/petCatalog.js`;
+        const module = await import(/* @vite-ignore */ moduleUrl);
         if (!isActive) {
           return;
         }

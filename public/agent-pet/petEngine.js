@@ -174,14 +174,20 @@ function getAtlasImage(src) {
     return null;
   }
 
-  const cached = ATLAS_IMAGE_CACHE.get(src);
+  let resolvedSrc = src;
+  if (typeof src === "string" && src.startsWith("/agent-pet/")) {
+    const relativeSrc = src.replace(/^\/agent-pet\//, "");
+    resolvedSrc = new URL(`./${relativeSrc}`, window.location.href).toString();
+  }
+
+  const cached = ATLAS_IMAGE_CACHE.get(resolvedSrc);
   if (cached) {
     return cached;
   }
 
   const image = new Image();
-  image.src = src;
-  ATLAS_IMAGE_CACHE.set(src, image);
+  image.src = resolvedSrc;
+  ATLAS_IMAGE_CACHE.set(resolvedSrc, image);
   return image;
 }
 

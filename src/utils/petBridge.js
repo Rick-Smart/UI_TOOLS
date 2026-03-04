@@ -498,7 +498,13 @@ export function getPetIframeUrl() {
     agentId,
     v: String(PET_SCHEMA_VERSION),
   });
-  return `/agent-pet/index.html?${params.toString()}`;
+
+  const appBasePath =
+    typeof window !== "undefined"
+      ? window.location.pathname.replace(/[^/]*$/, "")
+      : "/";
+
+  return `${appBasePath}agent-pet/index.html?${params.toString()}`;
 }
 
 export function simulatePetRewardForTesting(stars = 5) {
