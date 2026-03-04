@@ -735,6 +735,46 @@ input:focus-visible,
   font-weight: 700;
 }
 
+.ask-question-form {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ask-question-modal-panel {
+  width: min(900px, 100%);
+}
+
+.ask-question-field {
+  min-width: 0;
+}
+
+.ask-question-field-full-row {
+  grid-column: 1 / -1;
+}
+
+.ask-question-field label {
+  min-height: 44px;
+  display: flex;
+  align-items: flex-end;
+}
+
+.ask-question-textarea {
+  min-height: 84px;
+  resize: vertical;
+}
+
+.ask-question-required {
+  color: var(--warning);
+  margin-left: 4px;
+}
+
+@media (max-width: 980px) {
+  .ask-question-form {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 1240px) {
   .call-col-left {
     flex: 1 1 300px;

@@ -38,6 +38,8 @@ import {
   subscribeInteractionMemory,
 } from "../utils/interactionMemory";
 import PageSection from "../components/layout/PageSection";
+import AppButton from "../components/ui/AppButton/AppButton";
+import AppModal from "../components/ui/AppModal/AppModal";
 
 const CASE_NOTE_DRAFT_KEY = "azdes.callHandling.caseNoteDraft";
 const CUSTOM_SCRIPTS_KEY = "azdes.callHandling.customScripts";
@@ -50,6 +52,40 @@ const LEGACY_TOOL_RESULTS_SECTION_START = "[[Tool Results Start]]";
 const LEGACY_TOOL_RESULTS_SECTION_END = "[[Tool Results End]]";
 const LEGACY_CAPTURED_DETAILS_SECTION_START = "[[Captured Tool Details Start]]";
 const LEGACY_CAPTURED_DETAILS_SECTION_END = "[[Captured Tool Details End]]";
+const ASK_QUESTION_MODAL_TITLE_ID = "ask-question-modal-title";
+
+const ASK_QUESTION_FIELDS = [
+  { key: "uid", label: "UID", type: "text" },
+  {
+    key: "issueDescription",
+    label: "Description of Issue",
+    type: "textarea",
+  },
+  { key: "question", label: "Your question", type: "textarea" },
+  {
+    key: "stepsTaken",
+    label: "What steps did you take to resolve issue?",
+    type: "textarea",
+  },
+  {
+    key: "resourcesUsed",
+    label: "What resources did you use to look up information?",
+    type: "textarea",
+  },
+  {
+    key: "googleResults",
+    label: "What did Google say?",
+    type: "textarea",
+  },
+];
+
+const INITIAL_ASK_QUESTION_FORM = ASK_QUESTION_FIELDS.reduce(
+  (accumulator, field) => ({
+    ...accumulator,
+    [field.key]: "",
+  }),
+  {},
+);
 
 function getDefaultTimeOfCall() {
   return new Date().toLocaleString();
@@ -247,6 +283,11 @@ function CallHandlingPage() {
   const [checkState, setCheckState] = useState(
     orderedCallChecklist.map(() => false),
   );
+  const [isAskQuestionModalOpen, setIsAskQuestionModalOpen] = useState(false);
+  const [askQuestionForm, setAskQuestionForm] = useState(
+    INITIAL_ASK_QUESTION_FORM,
+  );
+  const [askQuestionCopyStatus, setAskQuestionCopyStatus] = useState("");
 
   const checklistCompletedCount = useMemo(
     () => checkState.filter(Boolean).length,
@@ -318,6 +359,11 @@ function CallHandlingPage() {
   }, [agentName]);
 
   const completedCount = checklistCompletedCount;
+  const isAskQuestionReady = ASK_QUESTION_FIELDS.every((field) =>
+    askQuestionForm[field.key].trim(),
+  );
+  const shouldSpanLastAskQuestionField =
+    (ASK_QUESTION_FIELDS.length - 1) % 2 === 1;
 
   const currentStepScripts = useMemo(
     () => ({
@@ -564,6 +610,44 @@ function CallHandlingPage() {
     setScriptEditStatus("All custom scripts cleared.");
   }
 
+  function handleOpenAskQuestionModal() {
+    setAskQuestionCopyStatus("");
+    setIsAskQuestionModalOpen(true);
+  }
+
+  function handleCloseAskQuestionModal() {
+    setAskQuestionCopyStatus("");
+    setIsAskQuestionModalOpen(false);
+  }
+
+  function handleAskQuestionFieldChange(fieldKey, value) {
+    setAskQuestionForm((current) => ({
+      ...current,
+      [fieldKey]: value,
+    }));
+    setAskQuestionCopyStatus("");
+  }
+
+  function buildAskQuestionSummary() {
+    return ASK_QUESTION_FIELDS.map(
+      (field) => `${field.label}:\n${askQuestionForm[field.key].trim()}`,
+    ).join("\n\n");
+  }
+
+  async function handleCopyAskQuestion() {
+    if (!isAskQuestionReady) {
+      setAskQuestionCopyStatus("Complete all required fields before copying.");
+      return;
+    }
+
+    const copied = await copyText(buildAskQuestionSummary());
+    setAskQuestionCopyStatus(
+      copied
+        ? "Question copied. Paste it into your team Google Chat."
+        : "Copy unavailable.",
+    );
+  }
+
   const stepContent = (
     <StepContentRenderer
       selectedStep={selectedStep}
@@ -603,6 +687,7 @@ function CallHandlingPage() {
         />
 
         <CaseNoteTemplatePanel
+          handleOpenAskQuestionModal={handleOpenAskQuestionModal}
           handleRefreshCaseTemplate={handleRefreshCaseTemplate}
           handleCopyCaseNoteTemplate={handleCopyCaseNoteTemplate}
           handleAppendCapturedDetails={handleAppendCapturedDetails}
@@ -645,6 +730,98 @@ function CallHandlingPage() {
           supportResources={supportResources}
         />
       </section>
+
+      <AppModal
+        isOpen={isAskQuestionModalOpen}
+        onClose={handleCloseAskQuestionModal}
+        title="Ask a question"
+        titleId={ASK_QUESTION_MODAL_TITLE_ID}
+        panelClassName="ask-question-modal-panel"
+        footer={
+          <>
+            <AppButton
+              type="button"
+              variant="secondary"
+              onClick={handleCloseAskQuestionModal}
+            >
+              Cancel
+            </AppButton>
+            <AppButton
+              type="button"
+              variant="secondary"
+              onClick={handleCopyAskQuestion}
+              disabled={!isAskQuestionReady}
+              title={
+                isAskQuestionReady
+                  ? "Copies your completed question details for Google Chat."
+                  : "Complete all required fields to enable copy."
+              }
+            >
+              Copy to Clipboard
+            </AppButton>
+            {askQuestionCopyStatus ? (
+              <span className="muted">{askQuestionCopyStatus}</span>
+            ) : null}
+          </>
+        }
+      >
+        <div className="ask-question-form">
+          {ASK_QUESTION_FIELDS.map((field, index) => {
+            const inputId = `ask-question-${field.key}`;
+            const value = askQuestionForm[field.key];
+            const isFirstField = index === 0;
+            const isLoneTrailingField =
+              shouldSpanLastAskQuestionField &&
+              index === ASK_QUESTION_FIELDS.length - 1;
+            const fieldClassName = [
+              "ask-question-field",
+              isFirstField || isLoneTrailingField
+                ? "ask-question-field-full-row"
+                : "",
+            ]
+              .filter(Boolean)
+              .join(" ");
+
+            return (
+              <div key={field.key} className={fieldClassName}>
+                <label htmlFor={inputId}>
+                  {field.label}:
+                  <span className="ask-question-required" aria-hidden="true">
+                    *
+                  </span>
+                </label>
+                {field.type === "textarea" ? (
+                  <textarea
+                    id={inputId}
+                    className="ask-question-textarea"
+                    value={value}
+                    required
+                    onChange={(event) =>
+                      handleAskQuestionFieldChange(
+                        field.key,
+                        event.target.value,
+                      )
+                    }
+                  />
+                ) : (
+                  <input
+                    id={inputId}
+                    type="text"
+                    value={value}
+                    required
+                    onChange={(event) =>
+                      handleAskQuestionFieldChange(
+                        field.key,
+                        event.target.value,
+                      )
+                    }
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </AppModal>
     </PageSection>
   );
 }

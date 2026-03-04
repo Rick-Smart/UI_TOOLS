@@ -1,0 +1,49 @@
+.app-modal-root {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.62);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 32px 18px 18px;
+  z-index: 70;
+}
+
+.app-modal-panel {
+  width: min(700px, 100%);
+  max-height: min(82vh, 760px);
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.app-modal-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.app-modal-header h3 {
+  margin: 0;
+}
+
+.app-modal-close {
+  min-width: 88px;
+}
+
+.app-modal-body {
+  display: grid;
+  gap: 12px;
+}
+
+.app-modal-footer {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}

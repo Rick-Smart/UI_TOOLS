@@ -8,6 +8,7 @@ function applySentenceCase(value) {
 }
 
 function CaseNoteTemplatePanel({
+  handleOpenAskQuestionModal,
   handleRefreshCaseTemplate,
   handleCopyCaseNoteTemplate,
   handleAppendCapturedDetails,
@@ -47,6 +48,14 @@ function CaseNoteTemplatePanel({
         />
       </div>
       <div className="actions-row">
+        <AppButton
+          type="button"
+          variant="secondary"
+          onClick={handleOpenAskQuestionModal}
+          title="Opens a required template for asking your team a question in Google Chat."
+        >
+          Ask a question
+        </AppButton>
         <AppButton
           type="button"
           variant="secondary"
