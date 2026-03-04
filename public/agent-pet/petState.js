@@ -48,11 +48,24 @@ function levelFromPoints(points) {
   return Math.max(1, Math.floor(points / 120) + 1);
 }
 
+const DEFAULT_PET_ID = Object.keys(PET_CATALOG)[0];
+const LEGACY_PET_ID_MAP = {
+  cat: "sphynx-cat",
+  dog: "jack-russell",
+  crow: "pidgeon",
+  raccoon: "raccoon",
+  dragonling: "beaver",
+};
+
 export function buildPetState(agentId) {
   const keys = keySet(agentId);
   const profile = safeRead(keys.profile) || {};
   const progress = safeRead(keys.progress) || {};
-  const selectedPetId = profile.selectedPetId || "cat";
+  const normalizedPetId =
+    LEGACY_PET_ID_MAP[profile.selectedPetId] || profile.selectedPetId;
+  const selectedPetId = PET_CATALOG[normalizedPetId]
+    ? normalizedPetId
+    : DEFAULT_PET_ID;
   const points = safeNumber(progress.totalPoints, 0);
   const fiveStarCount = safeNumber(progress.qualifyingFiveStarCount, 0);
 

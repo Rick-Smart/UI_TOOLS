@@ -18,7 +18,13 @@ function AgentPetHost() {
   const iframeRef = useRef(null);
   const isDevBuild = Boolean(import.meta.env?.DEV);
   const location = useLocation();
+  const debugFlag = new URLSearchParams(location.search).get("petDebug");
+  const isDebugPetUi =
+    isDevBuild && (debugFlag === "1" || debugFlag === "true");
   const selectedPetId = petState.profile.selectedPetId;
+  const iframeSrc = isDebugPetUi
+    ? `${getPetIframeUrl()}&debug=1`
+    : getPetIframeUrl();
 
   useEffect(() => {
     return subscribePetState((nextState) => {
@@ -87,7 +93,20 @@ function AgentPetHost() {
         return;
       }
 
+      if (event.button !== 0) {
+        return;
+      }
+
       const bounds = iframeRef.current.getBoundingClientRect();
+      if (
+        event.clientX < bounds.left ||
+        event.clientX > bounds.right ||
+        event.clientY < bounds.top ||
+        event.clientY > bounds.bottom
+      ) {
+        return;
+      }
+
       const localX = event.clientX - bounds.left;
       const localY = event.clientY - bounds.top;
 
@@ -138,9 +157,9 @@ function AgentPetHost() {
     <>
       <iframe
         ref={iframeRef}
-        className="agent-pet-roamer-layer"
+        className={`agent-pet-roamer-layer${isDebugPetUi ? " agent-pet-roamer-layer--interactive" : ""}`}
         title="Agent pet roamer"
-        src={getPetIframeUrl()}
+        src={iframeSrc}
       />
       {devQuickSimButton}
     </>

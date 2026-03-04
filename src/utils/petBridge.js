@@ -7,12 +7,32 @@ const PET_UNLOCK_TEST_INTERACTIONS_REQUIRED = 3;
 const IS_DEV_BUILD = Boolean(import.meta.env?.DEV);
 
 const PET_CATALOG = [
-  { id: "cat", name: "Cat", mythical: false },
-  { id: "dog", name: "Dog", mythical: false },
-  { id: "crow", name: "Crow", mythical: false },
+  { id: "sphynx-cat", name: "Sphynx Cat", mythical: false },
+  { id: "jack-russell", name: "Jack Russell", mythical: false },
+  { id: "pidgeon", name: "Pidgeon", mythical: false },
+  { id: "red-panda", name: "Red Panda", mythical: false },
+  { id: "beaver", name: "Beaver", mythical: false },
+  { id: "chameleon", name: "Chameleon", mythical: false },
+  { id: "ferret", name: "Ferret", mythical: false },
+  { id: "fish", name: "Fish", mythical: false },
+  { id: "koala", name: "Koala", mythical: false },
   { id: "raccoon", name: "Raccoon", mythical: false },
-  { id: "dragonling", name: "Dragonling", mythical: true },
+  { id: "seagull", name: "Seagull", mythical: false },
+  { id: "wolf", name: "Wolf", mythical: false },
 ];
+
+const LEGACY_PET_ID_MAP = {
+  cat: "sphynx-cat",
+  dog: "jack-russell",
+  crow: "pidgeon",
+  raccoon: "raccoon",
+  dragonling: "beaver",
+};
+
+function normalizePetId(petId) {
+  const candidate = String(petId || "").trim();
+  return LEGACY_PET_ID_MAP[candidate] || candidate;
+}
 
 const POINTS_BY_STARS = {
   1: 5,
@@ -136,6 +156,10 @@ function sanitizeProfile(profile, agentId) {
     agentId,
   };
 
+  if (merged.selectedPetId) {
+    merged.selectedPetId = normalizePetId(merged.selectedPetId);
+  }
+
   if (
     merged.selectedPetId &&
     !PET_CATALOG.some((pet) => pet.id === merged.selectedPetId)
@@ -180,12 +204,32 @@ function sanitizeInventory(inventory) {
   };
 
   merged.ownedPetIds = Array.isArray(merged.ownedPetIds)
-    ? merged.ownedPetIds.filter((item) => typeof item === "string")
+    ? merged.ownedPetIds
+        .filter((item) => typeof item === "string")
+        .map((item) => normalizePetId(item))
     : fallback.ownedPetIds;
 
   merged.unlockedPetIds = Array.isArray(merged.unlockedPetIds)
-    ? merged.unlockedPetIds.filter((item) => typeof item === "string")
+    ? merged.unlockedPetIds
+        .filter((item) => typeof item === "string")
+        .map((item) => normalizePetId(item))
     : fallback.unlockedPetIds;
+
+  merged.ownedPetIds = [...new Set(merged.ownedPetIds)].filter((petId) =>
+    PET_CATALOG.some((pet) => pet.id === petId),
+  );
+
+  merged.unlockedPetIds = [...new Set(merged.unlockedPetIds)].filter((petId) =>
+    PET_CATALOG.some((pet) => pet.id === petId),
+  );
+
+  if (!merged.ownedPetIds.length) {
+    merged.ownedPetIds = fallback.ownedPetIds;
+  }
+
+  if (!merged.unlockedPetIds.length) {
+    merged.unlockedPetIds = fallback.unlockedPetIds;
+  }
 
   return merged;
 }
@@ -286,21 +330,22 @@ export function subscribePetState(listener) {
 
 export function choosePet(petId) {
   const { agentId, keys, profile, progress, inventory } = readPetState();
+  const normalizedPetId = normalizePetId(petId);
 
-  if (!PET_CATALOG.some((pet) => pet.id === petId)) {
+  if (!PET_CATALOG.some((pet) => pet.id === normalizedPetId)) {
     return;
   }
 
   const nextProfile = {
     ...profile,
-    selectedPetId: petId,
+    selectedPetId: normalizedPetId,
     enabled: true,
     dismissedAt: null,
     updatedAt: new Date().toISOString(),
   };
 
   savePetState({ keys, profile: nextProfile, progress, inventory });
-  emitPetStateUpdate({ agentId, reason: "choose-pet", petId });
+  emitPetStateUpdate({ agentId, reason: "choose-pet", petId: normalizedPetId });
 }
 
 export function dismissPet() {

@@ -1,0 +1,225 @@
+{
+  "generatedAt": "2026-03-03",
+  "basePath": "public/agent-pet/imports/new_pets_sprite_sheets",
+  "packs": [
+    {
+      "name": "Beaver",
+      "png": "Beaver Sprite Sheet.png",
+      "json": "Beaver Sprite Sheet.json",
+      "sheetSize": "128x352",
+      "frameCount": 44,
+      "cellSize": "32x32",
+      "actions": [
+        "Ascent",
+        "Bite",
+        "Damage",
+        "Death",
+        "Dive",
+        "Idle",
+        "Idle Water",
+        "Movement",
+        "Movement Water",
+        "Movement Water with Stick",
+        "Movement with Stick"
+      ],
+      "status": "ready"
+    },
+    {
+      "name": "Chameleon",
+      "png": "Chameleon Sprite Sheet.png",
+      "json": "Chameleon Sprite Sheet.json",
+      "sheetSize": "512x224",
+      "frameCount": 56,
+      "cellSize": "64x32",
+      "actions": [
+        "Damage",
+        "Death",
+        "Disappear",
+        "Idle",
+        "Movement",
+        "Reappear",
+        "Tongue"
+      ],
+      "status": "ready"
+    },
+    {
+      "name": "Dog",
+      "png": "Jack Russel Terrier Sprite Sheet.png",
+      "json": "Jack Russel Terrier Sprite Sheet.json",
+      "sheetSize": "256x320",
+      "frameCount": 80,
+      "cellSize": "32x32",
+      "actions": [
+        "Bark",
+        "Bite",
+        "Dash",
+        "Dash- Ball",
+        "Idle",
+        "Movement",
+        "Movement- Ball",
+        "Playful",
+        "Sit Idle",
+        "Sleep"
+      ],
+      "status": "ready"
+    },
+    {
+      "name": "Ferret",
+      "png": "Ferret Sprite Sheet.png",
+      "json": "Ferret Sprite Sheet.json",
+      "sheetSize": "256x288",
+      "frameCount": 72,
+      "cellSize": "32x32",
+      "actions": [
+        "Death",
+        "Dig",
+        "Disappear",
+        "Emerge",
+        "Idle",
+        "Idle2",
+        "Jump",
+        "Movement",
+        "Sleep"
+      ],
+      "status": "ready"
+    },
+    {
+      "name": "Fish",
+      "png": "Fishes Sprite Sheet.png",
+      "json": "Fishes Sprite Sheet.json",
+      "sheetSize": "512x768",
+      "frameCount": 192,
+      "cellSize": "64x32",
+      "actions": [
+        "Alaska Pollock - Death",
+        "Alaska Pollock - Movement",
+        "Anchovy - Death",
+        "Anchovy - Movement",
+        "Atlantic Cod - Death",
+        "Atlantic Cod - Movement",
+        "Blue Tang - Death",
+        "Blue Tang - Movement",
+        "Clown Fish - Death",
+        "Clown Fish - Movement",
+        "Frontosa - Death",
+        "Frontosa - Movement",
+        "Great Barracuda - Death",
+        "Great Barracuda - Movement",
+        "Red Parrot Fish - Death",
+        "Red Parrot Fish - Movement",
+        "Sailfish - Death",
+        "Sailfish - Movement",
+        "Shortfin Batfish - Death",
+        "Shortfin Batfish - Movement",
+        "Silver Salmon - Death",
+        "Silver Salmon - Movement",
+        "Tuna Fish -  Death",
+        "Tuna Fish - Movement"
+      ],
+      "status": "ready"
+    },
+    {
+      "name": "Koala",
+      "png": "Koala Sprite Sheet.png",
+      "json": "Koala Sprite Sheet.json",
+      "sheetSize": "384x128",
+      "frameCount": 48,
+      "cellSize": "32x32",
+      "actions": ["Climb", "Eat", "Idle", "Movement"],
+      "status": "ready"
+    },
+    {
+      "name": "Pidgeon",
+      "png": "Pidgeon Sprite Sheet.png",
+      "json": "Pidgeon Sprite Sheet.json",
+      "sheetSize": "128x128",
+      "frameCount": 16,
+      "cellSize": "32x32",
+      "actions": ["Flight", "Idle", "Movement", "Peck"],
+      "status": "ready"
+    },
+    {
+      "name": "Raccoon",
+      "png": "Raccoon Sprite Sheet.png",
+      "json": null,
+      "sheetSize": "256x128",
+      "frameCount": 0,
+      "cellSize": null,
+      "actions": [],
+      "status": "partial"
+    },
+    {
+      "name": "Red_Panda",
+      "png": "Red Panda Sprite Sheet.png",
+      "json": "Red Panda Sprite Sheet.json",
+      "sheetSize": "256x224",
+      "frameCount": 56,
+      "cellSize": "32x32",
+      "actions": [
+        "Attack",
+        "Damage",
+        "Death",
+        "Idle",
+        "Idle2",
+        "Movement",
+        "Sleep"
+      ],
+      "status": "ready"
+    },
+    {
+      "name": "Seagull",
+      "png": null,
+      "json": "Seagull Sprite Sheet.json",
+      "sheetSize": null,
+      "frameCount": 56,
+      "cellSize": "32x32",
+      "actions": [
+        "Damage",
+        "Death",
+        "Flap",
+        "Glide",
+        "Glide 2",
+        "Idle",
+        "Idle 2"
+      ],
+      "status": "partial"
+    },
+    {
+      "name": "Sphynx_Cat",
+      "png": "Sphynx Cat Sprite Sheet.png",
+      "json": "Sphynx Cat Sprite Sheet.json",
+      "sheetSize": "256x288",
+      "frameCount": 72,
+      "cellSize": "32x32",
+      "actions": [
+        "Clean",
+        "Idle",
+        "IdleSit",
+        "Jump",
+        "Lick",
+        "Paw",
+        "Run",
+        "Sleep",
+        "Walk"
+      ],
+      "status": "ready"
+    },
+    {
+      "name": "Wolf",
+      "png": "Wolf Cub Sprite Sheet.png",
+      "json": null,
+      "sheetSize": "256x224",
+      "frameCount": 0,
+      "cellSize": null,
+      "actions": [],
+      "status": "partial"
+    }
+  ],
+  "suggestedMapping": {
+    "cat": "Sphynx_Cat",
+    "dog": "Dog",
+    "crow": "Pidgeon",
+    "raccoon": "Raccoon",
+    "dragonling": "Red_Panda"
+  }
+}

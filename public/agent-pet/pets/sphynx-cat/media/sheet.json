@@ -1,0 +1,1481 @@
+﻿{
+    "frames":  {
+                   "Sphynx Cat Sprite Sheet (Idle) 0.ase":  {
+                                                                "frame":  {
+                                                                              "x":  0,
+                                                                              "y":  0,
+                                                                              "w":  32,
+                                                                              "h":  32
+                                                                          },
+                                                                "rotated":  false,
+                                                                "trimmed":  false,
+                                                                "spriteSourceSize":  {
+                                                                                         "x":  0,
+                                                                                         "y":  0,
+                                                                                         "w":  32,
+                                                                                         "h":  32
+                                                                                     },
+                                                                "sourceSize":  {
+                                                                                   "w":  32,
+                                                                                   "h":  32
+                                                                               },
+                                                                "duration":  100
+                                                            },
+                   "Sphynx Cat Sprite Sheet (Idle) 1.ase":  {
+                                                                "frame":  {
+                                                                              "x":  32,
+                                                                              "y":  0,
+                                                                              "w":  32,
+                                                                              "h":  32
+                                                                          },
+                                                                "rotated":  false,
+                                                                "trimmed":  false,
+                                                                "spriteSourceSize":  {
+                                                                                         "x":  0,
+                                                                                         "y":  0,
+                                                                                         "w":  32,
+                                                                                         "h":  32
+                                                                                     },
+                                                                "sourceSize":  {
+                                                                                   "w":  32,
+                                                                                   "h":  32
+                                                                               },
+                                                                "duration":  100
+                                                            },
+                   "Sphynx Cat Sprite Sheet (Idle) 2.ase":  {
+                                                                "frame":  {
+                                                                              "x":  64,
+                                                                              "y":  0,
+                                                                              "w":  32,
+                                                                              "h":  32
+                                                                          },
+                                                                "rotated":  false,
+                                                                "trimmed":  false,
+                                                                "spriteSourceSize":  {
+                                                                                         "x":  0,
+                                                                                         "y":  0,
+                                                                                         "w":  32,
+                                                                                         "h":  32
+                                                                                     },
+                                                                "sourceSize":  {
+                                                                                   "w":  32,
+                                                                                   "h":  32
+                                                                               },
+                                                                "duration":  100
+                                                            },
+                   "Sphynx Cat Sprite Sheet (Idle) 3.ase":  {
+                                                                "frame":  {
+                                                                              "x":  96,
+                                                                              "y":  0,
+                                                                              "w":  32,
+                                                                              "h":  32
+                                                                          },
+                                                                "rotated":  false,
+                                                                "trimmed":  false,
+                                                                "spriteSourceSize":  {
+                                                                                         "x":  0,
+                                                                                         "y":  0,
+                                                                                         "w":  32,
+                                                                                         "h":  32
+                                                                                     },
+                                                                "sourceSize":  {
+                                                                                   "w":  32,
+                                                                                   "h":  32
+                                                                               },
+                                                                "duration":  100
+                                                            },
+                   "Sphynx Cat Sprite Sheet (Idle) 4.ase":  {
+                                                                "frame":  {
+                                                                              "x":  128,
+                                                                              "y":  0,
+                                                                              "w":  32,
+                                                                              "h":  32
+                                                                          },
+                                                                "rotated":  false,
+                                                                "trimmed":  false,
+                                                                "spriteSourceSize":  {
+                                                                                         "x":  0,
+                                                                                         "y":  0,
+                                                                                         "w":  32,
+                                                                                         "h":  32
+                                                                                     },
+                                                                "sourceSize":  {
+                                                                                   "w":  32,
+                                                                                   "h":  32
+                                                                               },
+                                                                "duration":  100
+                                                            },
+                   "Sphynx Cat Sprite Sheet (Idle) 5.ase":  {
+                                                                "frame":  {
+                                                                              "x":  160,
+                                                                              "y":  0,
+                                                                              "w":  32,
+                                                                              "h":  32
+                                                                          },
+                                                                "rotated":  false,
+                                                                "trimmed":  false,
+                                                                "spriteSourceSize":  {
+                                                                                         "x":  0,
+                                                                                         "y":  0,
+                                                                                         "w":  32,
+                                                                                         "h":  32
+                                                                                     },
+                                                                "sourceSize":  {
+                                                                                   "w":  32,
+                                                                                   "h":  32
+                                                                               },
+                                                                "duration":  100
+                                                            },
+                   "Sphynx Cat Sprite Sheet (Idle) 6.ase":  {
+                                                                "frame":  {
+                                                                              "x":  192,
+                                                                              "y":  0,
+                                                                              "w":  32,
+                                                                              "h":  32
+                                                                          },
+                                                                "rotated":  false,
+                                                                "trimmed":  false,
+                                                                "spriteSourceSize":  {
+                                                                                         "x":  0,
+                                                                                         "y":  0,
+                                                                                         "w":  32,
+                                                                                         "h":  32
+                                                                                     },
+                                                                "sourceSize":  {
+                                                                                   "w":  32,
+                                                                                   "h":  32
+                                                                               },
+                                                                "duration":  100
+                                                            },
+                   "Sphynx Cat Sprite Sheet (Idle) 7.ase":  {
+                                                                "frame":  {
+                                                                              "x":  224,
+                                                                              "y":  0,
+                                                                              "w":  32,
+                                                                              "h":  32
+                                                                          },
+                                                                "rotated":  false,
+                                                                "trimmed":  false,
+                                                                "spriteSourceSize":  {
+                                                                                         "x":  0,
+                                                                                         "y":  0,
+                                                                                         "w":  32,
+                                                                                         "h":  32
+                                                                                     },
+                                                                "sourceSize":  {
+                                                                                   "w":  32,
+                                                                                   "h":  32
+                                                                               },
+                                                                "duration":  100
+                                                            },
+                   "Sphynx Cat Sprite Sheet (IdleSit) 0.ase":  {
+                                                                   "frame":  {
+                                                                                 "x":  0,
+                                                                                 "y":  32,
+                                                                                 "w":  32,
+                                                                                 "h":  32
+                                                                             },
+                                                                   "rotated":  false,
+                                                                   "trimmed":  false,
+                                                                   "spriteSourceSize":  {
+                                                                                            "x":  0,
+                                                                                            "y":  0,
+                                                                                            "w":  32,
+                                                                                            "h":  32
+                                                                                        },
+                                                                   "sourceSize":  {
+                                                                                      "w":  32,
+                                                                                      "h":  32
+                                                                                  },
+                                                                   "duration":  100
+                                                               },
+                   "Sphynx Cat Sprite Sheet (IdleSit) 1.ase":  {
+                                                                   "frame":  {
+                                                                                 "x":  32,
+                                                                                 "y":  32,
+                                                                                 "w":  32,
+                                                                                 "h":  32
+                                                                             },
+                                                                   "rotated":  false,
+                                                                   "trimmed":  false,
+                                                                   "spriteSourceSize":  {
+                                                                                            "x":  0,
+                                                                                            "y":  0,
+                                                                                            "w":  32,
+                                                                                            "h":  32
+                                                                                        },
+                                                                   "sourceSize":  {
+                                                                                      "w":  32,
+                                                                                      "h":  32
+                                                                                  },
+                                                                   "duration":  100
+                                                               },
+                   "Sphynx Cat Sprite Sheet (IdleSit) 2.ase":  {
+                                                                   "frame":  {
+                                                                                 "x":  64,
+                                                                                 "y":  32,
+                                                                                 "w":  32,
+                                                                                 "h":  32
+                                                                             },
+                                                                   "rotated":  false,
+                                                                   "trimmed":  false,
+                                                                   "spriteSourceSize":  {
+                                                                                            "x":  0,
+                                                                                            "y":  0,
+                                                                                            "w":  32,
+                                                                                            "h":  32
+                                                                                        },
+                                                                   "sourceSize":  {
+                                                                                      "w":  32,
+                                                                                      "h":  32
+                                                                                  },
+                                                                   "duration":  100
+                                                               },
+                   "Sphynx Cat Sprite Sheet (IdleSit) 3.ase":  {
+                                                                   "frame":  {
+                                                                                 "x":  96,
+                                                                                 "y":  32,
+                                                                                 "w":  32,
+                                                                                 "h":  32
+                                                                             },
+                                                                   "rotated":  false,
+                                                                   "trimmed":  false,
+                                                                   "spriteSourceSize":  {
+                                                                                            "x":  0,
+                                                                                            "y":  0,
+                                                                                            "w":  32,
+                                                                                            "h":  32
+                                                                                        },
+                                                                   "sourceSize":  {
+                                                                                      "w":  32,
+                                                                                      "h":  32
+                                                                                  },
+                                                                   "duration":  100
+                                                               },
+                   "Sphynx Cat Sprite Sheet (IdleSit) 4.ase":  {
+                                                                   "frame":  {
+                                                                                 "x":  128,
+                                                                                 "y":  32,
+                                                                                 "w":  32,
+                                                                                 "h":  32
+                                                                             },
+                                                                   "rotated":  false,
+                                                                   "trimmed":  false,
+                                                                   "spriteSourceSize":  {
+                                                                                            "x":  0,
+                                                                                            "y":  0,
+                                                                                            "w":  32,
+                                                                                            "h":  32
+                                                                                        },
+                                                                   "sourceSize":  {
+                                                                                      "w":  32,
+                                                                                      "h":  32
+                                                                                  },
+                                                                   "duration":  100
+                                                               },
+                   "Sphynx Cat Sprite Sheet (IdleSit) 5.ase":  {
+                                                                   "frame":  {
+                                                                                 "x":  160,
+                                                                                 "y":  32,
+                                                                                 "w":  32,
+                                                                                 "h":  32
+                                                                             },
+                                                                   "rotated":  false,
+                                                                   "trimmed":  false,
+                                                                   "spriteSourceSize":  {
+                                                                                            "x":  0,
+                                                                                            "y":  0,
+                                                                                            "w":  32,
+                                                                                            "h":  32
+                                                                                        },
+                                                                   "sourceSize":  {
+                                                                                      "w":  32,
+                                                                                      "h":  32
+                                                                                  },
+                                                                   "duration":  100
+                                                               },
+                   "Sphynx Cat Sprite Sheet (IdleSit) 6.ase":  {
+                                                                   "frame":  {
+                                                                                 "x":  192,
+                                                                                 "y":  32,
+                                                                                 "w":  32,
+                                                                                 "h":  32
+                                                                             },
+                                                                   "rotated":  false,
+                                                                   "trimmed":  false,
+                                                                   "spriteSourceSize":  {
+                                                                                            "x":  0,
+                                                                                            "y":  0,
+                                                                                            "w":  32,
+                                                                                            "h":  32
+                                                                                        },
+                                                                   "sourceSize":  {
+                                                                                      "w":  32,
+                                                                                      "h":  32
+                                                                                  },
+                                                                   "duration":  100
+                                                               },
+                   "Sphynx Cat Sprite Sheet (IdleSit) 7.ase":  {
+                                                                   "frame":  {
+                                                                                 "x":  224,
+                                                                                 "y":  32,
+                                                                                 "w":  32,
+                                                                                 "h":  32
+                                                                             },
+                                                                   "rotated":  false,
+                                                                   "trimmed":  false,
+                                                                   "spriteSourceSize":  {
+                                                                                            "x":  0,
+                                                                                            "y":  0,
+                                                                                            "w":  32,
+                                                                                            "h":  32
+                                                                                        },
+                                                                   "sourceSize":  {
+                                                                                      "w":  32,
+                                                                                      "h":  32
+                                                                                  },
+                                                                   "duration":  100
+                                                               },
+                   "Sphynx Cat Sprite Sheet (Lick) 0.ase":  {
+                                                                "frame":  {
+                                                                              "x":  0,
+                                                                              "y":  64,
+                                                                              "w":  32,
+                                                                              "h":  32
+                                                                          },
+                                                                "rotated":  false,
+                                                                "trimmed":  false,
+                                                                "spriteSourceSize":  {
+                                                                                         "x":  0,
+                                                                                         "y":  0,
+                                                                                         "w":  32,
+                                                                                         "h":  32
+                                                                                     },
+                                                                "sourceSize":  {
+                                                                                   "w":  32,
+                                                                                   "h":  32
+                                                                               },
+                                                                "duration":  100
+                                                            },
+                   "Sphynx Cat Sprite Sheet (Lick) 1.ase":  {
+                                                                "frame":  {
+                                                                              "x":  32,
+                                                                              "y":  64,
+                                                                              "w":  32,
+                                                                              "h":  32
+                                                                          },
+                                                                "rotated":  false,
+                                                                "trimmed":  false,
+                                                                "spriteSourceSize":  {
+                                                                                         "x":  0,
+                                                                                         "y":  0,
+                                                                                         "w":  32,
+                                                                                         "h":  32
+                                                                                     },
+                                                                "sourceSize":  {
+                                                                                   "w":  32,
+                                                                                   "h":  32
+                                                                               },
+                                                                "duration":  100
+                                                            },
+                   "Sphynx Cat Sprite Sheet (Lick) 2.ase":  {
+                                                                "frame":  {
+                                                                              "x":  64,
+                                                                              "y":  64,
+                                                                              "w":  32,
+                                                                              "h":  32
+                                                                          },
+                                                                "rotated":  false,
+                                                                "trimmed":  false,
+                                                                "spriteSourceSize":  {
+                                                                                         "x":  0,
+                                                                                         "y":  0,
+                                                                                         "w":  32,
+                                                                                         "h":  32
+                                                                                     },
+                                                                "sourceSize":  {
+                                                                                   "w":  32,
+                                                                                   "h":  32
+                                                                               },
+                                                                "duration":  100
+                                                            },
+                   "Sphynx Cat Sprite Sheet (Lick) 3.ase":  {
+                                                                "frame":  {
+                                                                              "x":  96,
+                                                                              "y":  64,
+                                                                              "w":  32,
+                                                                              "h":  32
+                                                                          },
+                                                                "rotated":  false,
+                                                                "trimmed":  false,
+                                                                "spriteSourceSize":  {
+                                                                                         "x":  0,
+                                                                                         "y":  0,
+                                                                                         "w":  32,
+                                                                                         "h":  32
+                                                                                     },
+                                                                "sourceSize":  {
+                                                                                   "w":  32,
+                                                                                   "h":  32
+                                                                               },
+                                                                "duration":  100
+                                                            },
+                   "Sphynx Cat Sprite Sheet (Lick) 4.ase":  {
+                                                                "frame":  {
+                                                                              "x":  128,
+                                                                              "y":  64,
+                                                                              "w":  32,
+                                                                              "h":  32
+                                                                          },
+                                                                "rotated":  false,
+                                                                "trimmed":  false,
+                                                                "spriteSourceSize":  {
+                                                                                         "x":  0,
+                                                                                         "y":  0,
+                                                                                         "w":  32,
+                                                                                         "h":  32
+                                                                                     },
+                                                                "sourceSize":  {
+                                                                                   "w":  32,
+                                                                                   "h":  32
+                                                                               },
+                                                                "duration":  100
+                                                            },
+                   "Sphynx Cat Sprite Sheet (Lick) 5.ase":  {
+                                                                "frame":  {
+                                                                              "x":  160,
+                                                                              "y":  64,
+                                                                              "w":  32,
+                                                                              "h":  32
+                                                                          },
+                                                                "rotated":  false,
+                                                                "trimmed":  false,
+                                                                "spriteSourceSize":  {
+                                                                                         "x":  0,
+                                                                                         "y":  0,
+                                                                                         "w":  32,
+                                                                                         "h":  32
+                                                                                     },
+                                                                "sourceSize":  {
+                                                                                   "w":  32,
+                                                                                   "h":  32
+                                                                               },
+                                                                "duration":  100
+                                                            },
+                   "Sphynx Cat Sprite Sheet (Lick) 6.ase":  {
+                                                                "frame":  {
+                                                                              "x":  192,
+                                                                              "y":  64,
+                                                                              "w":  32,
+                                                                              "h":  32
+                                                                          },
+                                                                "rotated":  false,
+                                                                "trimmed":  false,
+                                                                "spriteSourceSize":  {
+                                                                                         "x":  0,
+                                                                                         "y":  0,
+                                                                                         "w":  32,
+                                                                                         "h":  32
+                                                                                     },
+                                                                "sourceSize":  {
+                                                                                   "w":  32,
+                                                                                   "h":  32
+                                                                               },
+                                                                "duration":  100
+                                                            },
+                   "Sphynx Cat Sprite Sheet (Lick) 7.ase":  {
+                                                                "frame":  {
+                                                                              "x":  224,
+                                                                              "y":  64,
+                                                                              "w":  32,
+                                                                              "h":  32
+                                                                          },
+                                                                "rotated":  false,
+                                                                "trimmed":  false,
+                                                                "spriteSourceSize":  {
+                                                                                         "x":  0,
+                                                                                         "y":  0,
+                                                                                         "w":  32,
+                                                                                         "h":  32
+                                                                                     },
+                                                                "sourceSize":  {
+                                                                                   "w":  32,
+                                                                                   "h":  32
+                                                                               },
+                                                                "duration":  100
+                                                            },
+                   "Sphynx Cat Sprite Sheet (Clean) 0.ase":  {
+                                                                 "frame":  {
+                                                                               "x":  0,
+                                                                               "y":  96,
+                                                                               "w":  32,
+                                                                               "h":  32
+                                                                           },
+                                                                 "rotated":  false,
+                                                                 "trimmed":  false,
+                                                                 "spriteSourceSize":  {
+                                                                                          "x":  0,
+                                                                                          "y":  0,
+                                                                                          "w":  32,
+                                                                                          "h":  32
+                                                                                      },
+                                                                 "sourceSize":  {
+                                                                                    "w":  32,
+                                                                                    "h":  32
+                                                                                },
+                                                                 "duration":  100
+                                                             },
+                   "Sphynx Cat Sprite Sheet (Clean) 1.ase":  {
+                                                                 "frame":  {
+                                                                               "x":  32,
+                                                                               "y":  96,
+                                                                               "w":  32,
+                                                                               "h":  32
+                                                                           },
+                                                                 "rotated":  false,
+                                                                 "trimmed":  false,
+                                                                 "spriteSourceSize":  {
+                                                                                          "x":  0,
+                                                                                          "y":  0,
+                                                                                          "w":  32,
+                                                                                          "h":  32
+                                                                                      },
+                                                                 "sourceSize":  {
+                                                                                    "w":  32,
+                                                                                    "h":  32
+                                                                                },
+                                                                 "duration":  100
+                                                             },
+                   "Sphynx Cat Sprite Sheet (Clean) 2.ase":  {
+                                                                 "frame":  {
+                                                                               "x":  64,
+                                                                               "y":  96,
+                                                                               "w":  32,
+                                                                               "h":  32
+                                                                           },
+                                                                 "rotated":  false,
+                                                                 "trimmed":  false,
+                                                                 "spriteSourceSize":  {
+                                                                                          "x":  0,
+                                                                                          "y":  0,
+                                                                                          "w":  32,
+                                                                                          "h":  32
+                                                                                      },
+                                                                 "sourceSize":  {
+                                                                                    "w":  32,
+                                                                                    "h":  32
+                                                                                },
+                                                                 "duration":  100
+                                                             },
+                   "Sphynx Cat Sprite Sheet (Clean) 3.ase":  {
+                                                                 "frame":  {
+                                                                               "x":  96,
+                                                                               "y":  96,
+                                                                               "w":  32,
+                                                                               "h":  32
+                                                                           },
+                                                                 "rotated":  false,
+                                                                 "trimmed":  false,
+                                                                 "spriteSourceSize":  {
+                                                                                          "x":  0,
+                                                                                          "y":  0,
+                                                                                          "w":  32,
+                                                                                          "h":  32
+                                                                                      },
+                                                                 "sourceSize":  {
+                                                                                    "w":  32,
+                                                                                    "h":  32
+                                                                                },
+                                                                 "duration":  100
+                                                             },
+                   "Sphynx Cat Sprite Sheet (Clean) 4.ase":  {
+                                                                 "frame":  {
+                                                                               "x":  128,
+                                                                               "y":  96,
+                                                                               "w":  32,
+                                                                               "h":  32
+                                                                           },
+                                                                 "rotated":  false,
+                                                                 "trimmed":  false,
+                                                                 "spriteSourceSize":  {
+                                                                                          "x":  0,
+                                                                                          "y":  0,
+                                                                                          "w":  32,
+                                                                                          "h":  32
+                                                                                      },
+                                                                 "sourceSize":  {
+                                                                                    "w":  32,
+                                                                                    "h":  32
+                                                                                },
+                                                                 "duration":  100
+                                                             },
+                   "Sphynx Cat Sprite Sheet (Clean) 5.ase":  {
+                                                                 "frame":  {
+                                                                               "x":  160,
+                                                                               "y":  96,
+                                                                               "w":  32,
+                                                                               "h":  32
+                                                                           },
+                                                                 "rotated":  false,
+                                                                 "trimmed":  false,
+                                                                 "spriteSourceSize":  {
+                                                                                          "x":  0,
+                                                                                          "y":  0,
+                                                                                          "w":  32,
+                                                                                          "h":  32
+                                                                                      },
+                                                                 "sourceSize":  {
+                                                                                    "w":  32,
+                                                                                    "h":  32
+                                                                                },
+                                                                 "duration":  100
+                                                             },
+                   "Sphynx Cat Sprite Sheet (Walk) 0.ase":  {
+                                                                "frame":  {
+                                                                              "x":  0,
+                                                                              "y":  128,
+                                                                              "w":  32,
+                                                                              "h":  32
+                                                                          },
+                                                                "rotated":  false,
+                                                                "trimmed":  false,
+                                                                "spriteSourceSize":  {
+                                                                                         "x":  0,
+                                                                                         "y":  0,
+                                                                                         "w":  32,
+                                                                                         "h":  32
+                                                                                     },
+                                                                "sourceSize":  {
+                                                                                   "w":  32,
+                                                                                   "h":  32
+                                                                               },
+                                                                "duration":  100
+                                                            },
+                   "Sphynx Cat Sprite Sheet (Walk) 1.ase":  {
+                                                                "frame":  {
+                                                                              "x":  32,
+                                                                              "y":  128,
+                                                                              "w":  32,
+                                                                              "h":  32
+                                                                          },
+                                                                "rotated":  false,
+                                                                "trimmed":  false,
+                                                                "spriteSourceSize":  {
+                                                                                         "x":  0,
+                                                                                         "y":  0,
+                                                                                         "w":  32,
+                                                                                         "h":  32
+                                                                                     },
+                                                                "sourceSize":  {
+                                                                                   "w":  32,
+                                                                                   "h":  32
+                                                                               },
+                                                                "duration":  100
+                                                            },
+                   "Sphynx Cat Sprite Sheet (Walk) 2.ase":  {
+                                                                "frame":  {
+                                                                              "x":  64,
+                                                                              "y":  128,
+                                                                              "w":  32,
+                                                                              "h":  32
+                                                                          },
+                                                                "rotated":  false,
+                                                                "trimmed":  false,
+                                                                "spriteSourceSize":  {
+                                                                                         "x":  0,
+                                                                                         "y":  0,
+                                                                                         "w":  32,
+                                                                                         "h":  32
+                                                                                     },
+                                                                "sourceSize":  {
+                                                                                   "w":  32,
+                                                                                   "h":  32
+                                                                               },
+                                                                "duration":  100
+                                                            },
+                   "Sphynx Cat Sprite Sheet (Walk) 3.ase":  {
+                                                                "frame":  {
+                                                                              "x":  96,
+                                                                              "y":  128,
+                                                                              "w":  32,
+                                                                              "h":  32
+                                                                          },
+                                                                "rotated":  false,
+                                                                "trimmed":  false,
+                                                                "spriteSourceSize":  {
+                                                                                         "x":  0,
+                                                                                         "y":  0,
+                                                                                         "w":  32,
+                                                                                         "h":  32
+                                                                                     },
+                                                                "sourceSize":  {
+                                                                                   "w":  32,
+                                                                                   "h":  32
+                                                                               },
+                                                                "duration":  100
+                                                            },
+                   "Sphynx Cat Sprite Sheet (Walk) 4.ase":  {
+                                                                "frame":  {
+                                                                              "x":  128,
+                                                                              "y":  128,
+                                                                              "w":  32,
+                                                                              "h":  32
+                                                                          },
+                                                                "rotated":  false,
+                                                                "trimmed":  false,
+                                                                "spriteSourceSize":  {
+                                                                                         "x":  0,
+                                                                                         "y":  0,
+                                                                                         "w":  32,
+                                                                                         "h":  32
+                                                                                     },
+                                                                "sourceSize":  {
+                                                                                   "w":  32,
+                                                                                   "h":  32
+                                                                               },
+                                                                "duration":  100
+                                                            },
+                   "Sphynx Cat Sprite Sheet (Walk) 5.ase":  {
+                                                                "frame":  {
+                                                                              "x":  160,
+                                                                              "y":  128,
+                                                                              "w":  32,
+                                                                              "h":  32
+                                                                          },
+                                                                "rotated":  false,
+                                                                "trimmed":  false,
+                                                                "spriteSourceSize":  {
+                                                                                         "x":  0,
+                                                                                         "y":  0,
+                                                                                         "w":  32,
+                                                                                         "h":  32
+                                                                                     },
+                                                                "sourceSize":  {
+                                                                                   "w":  32,
+                                                                                   "h":  32
+                                                                               },
+                                                                "duration":  100
+                                                            },
+                   "Sphynx Cat Sprite Sheet (Run) 0.ase":  {
+                                                               "frame":  {
+                                                                             "x":  0,
+                                                                             "y":  160,
+                                                                             "w":  32,
+                                                                             "h":  32
+                                                                         },
+                                                               "rotated":  false,
+                                                               "trimmed":  false,
+                                                               "spriteSourceSize":  {
+                                                                                        "x":  0,
+                                                                                        "y":  0,
+                                                                                        "w":  32,
+                                                                                        "h":  32
+                                                                                    },
+                                                               "sourceSize":  {
+                                                                                  "w":  32,
+                                                                                  "h":  32
+                                                                              },
+                                                               "duration":  100
+                                                           },
+                   "Sphynx Cat Sprite Sheet (Run) 1.ase":  {
+                                                               "frame":  {
+                                                                             "x":  32,
+                                                                             "y":  160,
+                                                                             "w":  32,
+                                                                             "h":  32
+                                                                         },
+                                                               "rotated":  false,
+                                                               "trimmed":  false,
+                                                               "spriteSourceSize":  {
+                                                                                        "x":  0,
+                                                                                        "y":  0,
+                                                                                        "w":  32,
+                                                                                        "h":  32
+                                                                                    },
+                                                               "sourceSize":  {
+                                                                                  "w":  32,
+                                                                                  "h":  32
+                                                                              },
+                                                               "duration":  100
+                                                           },
+                   "Sphynx Cat Sprite Sheet (Run) 2.ase":  {
+                                                               "frame":  {
+                                                                             "x":  64,
+                                                                             "y":  160,
+                                                                             "w":  32,
+                                                                             "h":  32
+                                                                         },
+                                                               "rotated":  false,
+                                                               "trimmed":  false,
+                                                               "spriteSourceSize":  {
+                                                                                        "x":  0,
+                                                                                        "y":  0,
+                                                                                        "w":  32,
+                                                                                        "h":  32
+                                                                                    },
+                                                               "sourceSize":  {
+                                                                                  "w":  32,
+                                                                                  "h":  32
+                                                                              },
+                                                               "duration":  100
+                                                           },
+                   "Sphynx Cat Sprite Sheet (Run) 3.ase":  {
+                                                               "frame":  {
+                                                                             "x":  96,
+                                                                             "y":  160,
+                                                                             "w":  32,
+                                                                             "h":  32
+                                                                         },
+                                                               "rotated":  false,
+                                                               "trimmed":  false,
+                                                               "spriteSourceSize":  {
+                                                                                        "x":  0,
+                                                                                        "y":  0,
+                                                                                        "w":  32,
+                                                                                        "h":  32
+                                                                                    },
+                                                               "sourceSize":  {
+                                                                                  "w":  32,
+                                                                                  "h":  32
+                                                                              },
+                                                               "duration":  100
+                                                           },
+                   "Sphynx Cat Sprite Sheet (Run) 4.ase":  {
+                                                               "frame":  {
+                                                                             "x":  128,
+                                                                             "y":  160,
+                                                                             "w":  32,
+                                                                             "h":  32
+                                                                         },
+                                                               "rotated":  false,
+                                                               "trimmed":  false,
+                                                               "spriteSourceSize":  {
+                                                                                        "x":  0,
+                                                                                        "y":  0,
+                                                                                        "w":  32,
+                                                                                        "h":  32
+                                                                                    },
+                                                               "sourceSize":  {
+                                                                                  "w":  32,
+                                                                                  "h":  32
+                                                                              },
+                                                               "duration":  100
+                                                           },
+                   "Sphynx Cat Sprite Sheet (Run) 5.ase":  {
+                                                               "frame":  {
+                                                                             "x":  160,
+                                                                             "y":  160,
+                                                                             "w":  32,
+                                                                             "h":  32
+                                                                         },
+                                                               "rotated":  false,
+                                                               "trimmed":  false,
+                                                               "spriteSourceSize":  {
+                                                                                        "x":  0,
+                                                                                        "y":  0,
+                                                                                        "w":  32,
+                                                                                        "h":  32
+                                                                                    },
+                                                               "sourceSize":  {
+                                                                                  "w":  32,
+                                                                                  "h":  32
+                                                                              },
+                                                               "duration":  100
+                                                           },
+                   "Sphynx Cat Sprite Sheet (Run) 6.ase":  {
+                                                               "frame":  {
+                                                                             "x":  192,
+                                                                             "y":  160,
+                                                                             "w":  32,
+                                                                             "h":  32
+                                                                         },
+                                                               "rotated":  false,
+                                                               "trimmed":  false,
+                                                               "spriteSourceSize":  {
+                                                                                        "x":  0,
+                                                                                        "y":  0,
+                                                                                        "w":  32,
+                                                                                        "h":  32
+                                                                                    },
+                                                               "sourceSize":  {
+                                                                                  "w":  32,
+                                                                                  "h":  32
+                                                                              },
+                                                               "duration":  100
+                                                           },
+                   "Sphynx Cat Sprite Sheet (Run) 7.ase":  {
+                                                               "frame":  {
+                                                                             "x":  224,
+                                                                             "y":  160,
+                                                                             "w":  32,
+                                                                             "h":  32
+                                                                         },
+                                                               "rotated":  false,
+                                                               "trimmed":  false,
+                                                               "spriteSourceSize":  {
+                                                                                        "x":  0,
+                                                                                        "y":  0,
+                                                                                        "w":  32,
+                                                                                        "h":  32
+                                                                                    },
+                                                               "sourceSize":  {
+                                                                                  "w":  32,
+                                                                                  "h":  32
+                                                                              },
+                                                               "duration":  100
+                                                           },
+                   "Sphynx Cat Sprite Sheet (Sleep) 0.ase":  {
+                                                                 "frame":  {
+                                                                               "x":  0,
+                                                                               "y":  192,
+                                                                               "w":  32,
+                                                                               "h":  32
+                                                                           },
+                                                                 "rotated":  false,
+                                                                 "trimmed":  false,
+                                                                 "spriteSourceSize":  {
+                                                                                          "x":  0,
+                                                                                          "y":  0,
+                                                                                          "w":  32,
+                                                                                          "h":  32
+                                                                                      },
+                                                                 "sourceSize":  {
+                                                                                    "w":  32,
+                                                                                    "h":  32
+                                                                                },
+                                                                 "duration":  100
+                                                             },
+                   "Sphynx Cat Sprite Sheet (Sleep) 1.ase":  {
+                                                                 "frame":  {
+                                                                               "x":  32,
+                                                                               "y":  192,
+                                                                               "w":  32,
+                                                                               "h":  32
+                                                                           },
+                                                                 "rotated":  false,
+                                                                 "trimmed":  false,
+                                                                 "spriteSourceSize":  {
+                                                                                          "x":  0,
+                                                                                          "y":  0,
+                                                                                          "w":  32,
+                                                                                          "h":  32
+                                                                                      },
+                                                                 "sourceSize":  {
+                                                                                    "w":  32,
+                                                                                    "h":  32
+                                                                                },
+                                                                 "duration":  100
+                                                             },
+                   "Sphynx Cat Sprite Sheet (Sleep) 2.ase":  {
+                                                                 "frame":  {
+                                                                               "x":  64,
+                                                                               "y":  192,
+                                                                               "w":  32,
+                                                                               "h":  32
+                                                                           },
+                                                                 "rotated":  false,
+                                                                 "trimmed":  false,
+                                                                 "spriteSourceSize":  {
+                                                                                          "x":  0,
+                                                                                          "y":  0,
+                                                                                          "w":  32,
+                                                                                          "h":  32
+                                                                                      },
+                                                                 "sourceSize":  {
+                                                                                    "w":  32,
+                                                                                    "h":  32
+                                                                                },
+                                                                 "duration":  100
+                                                             },
+                   "Sphynx Cat Sprite Sheet (Sleep) 3.ase":  {
+                                                                 "frame":  {
+                                                                               "x":  96,
+                                                                               "y":  192,
+                                                                               "w":  32,
+                                                                               "h":  32
+                                                                           },
+                                                                 "rotated":  false,
+                                                                 "trimmed":  false,
+                                                                 "spriteSourceSize":  {
+                                                                                          "x":  0,
+                                                                                          "y":  0,
+                                                                                          "w":  32,
+                                                                                          "h":  32
+                                                                                      },
+                                                                 "sourceSize":  {
+                                                                                    "w":  32,
+                                                                                    "h":  32
+                                                                                },
+                                                                 "duration":  100
+                                                             },
+                   "Sphynx Cat Sprite Sheet (Sleep) 4.ase":  {
+                                                                 "frame":  {
+                                                                               "x":  128,
+                                                                               "y":  192,
+                                                                               "w":  32,
+                                                                               "h":  32
+                                                                           },
+                                                                 "rotated":  false,
+                                                                 "trimmed":  false,
+                                                                 "spriteSourceSize":  {
+                                                                                          "x":  0,
+                                                                                          "y":  0,
+                                                                                          "w":  32,
+                                                                                          "h":  32
+                                                                                      },
+                                                                 "sourceSize":  {
+                                                                                    "w":  32,
+                                                                                    "h":  32
+                                                                                },
+                                                                 "duration":  100
+                                                             },
+                   "Sphynx Cat Sprite Sheet (Sleep) 5.ase":  {
+                                                                 "frame":  {
+                                                                               "x":  160,
+                                                                               "y":  192,
+                                                                               "w":  32,
+                                                                               "h":  32
+                                                                           },
+                                                                 "rotated":  false,
+                                                                 "trimmed":  false,
+                                                                 "spriteSourceSize":  {
+                                                                                          "x":  0,
+                                                                                          "y":  0,
+                                                                                          "w":  32,
+                                                                                          "h":  32
+                                                                                      },
+                                                                 "sourceSize":  {
+                                                                                    "w":  32,
+                                                                                    "h":  32
+                                                                                },
+                                                                 "duration":  100
+                                                             },
+                   "Sphynx Cat Sprite Sheet (Sleep) 6.ase":  {
+                                                                 "frame":  {
+                                                                               "x":  192,
+                                                                               "y":  192,
+                                                                               "w":  32,
+                                                                               "h":  32
+                                                                           },
+                                                                 "rotated":  false,
+                                                                 "trimmed":  false,
+                                                                 "spriteSourceSize":  {
+                                                                                          "x":  0,
+                                                                                          "y":  0,
+                                                                                          "w":  32,
+                                                                                          "h":  32
+                                                                                      },
+                                                                 "sourceSize":  {
+                                                                                    "w":  32,
+                                                                                    "h":  32
+                                                                                },
+                                                                 "duration":  100
+                                                             },
+                   "Sphynx Cat Sprite Sheet (Sleep) 7.ase":  {
+                                                                 "frame":  {
+                                                                               "x":  224,
+                                                                               "y":  192,
+                                                                               "w":  32,
+                                                                               "h":  32
+                                                                           },
+                                                                 "rotated":  false,
+                                                                 "trimmed":  false,
+                                                                 "spriteSourceSize":  {
+                                                                                          "x":  0,
+                                                                                          "y":  0,
+                                                                                          "w":  32,
+                                                                                          "h":  32
+                                                                                      },
+                                                                 "sourceSize":  {
+                                                                                    "w":  32,
+                                                                                    "h":  32
+                                                                                },
+                                                                 "duration":  100
+                                                             },
+                   "Sphynx Cat Sprite Sheet (Paw) 0.ase":  {
+                                                               "frame":  {
+                                                                             "x":  0,
+                                                                             "y":  224,
+                                                                             "w":  32,
+                                                                             "h":  32
+                                                                         },
+                                                               "rotated":  false,
+                                                               "trimmed":  false,
+                                                               "spriteSourceSize":  {
+                                                                                        "x":  0,
+                                                                                        "y":  0,
+                                                                                        "w":  32,
+                                                                                        "h":  32
+                                                                                    },
+                                                               "sourceSize":  {
+                                                                                  "w":  32,
+                                                                                  "h":  32
+                                                                              },
+                                                               "duration":  100
+                                                           },
+                   "Sphynx Cat Sprite Sheet (Paw) 1.ase":  {
+                                                               "frame":  {
+                                                                             "x":  32,
+                                                                             "y":  224,
+                                                                             "w":  32,
+                                                                             "h":  32
+                                                                         },
+                                                               "rotated":  false,
+                                                               "trimmed":  false,
+                                                               "spriteSourceSize":  {
+                                                                                        "x":  0,
+                                                                                        "y":  0,
+                                                                                        "w":  32,
+                                                                                        "h":  32
+                                                                                    },
+                                                               "sourceSize":  {
+                                                                                  "w":  32,
+                                                                                  "h":  32
+                                                                              },
+                                                               "duration":  100
+                                                           },
+                   "Sphynx Cat Sprite Sheet (Paw) 2.ase":  {
+                                                               "frame":  {
+                                                                             "x":  64,
+                                                                             "y":  224,
+                                                                             "w":  32,
+                                                                             "h":  32
+                                                                         },
+                                                               "rotated":  false,
+                                                               "trimmed":  false,
+                                                               "spriteSourceSize":  {
+                                                                                        "x":  0,
+                                                                                        "y":  0,
+                                                                                        "w":  32,
+                                                                                        "h":  32
+                                                                                    },
+                                                               "sourceSize":  {
+                                                                                  "w":  32,
+                                                                                  "h":  32
+                                                                              },
+                                                               "duration":  100
+                                                           },
+                   "Sphynx Cat Sprite Sheet (Paw) 3.ase":  {
+                                                               "frame":  {
+                                                                             "x":  96,
+                                                                             "y":  224,
+                                                                             "w":  32,
+                                                                             "h":  32
+                                                                         },
+                                                               "rotated":  false,
+                                                               "trimmed":  false,
+                                                               "spriteSourceSize":  {
+                                                                                        "x":  0,
+                                                                                        "y":  0,
+                                                                                        "w":  32,
+                                                                                        "h":  32
+                                                                                    },
+                                                               "sourceSize":  {
+                                                                                  "w":  32,
+                                                                                  "h":  32
+                                                                              },
+                                                               "duration":  100
+                                                           },
+                   "Sphynx Cat Sprite Sheet (Paw) 4.ase":  {
+                                                               "frame":  {
+                                                                             "x":  128,
+                                                                             "y":  224,
+                                                                             "w":  32,
+                                                                             "h":  32
+                                                                         },
+                                                               "rotated":  false,
+                                                               "trimmed":  false,
+                                                               "spriteSourceSize":  {
+                                                                                        "x":  0,
+                                                                                        "y":  0,
+                                                                                        "w":  32,
+                                                                                        "h":  32
+                                                                                    },
+                                                               "sourceSize":  {
+                                                                                  "w":  32,
+                                                                                  "h":  32
+                                                                              },
+                                                               "duration":  100
+                                                           },
+                   "Sphynx Cat Sprite Sheet (Paw) 5.ase":  {
+                                                               "frame":  {
+                                                                             "x":  160,
+                                                                             "y":  224,
+                                                                             "w":  32,
+                                                                             "h":  32
+                                                                         },
+                                                               "rotated":  false,
+                                                               "trimmed":  false,
+                                                               "spriteSourceSize":  {
+                                                                                        "x":  0,
+                                                                                        "y":  0,
+                                                                                        "w":  32,
+                                                                                        "h":  32
+                                                                                    },
+                                                               "sourceSize":  {
+                                                                                  "w":  32,
+                                                                                  "h":  32
+                                                                              },
+                                                               "duration":  100
+                                                           },
+                   "Sphynx Cat Sprite Sheet (Paw) 6.ase":  {
+                                                               "frame":  {
+                                                                             "x":  192,
+                                                                             "y":  224,
+                                                                             "w":  32,
+                                                                             "h":  32
+                                                                         },
+                                                               "rotated":  false,
+                                                               "trimmed":  false,
+                                                               "spriteSourceSize":  {
+                                                                                        "x":  0,
+                                                                                        "y":  0,
+                                                                                        "w":  32,
+                                                                                        "h":  32
+                                                                                    },
+                                                               "sourceSize":  {
+                                                                                  "w":  32,
+                                                                                  "h":  32
+                                                                              },
+                                                               "duration":  100
+                                                           },
+                   "Sphynx Cat Sprite Sheet (Paw) 7.ase":  {
+                                                               "frame":  {
+                                                                             "x":  224,
+                                                                             "y":  224,
+                                                                             "w":  32,
+                                                                             "h":  32
+                                                                         },
+                                                               "rotated":  false,
+                                                               "trimmed":  false,
+                                                               "spriteSourceSize":  {
+                                                                                        "x":  0,
+                                                                                        "y":  0,
+                                                                                        "w":  32,
+                                                                                        "h":  32
+                                                                                    },
+                                                               "sourceSize":  {
+                                                                                  "w":  32,
+                                                                                  "h":  32
+                                                                              },
+                                                               "duration":  100
+                                                           },
+                   "Sphynx Cat Sprite Sheet (Jump) 0.ase":  {
+                                                                "frame":  {
+                                                                              "x":  0,
+                                                                              "y":  256,
+                                                                              "w":  32,
+                                                                              "h":  32
+                                                                          },
+                                                                "rotated":  false,
+                                                                "trimmed":  false,
+                                                                "spriteSourceSize":  {
+                                                                                         "x":  0,
+                                                                                         "y":  0,
+                                                                                         "w":  32,
+                                                                                         "h":  32
+                                                                                     },
+                                                                "sourceSize":  {
+                                                                                   "w":  32,
+                                                                                   "h":  32
+                                                                               },
+                                                                "duration":  100
+                                                            },
+                   "Sphynx Cat Sprite Sheet (Jump) 1.ase":  {
+                                                                "frame":  {
+                                                                              "x":  32,
+                                                                              "y":  256,
+                                                                              "w":  32,
+                                                                              "h":  32
+                                                                          },
+                                                                "rotated":  false,
+                                                                "trimmed":  false,
+                                                                "spriteSourceSize":  {
+                                                                                         "x":  0,
+                                                                                         "y":  0,
+                                                                                         "w":  32,
+                                                                                         "h":  32
+                                                                                     },
+                                                                "sourceSize":  {
+                                                                                   "w":  32,
+                                                                                   "h":  32
+                                                                               },
+                                                                "duration":  100
+                                                            },
+                   "Sphynx Cat Sprite Sheet (Jump) 2.ase":  {
+                                                                "frame":  {
+                                                                              "x":  64,
+                                                                              "y":  256,
+                                                                              "w":  32,
+                                                                              "h":  32
+                                                                          },
+                                                                "rotated":  false,
+                                                                "trimmed":  false,
+                                                                "spriteSourceSize":  {
+                                                                                         "x":  0,
+                                                                                         "y":  0,
+                                                                                         "w":  32,
+                                                                                         "h":  32
+                                                                                     },
+                                                                "sourceSize":  {
+                                                                                   "w":  32,
+                                                                                   "h":  32
+                                                                               },
+                                                                "duration":  100
+                                                            },
+                   "Sphynx Cat Sprite Sheet (Jump) 3.ase":  {
+                                                                "frame":  {
+                                                                              "x":  96,
+                                                                              "y":  256,
+                                                                              "w":  32,
+                                                                              "h":  32
+                                                                          },
+                                                                "rotated":  false,
+                                                                "trimmed":  false,
+                                                                "spriteSourceSize":  {
+                                                                                         "x":  0,
+                                                                                         "y":  0,
+                                                                                         "w":  32,
+                                                                                         "h":  32
+                                                                                     },
+                                                                "sourceSize":  {
+                                                                                   "w":  32,
+                                                                                   "h":  32
+                                                                               },
+                                                                "duration":  100
+                                                            },
+                   "Sphynx Cat Sprite Sheet (Jump) 4.ase":  {
+                                                                "frame":  {
+                                                                              "x":  128,
+                                                                              "y":  256,
+                                                                              "w":  32,
+                                                                              "h":  32
+                                                                          },
+                                                                "rotated":  false,
+                                                                "trimmed":  false,
+                                                                "spriteSourceSize":  {
+                                                                                         "x":  0,
+                                                                                         "y":  0,
+                                                                                         "w":  32,
+                                                                                         "h":  32
+                                                                                     },
+                                                                "sourceSize":  {
+                                                                                   "w":  32,
+                                                                                   "h":  32
+                                                                               },
+                                                                "duration":  100
+                                                            },
+                   "Sphynx Cat Sprite Sheet (Jump) 5.ase":  {
+                                                                "frame":  {
+                                                                              "x":  160,
+                                                                              "y":  256,
+                                                                              "w":  32,
+                                                                              "h":  32
+                                                                          },
+                                                                "rotated":  false,
+                                                                "trimmed":  false,
+                                                                "spriteSourceSize":  {
+                                                                                         "x":  0,
+                                                                                         "y":  0,
+                                                                                         "w":  32,
+                                                                                         "h":  32
+                                                                                     },
+                                                                "sourceSize":  {
+                                                                                   "w":  32,
+                                                                                   "h":  32
+                                                                               },
+                                                                "duration":  100
+                                                            },
+                   "Sphynx Cat Sprite Sheet (Jump) 6.ase":  {
+                                                                "frame":  {
+                                                                              "x":  192,
+                                                                              "y":  256,
+                                                                              "w":  32,
+                                                                              "h":  32
+                                                                          },
+                                                                "rotated":  false,
+                                                                "trimmed":  false,
+                                                                "spriteSourceSize":  {
+                                                                                         "x":  0,
+                                                                                         "y":  0,
+                                                                                         "w":  32,
+                                                                                         "h":  32
+                                                                                     },
+                                                                "sourceSize":  {
+                                                                                   "w":  32,
+                                                                                   "h":  32
+                                                                               },
+                                                                "duration":  100
+                                                            }
+               },
+    "meta":  {
+                 "app":  "https://www.aseprite.org/",
+                 "version":  "1.3.8.1-x64",
+                 "image":  "Sphynx Cat Sprite Sheet.png",
+                 "format":  "RGBA8888",
+                 "size":  {
+                              "w":  256,
+                              "h":  288
+                          },
+                 "scale":  "1",
+                 "frameTags":  [
+                                   {
+                                       "name":  "walk",
+                                       "from":  0,
+                                       "to":  5,
+                                       "direction":  "forward",
+                                       "color":  "#000000ff"
+                                   }
+                               ],
+                 "layers":  [
+                                {
+                                    "name":  "Idle",
+                                    "opacity":  255,
+                                    "blendMode":  "normal"
+                                },
+                                {
+                                    "name":  "IdleSit",
+                                    "opacity":  255,
+                                    "blendMode":  "normal"
+                                },
+                                {
+                                    "name":  "Lick",
+                                    "opacity":  255,
+                                    "blendMode":  "normal"
+                                },
+                                {
+                                    "name":  "Clean",
+                                    "opacity":  255,
+                                    "blendMode":  "normal"
+                                },
+                                {
+                                    "name":  "Walk",
+                                    "opacity":  255,
+                                    "blendMode":  "normal"
+                                },
+                                {
+                                    "name":  "Run",
+                                    "opacity":  255,
+                                    "blendMode":  "normal"
+                                },
+                                {
+                                    "name":  "Sleep",
+                                    "opacity":  255,
+                                    "blendMode":  "normal"
+                                },
+                                {
+                                    "name":  "Paw",
+                                    "opacity":  255,
+                                    "blendMode":  "normal"
+                                },
+                                {
+                                    "name":  "Jump",
+                                    "opacity":  255,
+                                    "blendMode":  "normal"
+                                }
+                            ],
+                 "slices":  [
+
+                            ]
+             }
+}

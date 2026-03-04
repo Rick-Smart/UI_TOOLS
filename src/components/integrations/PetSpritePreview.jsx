@@ -1,156 +1,22 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
-const PREVIEW_SPRITES = {
-  cat: {
-    frameDuration: 14,
-    palette: ["#00000000", "#ffbf69", "#8d5524", "#1f2937", "#fef3c7"],
-    frames: [
-      [
-        "0011111100",
-        "0112222110",
-        "1122442211",
-        "1122222211",
-        "0112222110",
-        "0011111100",
-        "0001101100",
-        "0011000110",
-        "0011001100",
-        "0000110000",
-      ],
-      [
-        "0011111100",
-        "0112222110",
-        "1122442211",
-        "1122222211",
-        "0112222110",
-        "0011111100",
-        "0001101100",
-        "0011000110",
-        "0011011000",
-        "0001100000",
-      ],
+const FALLBACK_SPRITE = {
+  frameDuration: 16,
+  palette: ["#00000000", "#60a5fa", "#1e3a8a", "#0f172a", "#dbeafe"],
+  frames: [
+    [
+      "0001111000",
+      "0012222100",
+      "0122442210",
+      "1222222221",
+      "0122222210",
+      "0012222100",
+      "0001111000",
+      "0001101100",
+      "0011000110",
+      "0011000110",
     ],
-  },
-  dog: {
-    frameDuration: 16,
-    palette: ["#00000000", "#d4a373", "#7f5539", "#1f2937", "#faedcd"],
-    frames: [
-      [
-        "0011111100",
-        "0112222110",
-        "1122442211",
-        "1122222211",
-        "0112222110",
-        "0011111110",
-        "0001101110",
-        "0011000110",
-        "0011000110",
-        "0000000000",
-      ],
-      [
-        "0011111100",
-        "0112222110",
-        "1122442211",
-        "1122222211",
-        "0112222110",
-        "0011111111",
-        "0011100110",
-        "0011000110",
-        "0011000110",
-        "0000000000",
-      ],
-    ],
-  },
-  crow: {
-    frameDuration: 12,
-    palette: ["#00000000", "#111827", "#334155", "#0f172a", "#facc15"],
-    frames: [
-      [
-        "0001111000",
-        "0012222100",
-        "0122242210",
-        "1222222221",
-        "0122222210",
-        "0012222100",
-        "0001111000",
-        "0001101100",
-        "0011000110",
-        "0011000110",
-      ],
-      [
-        "0011111100",
-        "1122222211",
-        "1222242221",
-        "1122222211",
-        "0012222100",
-        "0001221000",
-        "0001111000",
-        "0001101100",
-        "0011000110",
-        "0011000110",
-      ],
-    ],
-  },
-  raccoon: {
-    frameDuration: 14,
-    palette: ["#00000000", "#94a3b8", "#475569", "#0f172a", "#e2e8f0"],
-    frames: [
-      [
-        "0011111100",
-        "0112333210",
-        "1123444321",
-        "1123333321",
-        "0112222210",
-        "0011111100",
-        "0001101100",
-        "0011000110",
-        "0011000110",
-        "0022200000",
-      ],
-      [
-        "0011111100",
-        "0112333210",
-        "1123444321",
-        "1123333321",
-        "0112222210",
-        "0011111100",
-        "0001101100",
-        "0011000110",
-        "0011000110",
-        "0000222200",
-      ],
-    ],
-  },
-  dragonling: {
-    frameDuration: 12,
-    palette: ["#00000000", "#34d399", "#065f46", "#0f172a", "#a7f3d0"],
-    frames: [
-      [
-        "0001111100",
-        "0012222210",
-        "0122242221",
-        "1222222221",
-        "0122222210",
-        "0012222110",
-        "0001111220",
-        "0001101220",
-        "0011000110",
-        "0011000110",
-      ],
-      [
-        "0011111110",
-        "1122222221",
-        "1222242221",
-        "1122222211",
-        "0012222110",
-        "0001222110",
-        "0001111220",
-        "0001101220",
-        "0011000110",
-        "0011000110",
-      ],
-    ],
-  },
+  ],
 };
 
 function drawSprite(ctx, sprite, palette, blink) {
@@ -178,11 +44,79 @@ function drawSprite(ctx, sprite, palette, blink) {
   }
 }
 
+function drawAtlasPreview(ctx, image, frameRect) {
+  if (!image || !frameRect) {
+    return;
+  }
+
+  const width = Number(frameRect.w) || 0;
+  const height = Number(frameRect.h) || 0;
+  if (!width || !height) {
+    return;
+  }
+
+  const maxSize = 20;
+  const scale = Math.max(1, Math.floor(maxSize / Math.max(width, height)));
+  const drawWidth = width * scale;
+  const drawHeight = height * scale;
+  const offsetX = Math.max(0, Math.floor((24 - drawWidth) / 2));
+  const offsetY = Math.max(0, Math.floor((24 - drawHeight) / 2));
+
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(
+    image,
+    Number(frameRect.x) || 0,
+    Number(frameRect.y) || 0,
+    width,
+    height,
+    offsetX,
+    offsetY,
+    drawWidth,
+    drawHeight,
+  );
+}
+
 function PetSpritePreview({ petId }) {
   const canvasRef = useRef(null);
+  const [runtimeCatalog, setRuntimeCatalog] = useState(null);
+
+  useEffect(() => {
+    let isActive = true;
+
+    async function loadCatalog() {
+      try {
+        const module = await import("/agent-pet/petCatalog.js");
+        if (!isActive) {
+          return;
+        }
+
+        setRuntimeCatalog(module.PET_CATALOG || null);
+      } catch {
+        if (!isActive) {
+          return;
+        }
+
+        setRuntimeCatalog(null);
+      }
+    }
+
+    loadCatalog();
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
+
   const spriteData = useMemo(() => {
-    return PREVIEW_SPRITES[petId] || PREVIEW_SPRITES.cat;
-  }, [petId]);
+    if (!runtimeCatalog) {
+      return FALLBACK_SPRITE;
+    }
+
+    const defaultPetId = Object.keys(runtimeCatalog)[0];
+    return (
+      runtimeCatalog[petId] || runtimeCatalog[defaultPetId] || FALLBACK_SPRITE
+    );
+  }, [petId, runtimeCatalog]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -197,6 +131,18 @@ function PetSpritePreview({ petId }) {
 
     let isActive = true;
     let frame = 0;
+    let atlasImage = null;
+
+    const atlasEnabled = Boolean(
+      spriteData?.atlas?.src &&
+      Array.isArray(spriteData?.frames) &&
+      typeof spriteData.frames[0] === "object",
+    );
+
+    if (atlasEnabled) {
+      atlasImage = new Image();
+      atlasImage.src = spriteData.atlas.src;
+    }
 
     const render = () => {
       if (!isActive) {
@@ -208,11 +154,18 @@ function PetSpritePreview({ petId }) {
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       const frameIndex =
-        Math.floor(frame / spriteData.frameDuration) % spriteData.frames.length;
+        Math.floor(frame / (spriteData.frameDuration || 12)) %
+        spriteData.frames.length;
       const sprite = spriteData.frames[frameIndex] || spriteData.frames[0];
-      const shouldBlink = frame % 110 > 100;
 
-      drawSprite(ctx, sprite, spriteData.palette, shouldBlink);
+      if (atlasEnabled) {
+        if (atlasImage?.complete) {
+          drawAtlasPreview(ctx, atlasImage, sprite);
+        }
+      } else {
+        const shouldBlink = frame % 110 > 100;
+        drawSprite(ctx, sprite, spriteData.palette, shouldBlink);
+      }
 
       frame += 1;
       window.requestAnimationFrame(render);

@@ -9,6 +9,10 @@
   z-index: 35;
 }
 
+.agent-pet-roamer-layer--interactive {
+  pointer-events: auto;
+}
+
 .agent-pet-dev-fab {
   position: fixed;
   right: 16px;

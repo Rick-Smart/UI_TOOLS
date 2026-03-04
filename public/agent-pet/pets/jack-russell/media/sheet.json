@@ -1,0 +1,1690 @@
+﻿{
+    "frames":  {
+                   "Jack Russel Terrier Sprite Sheet (Idle) 0.ase":  {
+                                                                         "frame":  {
+                                                                                       "x":  0,
+                                                                                       "y":  0,
+                                                                                       "w":  32,
+                                                                                       "h":  32
+                                                                                   },
+                                                                         "rotated":  false,
+                                                                         "trimmed":  false,
+                                                                         "spriteSourceSize":  {
+                                                                                                  "x":  0,
+                                                                                                  "y":  0,
+                                                                                                  "w":  32,
+                                                                                                  "h":  32
+                                                                                              },
+                                                                         "sourceSize":  {
+                                                                                            "w":  32,
+                                                                                            "h":  32
+                                                                                        },
+                                                                         "duration":  100
+                                                                     },
+                   "Jack Russel Terrier Sprite Sheet (Idle) 1.ase":  {
+                                                                         "frame":  {
+                                                                                       "x":  32,
+                                                                                       "y":  0,
+                                                                                       "w":  32,
+                                                                                       "h":  32
+                                                                                   },
+                                                                         "rotated":  false,
+                                                                         "trimmed":  false,
+                                                                         "spriteSourceSize":  {
+                                                                                                  "x":  0,
+                                                                                                  "y":  0,
+                                                                                                  "w":  32,
+                                                                                                  "h":  32
+                                                                                              },
+                                                                         "sourceSize":  {
+                                                                                            "w":  32,
+                                                                                            "h":  32
+                                                                                        },
+                                                                         "duration":  100
+                                                                     },
+                   "Jack Russel Terrier Sprite Sheet (Idle) 2.ase":  {
+                                                                         "frame":  {
+                                                                                       "x":  64,
+                                                                                       "y":  0,
+                                                                                       "w":  32,
+                                                                                       "h":  32
+                                                                                   },
+                                                                         "rotated":  false,
+                                                                         "trimmed":  false,
+                                                                         "spriteSourceSize":  {
+                                                                                                  "x":  0,
+                                                                                                  "y":  0,
+                                                                                                  "w":  32,
+                                                                                                  "h":  32
+                                                                                              },
+                                                                         "sourceSize":  {
+                                                                                            "w":  32,
+                                                                                            "h":  32
+                                                                                        },
+                                                                         "duration":  100
+                                                                     },
+                   "Jack Russel Terrier Sprite Sheet (Idle) 3.ase":  {
+                                                                         "frame":  {
+                                                                                       "x":  96,
+                                                                                       "y":  0,
+                                                                                       "w":  32,
+                                                                                       "h":  32
+                                                                                   },
+                                                                         "rotated":  false,
+                                                                         "trimmed":  false,
+                                                                         "spriteSourceSize":  {
+                                                                                                  "x":  0,
+                                                                                                  "y":  0,
+                                                                                                  "w":  32,
+                                                                                                  "h":  32
+                                                                                              },
+                                                                         "sourceSize":  {
+                                                                                            "w":  32,
+                                                                                            "h":  32
+                                                                                        },
+                                                                         "duration":  100
+                                                                     },
+                   "Jack Russel Terrier Sprite Sheet (Idle) 4.ase":  {
+                                                                         "frame":  {
+                                                                                       "x":  128,
+                                                                                       "y":  0,
+                                                                                       "w":  32,
+                                                                                       "h":  32
+                                                                                   },
+                                                                         "rotated":  false,
+                                                                         "trimmed":  false,
+                                                                         "spriteSourceSize":  {
+                                                                                                  "x":  0,
+                                                                                                  "y":  0,
+                                                                                                  "w":  32,
+                                                                                                  "h":  32
+                                                                                              },
+                                                                         "sourceSize":  {
+                                                                                            "w":  32,
+                                                                                            "h":  32
+                                                                                        },
+                                                                         "duration":  100
+                                                                     },
+                   "Jack Russel Terrier Sprite Sheet (Idle) 5.ase":  {
+                                                                         "frame":  {
+                                                                                       "x":  160,
+                                                                                       "y":  0,
+                                                                                       "w":  32,
+                                                                                       "h":  32
+                                                                                   },
+                                                                         "rotated":  false,
+                                                                         "trimmed":  false,
+                                                                         "spriteSourceSize":  {
+                                                                                                  "x":  0,
+                                                                                                  "y":  0,
+                                                                                                  "w":  32,
+                                                                                                  "h":  32
+                                                                                              },
+                                                                         "sourceSize":  {
+                                                                                            "w":  32,
+                                                                                            "h":  32
+                                                                                        },
+                                                                         "duration":  100
+                                                                     },
+                   "Jack Russel Terrier Sprite Sheet (Idle) 6.ase":  {
+                                                                         "frame":  {
+                                                                                       "x":  192,
+                                                                                       "y":  0,
+                                                                                       "w":  32,
+                                                                                       "h":  32
+                                                                                   },
+                                                                         "rotated":  false,
+                                                                         "trimmed":  false,
+                                                                         "spriteSourceSize":  {
+                                                                                                  "x":  0,
+                                                                                                  "y":  0,
+                                                                                                  "w":  32,
+                                                                                                  "h":  32
+                                                                                              },
+                                                                         "sourceSize":  {
+                                                                                            "w":  32,
+                                                                                            "h":  32
+                                                                                        },
+                                                                         "duration":  100
+                                                                     },
+                   "Jack Russel Terrier Sprite Sheet (Idle) 7.ase":  {
+                                                                         "frame":  {
+                                                                                       "x":  224,
+                                                                                       "y":  0,
+                                                                                       "w":  32,
+                                                                                       "h":  32
+                                                                                   },
+                                                                         "rotated":  false,
+                                                                         "trimmed":  false,
+                                                                         "spriteSourceSize":  {
+                                                                                                  "x":  0,
+                                                                                                  "y":  0,
+                                                                                                  "w":  32,
+                                                                                                  "h":  32
+                                                                                              },
+                                                                         "sourceSize":  {
+                                                                                            "w":  32,
+                                                                                            "h":  32
+                                                                                        },
+                                                                         "duration":  100
+                                                                     },
+                   "Jack Russel Terrier Sprite Sheet (Sit Idle) 0.ase":  {
+                                                                             "frame":  {
+                                                                                           "x":  0,
+                                                                                           "y":  32,
+                                                                                           "w":  32,
+                                                                                           "h":  32
+                                                                                       },
+                                                                             "rotated":  false,
+                                                                             "trimmed":  false,
+                                                                             "spriteSourceSize":  {
+                                                                                                      "x":  0,
+                                                                                                      "y":  0,
+                                                                                                      "w":  32,
+                                                                                                      "h":  32
+                                                                                                  },
+                                                                             "sourceSize":  {
+                                                                                                "w":  32,
+                                                                                                "h":  32
+                                                                                            },
+                                                                             "duration":  100
+                                                                         },
+                   "Jack Russel Terrier Sprite Sheet (Sit Idle) 1.ase":  {
+                                                                             "frame":  {
+                                                                                           "x":  32,
+                                                                                           "y":  32,
+                                                                                           "w":  32,
+                                                                                           "h":  32
+                                                                                       },
+                                                                             "rotated":  false,
+                                                                             "trimmed":  false,
+                                                                             "spriteSourceSize":  {
+                                                                                                      "x":  0,
+                                                                                                      "y":  0,
+                                                                                                      "w":  32,
+                                                                                                      "h":  32
+                                                                                                  },
+                                                                             "sourceSize":  {
+                                                                                                "w":  32,
+                                                                                                "h":  32
+                                                                                            },
+                                                                             "duration":  100
+                                                                         },
+                   "Jack Russel Terrier Sprite Sheet (Sit Idle) 2.ase":  {
+                                                                             "frame":  {
+                                                                                           "x":  64,
+                                                                                           "y":  32,
+                                                                                           "w":  32,
+                                                                                           "h":  32
+                                                                                       },
+                                                                             "rotated":  false,
+                                                                             "trimmed":  false,
+                                                                             "spriteSourceSize":  {
+                                                                                                      "x":  0,
+                                                                                                      "y":  0,
+                                                                                                      "w":  32,
+                                                                                                      "h":  32
+                                                                                                  },
+                                                                             "sourceSize":  {
+                                                                                                "w":  32,
+                                                                                                "h":  32
+                                                                                            },
+                                                                             "duration":  100
+                                                                         },
+                   "Jack Russel Terrier Sprite Sheet (Sit Idle) 3.ase":  {
+                                                                             "frame":  {
+                                                                                           "x":  96,
+                                                                                           "y":  32,
+                                                                                           "w":  32,
+                                                                                           "h":  32
+                                                                                       },
+                                                                             "rotated":  false,
+                                                                             "trimmed":  false,
+                                                                             "spriteSourceSize":  {
+                                                                                                      "x":  0,
+                                                                                                      "y":  0,
+                                                                                                      "w":  32,
+                                                                                                      "h":  32
+                                                                                                  },
+                                                                             "sourceSize":  {
+                                                                                                "w":  32,
+                                                                                                "h":  32
+                                                                                            },
+                                                                             "duration":  100
+                                                                         },
+                   "Jack Russel Terrier Sprite Sheet (Sit Idle) 4.ase":  {
+                                                                             "frame":  {
+                                                                                           "x":  128,
+                                                                                           "y":  32,
+                                                                                           "w":  32,
+                                                                                           "h":  32
+                                                                                       },
+                                                                             "rotated":  false,
+                                                                             "trimmed":  false,
+                                                                             "spriteSourceSize":  {
+                                                                                                      "x":  0,
+                                                                                                      "y":  0,
+                                                                                                      "w":  32,
+                                                                                                      "h":  32
+                                                                                                  },
+                                                                             "sourceSize":  {
+                                                                                                "w":  32,
+                                                                                                "h":  32
+                                                                                            },
+                                                                             "duration":  100
+                                                                         },
+                   "Jack Russel Terrier Sprite Sheet (Sit Idle) 5.ase":  {
+                                                                             "frame":  {
+                                                                                           "x":  160,
+                                                                                           "y":  32,
+                                                                                           "w":  32,
+                                                                                           "h":  32
+                                                                                       },
+                                                                             "rotated":  false,
+                                                                             "trimmed":  false,
+                                                                             "spriteSourceSize":  {
+                                                                                                      "x":  0,
+                                                                                                      "y":  0,
+                                                                                                      "w":  32,
+                                                                                                      "h":  32
+                                                                                                  },
+                                                                             "sourceSize":  {
+                                                                                                "w":  32,
+                                                                                                "h":  32
+                                                                                            },
+                                                                             "duration":  100
+                                                                         },
+                   "Jack Russel Terrier Sprite Sheet (Sit Idle) 6.ase":  {
+                                                                             "frame":  {
+                                                                                           "x":  192,
+                                                                                           "y":  32,
+                                                                                           "w":  32,
+                                                                                           "h":  32
+                                                                                       },
+                                                                             "rotated":  false,
+                                                                             "trimmed":  false,
+                                                                             "spriteSourceSize":  {
+                                                                                                      "x":  0,
+                                                                                                      "y":  0,
+                                                                                                      "w":  32,
+                                                                                                      "h":  32
+                                                                                                  },
+                                                                             "sourceSize":  {
+                                                                                                "w":  32,
+                                                                                                "h":  32
+                                                                                            },
+                                                                             "duration":  100
+                                                                         },
+                   "Jack Russel Terrier Sprite Sheet (Sit Idle) 7.ase":  {
+                                                                             "frame":  {
+                                                                                           "x":  224,
+                                                                                           "y":  32,
+                                                                                           "w":  32,
+                                                                                           "h":  32
+                                                                                       },
+                                                                             "rotated":  false,
+                                                                             "trimmed":  false,
+                                                                             "spriteSourceSize":  {
+                                                                                                      "x":  0,
+                                                                                                      "y":  0,
+                                                                                                      "w":  32,
+                                                                                                      "h":  32
+                                                                                                  },
+                                                                             "sourceSize":  {
+                                                                                                "w":  32,
+                                                                                                "h":  32
+                                                                                            },
+                                                                             "duration":  100
+                                                                         },
+                   "Jack Russel Terrier Sprite Sheet (Movement) 0.ase":  {
+                                                                             "frame":  {
+                                                                                           "x":  0,
+                                                                                           "y":  64,
+                                                                                           "w":  32,
+                                                                                           "h":  32
+                                                                                       },
+                                                                             "rotated":  false,
+                                                                             "trimmed":  false,
+                                                                             "spriteSourceSize":  {
+                                                                                                      "x":  0,
+                                                                                                      "y":  0,
+                                                                                                      "w":  32,
+                                                                                                      "h":  32
+                                                                                                  },
+                                                                             "sourceSize":  {
+                                                                                                "w":  32,
+                                                                                                "h":  32
+                                                                                            },
+                                                                             "duration":  100
+                                                                         },
+                   "Jack Russel Terrier Sprite Sheet (Movement) 1.ase":  {
+                                                                             "frame":  {
+                                                                                           "x":  32,
+                                                                                           "y":  64,
+                                                                                           "w":  32,
+                                                                                           "h":  32
+                                                                                       },
+                                                                             "rotated":  false,
+                                                                             "trimmed":  false,
+                                                                             "spriteSourceSize":  {
+                                                                                                      "x":  0,
+                                                                                                      "y":  0,
+                                                                                                      "w":  32,
+                                                                                                      "h":  32
+                                                                                                  },
+                                                                             "sourceSize":  {
+                                                                                                "w":  32,
+                                                                                                "h":  32
+                                                                                            },
+                                                                             "duration":  100
+                                                                         },
+                   "Jack Russel Terrier Sprite Sheet (Movement) 2.ase":  {
+                                                                             "frame":  {
+                                                                                           "x":  64,
+                                                                                           "y":  64,
+                                                                                           "w":  32,
+                                                                                           "h":  32
+                                                                                       },
+                                                                             "rotated":  false,
+                                                                             "trimmed":  false,
+                                                                             "spriteSourceSize":  {
+                                                                                                      "x":  0,
+                                                                                                      "y":  0,
+                                                                                                      "w":  32,
+                                                                                                      "h":  32
+                                                                                                  },
+                                                                             "sourceSize":  {
+                                                                                                "w":  32,
+                                                                                                "h":  32
+                                                                                            },
+                                                                             "duration":  100
+                                                                         },
+                   "Jack Russel Terrier Sprite Sheet (Movement) 3.ase":  {
+                                                                             "frame":  {
+                                                                                           "x":  96,
+                                                                                           "y":  64,
+                                                                                           "w":  32,
+                                                                                           "h":  32
+                                                                                       },
+                                                                             "rotated":  false,
+                                                                             "trimmed":  false,
+                                                                             "spriteSourceSize":  {
+                                                                                                      "x":  0,
+                                                                                                      "y":  0,
+                                                                                                      "w":  32,
+                                                                                                      "h":  32
+                                                                                                  },
+                                                                             "sourceSize":  {
+                                                                                                "w":  32,
+                                                                                                "h":  32
+                                                                                            },
+                                                                             "duration":  100
+                                                                         },
+                   "Jack Russel Terrier Sprite Sheet (Movement) 4.ase":  {
+                                                                             "frame":  {
+                                                                                           "x":  128,
+                                                                                           "y":  64,
+                                                                                           "w":  32,
+                                                                                           "h":  32
+                                                                                       },
+                                                                             "rotated":  false,
+                                                                             "trimmed":  false,
+                                                                             "spriteSourceSize":  {
+                                                                                                      "x":  0,
+                                                                                                      "y":  0,
+                                                                                                      "w":  32,
+                                                                                                      "h":  32
+                                                                                                  },
+                                                                             "sourceSize":  {
+                                                                                                "w":  32,
+                                                                                                "h":  32
+                                                                                            },
+                                                                             "duration":  100
+                                                                         },
+                   "Jack Russel Terrier Sprite Sheet (Movement) 5.ase":  {
+                                                                             "frame":  {
+                                                                                           "x":  160,
+                                                                                           "y":  64,
+                                                                                           "w":  32,
+                                                                                           "h":  32
+                                                                                       },
+                                                                             "rotated":  false,
+                                                                             "trimmed":  false,
+                                                                             "spriteSourceSize":  {
+                                                                                                      "x":  0,
+                                                                                                      "y":  0,
+                                                                                                      "w":  32,
+                                                                                                      "h":  32
+                                                                                                  },
+                                                                             "sourceSize":  {
+                                                                                                "w":  32,
+                                                                                                "h":  32
+                                                                                            },
+                                                                             "duration":  100
+                                                                         },
+                   "Jack Russel Terrier Sprite Sheet (Movement) 6.ase":  {
+                                                                             "frame":  {
+                                                                                           "x":  192,
+                                                                                           "y":  64,
+                                                                                           "w":  32,
+                                                                                           "h":  32
+                                                                                       },
+                                                                             "rotated":  false,
+                                                                             "trimmed":  false,
+                                                                             "spriteSourceSize":  {
+                                                                                                      "x":  0,
+                                                                                                      "y":  0,
+                                                                                                      "w":  32,
+                                                                                                      "h":  32
+                                                                                                  },
+                                                                             "sourceSize":  {
+                                                                                                "w":  32,
+                                                                                                "h":  32
+                                                                                            },
+                                                                             "duration":  100
+                                                                         },
+                   "Jack Russel Terrier Sprite Sheet (Movement) 7.ase":  {
+                                                                             "frame":  {
+                                                                                           "x":  224,
+                                                                                           "y":  64,
+                                                                                           "w":  32,
+                                                                                           "h":  32
+                                                                                       },
+                                                                             "rotated":  false,
+                                                                             "trimmed":  false,
+                                                                             "spriteSourceSize":  {
+                                                                                                      "x":  0,
+                                                                                                      "y":  0,
+                                                                                                      "w":  32,
+                                                                                                      "h":  32
+                                                                                                  },
+                                                                             "sourceSize":  {
+                                                                                                "w":  32,
+                                                                                                "h":  32
+                                                                                            },
+                                                                             "duration":  100
+                                                                         },
+                   "Jack Russel Terrier Sprite Sheet (Dash) 0.ase":  {
+                                                                         "frame":  {
+                                                                                       "x":  0,
+                                                                                       "y":  96,
+                                                                                       "w":  32,
+                                                                                       "h":  32
+                                                                                   },
+                                                                         "rotated":  false,
+                                                                         "trimmed":  false,
+                                                                         "spriteSourceSize":  {
+                                                                                                  "x":  0,
+                                                                                                  "y":  0,
+                                                                                                  "w":  32,
+                                                                                                  "h":  32
+                                                                                              },
+                                                                         "sourceSize":  {
+                                                                                            "w":  32,
+                                                                                            "h":  32
+                                                                                        },
+                                                                         "duration":  100
+                                                                     },
+                   "Jack Russel Terrier Sprite Sheet (Dash) 1.ase":  {
+                                                                         "frame":  {
+                                                                                       "x":  32,
+                                                                                       "y":  96,
+                                                                                       "w":  32,
+                                                                                       "h":  32
+                                                                                   },
+                                                                         "rotated":  false,
+                                                                         "trimmed":  false,
+                                                                         "spriteSourceSize":  {
+                                                                                                  "x":  0,
+                                                                                                  "y":  0,
+                                                                                                  "w":  32,
+                                                                                                  "h":  32
+                                                                                              },
+                                                                         "sourceSize":  {
+                                                                                            "w":  32,
+                                                                                            "h":  32
+                                                                                        },
+                                                                         "duration":  100
+                                                                     },
+                   "Jack Russel Terrier Sprite Sheet (Dash) 2.ase":  {
+                                                                         "frame":  {
+                                                                                       "x":  64,
+                                                                                       "y":  96,
+                                                                                       "w":  32,
+                                                                                       "h":  32
+                                                                                   },
+                                                                         "rotated":  false,
+                                                                         "trimmed":  false,
+                                                                         "spriteSourceSize":  {
+                                                                                                  "x":  0,
+                                                                                                  "y":  0,
+                                                                                                  "w":  32,
+                                                                                                  "h":  32
+                                                                                              },
+                                                                         "sourceSize":  {
+                                                                                            "w":  32,
+                                                                                            "h":  32
+                                                                                        },
+                                                                         "duration":  100
+                                                                     },
+                   "Jack Russel Terrier Sprite Sheet (Dash) 3.ase":  {
+                                                                         "frame":  {
+                                                                                       "x":  96,
+                                                                                       "y":  96,
+                                                                                       "w":  32,
+                                                                                       "h":  32
+                                                                                   },
+                                                                         "rotated":  false,
+                                                                         "trimmed":  false,
+                                                                         "spriteSourceSize":  {
+                                                                                                  "x":  0,
+                                                                                                  "y":  0,
+                                                                                                  "w":  32,
+                                                                                                  "h":  32
+                                                                                              },
+                                                                         "sourceSize":  {
+                                                                                            "w":  32,
+                                                                                            "h":  32
+                                                                                        },
+                                                                         "duration":  100
+                                                                     },
+                   "Jack Russel Terrier Sprite Sheet (Dash) 4.ase":  {
+                                                                         "frame":  {
+                                                                                       "x":  128,
+                                                                                       "y":  96,
+                                                                                       "w":  32,
+                                                                                       "h":  32
+                                                                                   },
+                                                                         "rotated":  false,
+                                                                         "trimmed":  false,
+                                                                         "spriteSourceSize":  {
+                                                                                                  "x":  0,
+                                                                                                  "y":  0,
+                                                                                                  "w":  32,
+                                                                                                  "h":  32
+                                                                                              },
+                                                                         "sourceSize":  {
+                                                                                            "w":  32,
+                                                                                            "h":  32
+                                                                                        },
+                                                                         "duration":  100
+                                                                     },
+                   "Jack Russel Terrier Sprite Sheet (Dash) 5.ase":  {
+                                                                         "frame":  {
+                                                                                       "x":  160,
+                                                                                       "y":  96,
+                                                                                       "w":  32,
+                                                                                       "h":  32
+                                                                                   },
+                                                                         "rotated":  false,
+                                                                         "trimmed":  false,
+                                                                         "spriteSourceSize":  {
+                                                                                                  "x":  0,
+                                                                                                  "y":  0,
+                                                                                                  "w":  32,
+                                                                                                  "h":  32
+                                                                                              },
+                                                                         "sourceSize":  {
+                                                                                            "w":  32,
+                                                                                            "h":  32
+                                                                                        },
+                                                                         "duration":  100
+                                                                     },
+                   "Jack Russel Terrier Sprite Sheet (Dash) 6.ase":  {
+                                                                         "frame":  {
+                                                                                       "x":  192,
+                                                                                       "y":  96,
+                                                                                       "w":  32,
+                                                                                       "h":  32
+                                                                                   },
+                                                                         "rotated":  false,
+                                                                         "trimmed":  false,
+                                                                         "spriteSourceSize":  {
+                                                                                                  "x":  0,
+                                                                                                  "y":  0,
+                                                                                                  "w":  32,
+                                                                                                  "h":  32
+                                                                                              },
+                                                                         "sourceSize":  {
+                                                                                            "w":  32,
+                                                                                            "h":  32
+                                                                                        },
+                                                                         "duration":  100
+                                                                     },
+                   "Jack Russel Terrier Sprite Sheet (Dash) 7.ase":  {
+                                                                         "frame":  {
+                                                                                       "x":  224,
+                                                                                       "y":  96,
+                                                                                       "w":  32,
+                                                                                       "h":  32
+                                                                                   },
+                                                                         "rotated":  false,
+                                                                         "trimmed":  false,
+                                                                         "spriteSourceSize":  {
+                                                                                                  "x":  0,
+                                                                                                  "y":  0,
+                                                                                                  "w":  32,
+                                                                                                  "h":  32
+                                                                                              },
+                                                                         "sourceSize":  {
+                                                                                            "w":  32,
+                                                                                            "h":  32
+                                                                                        },
+                                                                         "duration":  100
+                                                                     },
+                   "Jack Russel Terrier Sprite Sheet (Movement- Ball) 0.ase":  {
+                                                                                   "frame":  {
+                                                                                                 "x":  0,
+                                                                                                 "y":  128,
+                                                                                                 "w":  32,
+                                                                                                 "h":  32
+                                                                                             },
+                                                                                   "rotated":  false,
+                                                                                   "trimmed":  false,
+                                                                                   "spriteSourceSize":  {
+                                                                                                            "x":  0,
+                                                                                                            "y":  0,
+                                                                                                            "w":  32,
+                                                                                                            "h":  32
+                                                                                                        },
+                                                                                   "sourceSize":  {
+                                                                                                      "w":  32,
+                                                                                                      "h":  32
+                                                                                                  },
+                                                                                   "duration":  100
+                                                                               },
+                   "Jack Russel Terrier Sprite Sheet (Movement- Ball) 1.ase":  {
+                                                                                   "frame":  {
+                                                                                                 "x":  32,
+                                                                                                 "y":  128,
+                                                                                                 "w":  32,
+                                                                                                 "h":  32
+                                                                                             },
+                                                                                   "rotated":  false,
+                                                                                   "trimmed":  false,
+                                                                                   "spriteSourceSize":  {
+                                                                                                            "x":  0,
+                                                                                                            "y":  0,
+                                                                                                            "w":  32,
+                                                                                                            "h":  32
+                                                                                                        },
+                                                                                   "sourceSize":  {
+                                                                                                      "w":  32,
+                                                                                                      "h":  32
+                                                                                                  },
+                                                                                   "duration":  100
+                                                                               },
+                   "Jack Russel Terrier Sprite Sheet (Movement- Ball) 2.ase":  {
+                                                                                   "frame":  {
+                                                                                                 "x":  64,
+                                                                                                 "y":  128,
+                                                                                                 "w":  32,
+                                                                                                 "h":  32
+                                                                                             },
+                                                                                   "rotated":  false,
+                                                                                   "trimmed":  false,
+                                                                                   "spriteSourceSize":  {
+                                                                                                            "x":  0,
+                                                                                                            "y":  0,
+                                                                                                            "w":  32,
+                                                                                                            "h":  32
+                                                                                                        },
+                                                                                   "sourceSize":  {
+                                                                                                      "w":  32,
+                                                                                                      "h":  32
+                                                                                                  },
+                                                                                   "duration":  100
+                                                                               },
+                   "Jack Russel Terrier Sprite Sheet (Movement- Ball) 3.ase":  {
+                                                                                   "frame":  {
+                                                                                                 "x":  96,
+                                                                                                 "y":  128,
+                                                                                                 "w":  32,
+                                                                                                 "h":  32
+                                                                                             },
+                                                                                   "rotated":  false,
+                                                                                   "trimmed":  false,
+                                                                                   "spriteSourceSize":  {
+                                                                                                            "x":  0,
+                                                                                                            "y":  0,
+                                                                                                            "w":  32,
+                                                                                                            "h":  32
+                                                                                                        },
+                                                                                   "sourceSize":  {
+                                                                                                      "w":  32,
+                                                                                                      "h":  32
+                                                                                                  },
+                                                                                   "duration":  100
+                                                                               },
+                   "Jack Russel Terrier Sprite Sheet (Movement- Ball) 4.ase":  {
+                                                                                   "frame":  {
+                                                                                                 "x":  128,
+                                                                                                 "y":  128,
+                                                                                                 "w":  32,
+                                                                                                 "h":  32
+                                                                                             },
+                                                                                   "rotated":  false,
+                                                                                   "trimmed":  false,
+                                                                                   "spriteSourceSize":  {
+                                                                                                            "x":  0,
+                                                                                                            "y":  0,
+                                                                                                            "w":  32,
+                                                                                                            "h":  32
+                                                                                                        },
+                                                                                   "sourceSize":  {
+                                                                                                      "w":  32,
+                                                                                                      "h":  32
+                                                                                                  },
+                                                                                   "duration":  100
+                                                                               },
+                   "Jack Russel Terrier Sprite Sheet (Movement- Ball) 5.ase":  {
+                                                                                   "frame":  {
+                                                                                                 "x":  160,
+                                                                                                 "y":  128,
+                                                                                                 "w":  32,
+                                                                                                 "h":  32
+                                                                                             },
+                                                                                   "rotated":  false,
+                                                                                   "trimmed":  false,
+                                                                                   "spriteSourceSize":  {
+                                                                                                            "x":  0,
+                                                                                                            "y":  0,
+                                                                                                            "w":  32,
+                                                                                                            "h":  32
+                                                                                                        },
+                                                                                   "sourceSize":  {
+                                                                                                      "w":  32,
+                                                                                                      "h":  32
+                                                                                                  },
+                                                                                   "duration":  100
+                                                                               },
+                   "Jack Russel Terrier Sprite Sheet (Movement- Ball) 6.ase":  {
+                                                                                   "frame":  {
+                                                                                                 "x":  192,
+                                                                                                 "y":  128,
+                                                                                                 "w":  32,
+                                                                                                 "h":  32
+                                                                                             },
+                                                                                   "rotated":  false,
+                                                                                   "trimmed":  false,
+                                                                                   "spriteSourceSize":  {
+                                                                                                            "x":  0,
+                                                                                                            "y":  0,
+                                                                                                            "w":  32,
+                                                                                                            "h":  32
+                                                                                                        },
+                                                                                   "sourceSize":  {
+                                                                                                      "w":  32,
+                                                                                                      "h":  32
+                                                                                                  },
+                                                                                   "duration":  100
+                                                                               },
+                   "Jack Russel Terrier Sprite Sheet (Movement- Ball) 7.ase":  {
+                                                                                   "frame":  {
+                                                                                                 "x":  224,
+                                                                                                 "y":  128,
+                                                                                                 "w":  32,
+                                                                                                 "h":  32
+                                                                                             },
+                                                                                   "rotated":  false,
+                                                                                   "trimmed":  false,
+                                                                                   "spriteSourceSize":  {
+                                                                                                            "x":  0,
+                                                                                                            "y":  0,
+                                                                                                            "w":  32,
+                                                                                                            "h":  32
+                                                                                                        },
+                                                                                   "sourceSize":  {
+                                                                                                      "w":  32,
+                                                                                                      "h":  32
+                                                                                                  },
+                                                                                   "duration":  100
+                                                                               },
+                   "Jack Russel Terrier Sprite Sheet (Dash- Ball) 0.ase":  {
+                                                                               "frame":  {
+                                                                                             "x":  0,
+                                                                                             "y":  160,
+                                                                                             "w":  32,
+                                                                                             "h":  32
+                                                                                         },
+                                                                               "rotated":  false,
+                                                                               "trimmed":  false,
+                                                                               "spriteSourceSize":  {
+                                                                                                        "x":  0,
+                                                                                                        "y":  0,
+                                                                                                        "w":  32,
+                                                                                                        "h":  32
+                                                                                                    },
+                                                                               "sourceSize":  {
+                                                                                                  "w":  32,
+                                                                                                  "h":  32
+                                                                                              },
+                                                                               "duration":  100
+                                                                           },
+                   "Jack Russel Terrier Sprite Sheet (Dash- Ball) 1.ase":  {
+                                                                               "frame":  {
+                                                                                             "x":  32,
+                                                                                             "y":  160,
+                                                                                             "w":  32,
+                                                                                             "h":  32
+                                                                                         },
+                                                                               "rotated":  false,
+                                                                               "trimmed":  false,
+                                                                               "spriteSourceSize":  {
+                                                                                                        "x":  0,
+                                                                                                        "y":  0,
+                                                                                                        "w":  32,
+                                                                                                        "h":  32
+                                                                                                    },
+                                                                               "sourceSize":  {
+                                                                                                  "w":  32,
+                                                                                                  "h":  32
+                                                                                              },
+                                                                               "duration":  100
+                                                                           },
+                   "Jack Russel Terrier Sprite Sheet (Dash- Ball) 2.ase":  {
+                                                                               "frame":  {
+                                                                                             "x":  64,
+                                                                                             "y":  160,
+                                                                                             "w":  32,
+                                                                                             "h":  32
+                                                                                         },
+                                                                               "rotated":  false,
+                                                                               "trimmed":  false,
+                                                                               "spriteSourceSize":  {
+                                                                                                        "x":  0,
+                                                                                                        "y":  0,
+                                                                                                        "w":  32,
+                                                                                                        "h":  32
+                                                                                                    },
+                                                                               "sourceSize":  {
+                                                                                                  "w":  32,
+                                                                                                  "h":  32
+                                                                                              },
+                                                                               "duration":  100
+                                                                           },
+                   "Jack Russel Terrier Sprite Sheet (Dash- Ball) 3.ase":  {
+                                                                               "frame":  {
+                                                                                             "x":  96,
+                                                                                             "y":  160,
+                                                                                             "w":  32,
+                                                                                             "h":  32
+                                                                                         },
+                                                                               "rotated":  false,
+                                                                               "trimmed":  false,
+                                                                               "spriteSourceSize":  {
+                                                                                                        "x":  0,
+                                                                                                        "y":  0,
+                                                                                                        "w":  32,
+                                                                                                        "h":  32
+                                                                                                    },
+                                                                               "sourceSize":  {
+                                                                                                  "w":  32,
+                                                                                                  "h":  32
+                                                                                              },
+                                                                               "duration":  100
+                                                                           },
+                   "Jack Russel Terrier Sprite Sheet (Dash- Ball) 4.ase":  {
+                                                                               "frame":  {
+                                                                                             "x":  128,
+                                                                                             "y":  160,
+                                                                                             "w":  32,
+                                                                                             "h":  32
+                                                                                         },
+                                                                               "rotated":  false,
+                                                                               "trimmed":  false,
+                                                                               "spriteSourceSize":  {
+                                                                                                        "x":  0,
+                                                                                                        "y":  0,
+                                                                                                        "w":  32,
+                                                                                                        "h":  32
+                                                                                                    },
+                                                                               "sourceSize":  {
+                                                                                                  "w":  32,
+                                                                                                  "h":  32
+                                                                                              },
+                                                                               "duration":  100
+                                                                           },
+                   "Jack Russel Terrier Sprite Sheet (Dash- Ball) 5.ase":  {
+                                                                               "frame":  {
+                                                                                             "x":  160,
+                                                                                             "y":  160,
+                                                                                             "w":  32,
+                                                                                             "h":  32
+                                                                                         },
+                                                                               "rotated":  false,
+                                                                               "trimmed":  false,
+                                                                               "spriteSourceSize":  {
+                                                                                                        "x":  0,
+                                                                                                        "y":  0,
+                                                                                                        "w":  32,
+                                                                                                        "h":  32
+                                                                                                    },
+                                                                               "sourceSize":  {
+                                                                                                  "w":  32,
+                                                                                                  "h":  32
+                                                                                              },
+                                                                               "duration":  100
+                                                                           },
+                   "Jack Russel Terrier Sprite Sheet (Dash- Ball) 6.ase":  {
+                                                                               "frame":  {
+                                                                                             "x":  192,
+                                                                                             "y":  160,
+                                                                                             "w":  32,
+                                                                                             "h":  32
+                                                                                         },
+                                                                               "rotated":  false,
+                                                                               "trimmed":  false,
+                                                                               "spriteSourceSize":  {
+                                                                                                        "x":  0,
+                                                                                                        "y":  0,
+                                                                                                        "w":  32,
+                                                                                                        "h":  32
+                                                                                                    },
+                                                                               "sourceSize":  {
+                                                                                                  "w":  32,
+                                                                                                  "h":  32
+                                                                                              },
+                                                                               "duration":  100
+                                                                           },
+                   "Jack Russel Terrier Sprite Sheet (Dash- Ball) 7.ase":  {
+                                                                               "frame":  {
+                                                                                             "x":  224,
+                                                                                             "y":  160,
+                                                                                             "w":  32,
+                                                                                             "h":  32
+                                                                                         },
+                                                                               "rotated":  false,
+                                                                               "trimmed":  false,
+                                                                               "spriteSourceSize":  {
+                                                                                                        "x":  0,
+                                                                                                        "y":  0,
+                                                                                                        "w":  32,
+                                                                                                        "h":  32
+                                                                                                    },
+                                                                               "sourceSize":  {
+                                                                                                  "w":  32,
+                                                                                                  "h":  32
+                                                                                              },
+                                                                               "duration":  100
+                                                                           },
+                   "Jack Russel Terrier Sprite Sheet (Bark) 0.ase":  {
+                                                                         "frame":  {
+                                                                                       "x":  0,
+                                                                                       "y":  192,
+                                                                                       "w":  32,
+                                                                                       "h":  32
+                                                                                   },
+                                                                         "rotated":  false,
+                                                                         "trimmed":  false,
+                                                                         "spriteSourceSize":  {
+                                                                                                  "x":  0,
+                                                                                                  "y":  0,
+                                                                                                  "w":  32,
+                                                                                                  "h":  32
+                                                                                              },
+                                                                         "sourceSize":  {
+                                                                                            "w":  32,
+                                                                                            "h":  32
+                                                                                        },
+                                                                         "duration":  100
+                                                                     },
+                   "Jack Russel Terrier Sprite Sheet (Bark) 1.ase":  {
+                                                                         "frame":  {
+                                                                                       "x":  32,
+                                                                                       "y":  192,
+                                                                                       "w":  32,
+                                                                                       "h":  32
+                                                                                   },
+                                                                         "rotated":  false,
+                                                                         "trimmed":  false,
+                                                                         "spriteSourceSize":  {
+                                                                                                  "x":  0,
+                                                                                                  "y":  0,
+                                                                                                  "w":  32,
+                                                                                                  "h":  32
+                                                                                              },
+                                                                         "sourceSize":  {
+                                                                                            "w":  32,
+                                                                                            "h":  32
+                                                                                        },
+                                                                         "duration":  100
+                                                                     },
+                   "Jack Russel Terrier Sprite Sheet (Bark) 2.ase":  {
+                                                                         "frame":  {
+                                                                                       "x":  64,
+                                                                                       "y":  192,
+                                                                                       "w":  32,
+                                                                                       "h":  32
+                                                                                   },
+                                                                         "rotated":  false,
+                                                                         "trimmed":  false,
+                                                                         "spriteSourceSize":  {
+                                                                                                  "x":  0,
+                                                                                                  "y":  0,
+                                                                                                  "w":  32,
+                                                                                                  "h":  32
+                                                                                              },
+                                                                         "sourceSize":  {
+                                                                                            "w":  32,
+                                                                                            "h":  32
+                                                                                        },
+                                                                         "duration":  100
+                                                                     },
+                   "Jack Russel Terrier Sprite Sheet (Bark) 3.ase":  {
+                                                                         "frame":  {
+                                                                                       "x":  96,
+                                                                                       "y":  192,
+                                                                                       "w":  32,
+                                                                                       "h":  32
+                                                                                   },
+                                                                         "rotated":  false,
+                                                                         "trimmed":  false,
+                                                                         "spriteSourceSize":  {
+                                                                                                  "x":  0,
+                                                                                                  "y":  0,
+                                                                                                  "w":  32,
+                                                                                                  "h":  32
+                                                                                              },
+                                                                         "sourceSize":  {
+                                                                                            "w":  32,
+                                                                                            "h":  32
+                                                                                        },
+                                                                         "duration":  100
+                                                                     },
+                   "Jack Russel Terrier Sprite Sheet (Bark) 4.ase":  {
+                                                                         "frame":  {
+                                                                                       "x":  128,
+                                                                                       "y":  192,
+                                                                                       "w":  32,
+                                                                                       "h":  32
+                                                                                   },
+                                                                         "rotated":  false,
+                                                                         "trimmed":  false,
+                                                                         "spriteSourceSize":  {
+                                                                                                  "x":  0,
+                                                                                                  "y":  0,
+                                                                                                  "w":  32,
+                                                                                                  "h":  32
+                                                                                              },
+                                                                         "sourceSize":  {
+                                                                                            "w":  32,
+                                                                                            "h":  32
+                                                                                        },
+                                                                         "duration":  100
+                                                                     },
+                   "Jack Russel Terrier Sprite Sheet (Bite) 0.ase":  {
+                                                                         "frame":  {
+                                                                                       "x":  0,
+                                                                                       "y":  224,
+                                                                                       "w":  32,
+                                                                                       "h":  32
+                                                                                   },
+                                                                         "rotated":  false,
+                                                                         "trimmed":  false,
+                                                                         "spriteSourceSize":  {
+                                                                                                  "x":  0,
+                                                                                                  "y":  0,
+                                                                                                  "w":  32,
+                                                                                                  "h":  32
+                                                                                              },
+                                                                         "sourceSize":  {
+                                                                                            "w":  32,
+                                                                                            "h":  32
+                                                                                        },
+                                                                         "duration":  100
+                                                                     },
+                   "Jack Russel Terrier Sprite Sheet (Bite) 1.ase":  {
+                                                                         "frame":  {
+                                                                                       "x":  32,
+                                                                                       "y":  224,
+                                                                                       "w":  32,
+                                                                                       "h":  32
+                                                                                   },
+                                                                         "rotated":  false,
+                                                                         "trimmed":  false,
+                                                                         "spriteSourceSize":  {
+                                                                                                  "x":  0,
+                                                                                                  "y":  0,
+                                                                                                  "w":  32,
+                                                                                                  "h":  32
+                                                                                              },
+                                                                         "sourceSize":  {
+                                                                                            "w":  32,
+                                                                                            "h":  32
+                                                                                        },
+                                                                         "duration":  100
+                                                                     },
+                   "Jack Russel Terrier Sprite Sheet (Bite) 2.ase":  {
+                                                                         "frame":  {
+                                                                                       "x":  64,
+                                                                                       "y":  224,
+                                                                                       "w":  32,
+                                                                                       "h":  32
+                                                                                   },
+                                                                         "rotated":  false,
+                                                                         "trimmed":  false,
+                                                                         "spriteSourceSize":  {
+                                                                                                  "x":  0,
+                                                                                                  "y":  0,
+                                                                                                  "w":  32,
+                                                                                                  "h":  32
+                                                                                              },
+                                                                         "sourceSize":  {
+                                                                                            "w":  32,
+                                                                                            "h":  32
+                                                                                        },
+                                                                         "duration":  100
+                                                                     },
+                   "Jack Russel Terrier Sprite Sheet (Bite) 3.ase":  {
+                                                                         "frame":  {
+                                                                                       "x":  96,
+                                                                                       "y":  224,
+                                                                                       "w":  32,
+                                                                                       "h":  32
+                                                                                   },
+                                                                         "rotated":  false,
+                                                                         "trimmed":  false,
+                                                                         "spriteSourceSize":  {
+                                                                                                  "x":  0,
+                                                                                                  "y":  0,
+                                                                                                  "w":  32,
+                                                                                                  "h":  32
+                                                                                              },
+                                                                         "sourceSize":  {
+                                                                                            "w":  32,
+                                                                                            "h":  32
+                                                                                        },
+                                                                         "duration":  100
+                                                                     },
+                   "Jack Russel Terrier Sprite Sheet (Bite) 4.ase":  {
+                                                                         "frame":  {
+                                                                                       "x":  128,
+                                                                                       "y":  224,
+                                                                                       "w":  32,
+                                                                                       "h":  32
+                                                                                   },
+                                                                         "rotated":  false,
+                                                                         "trimmed":  false,
+                                                                         "spriteSourceSize":  {
+                                                                                                  "x":  0,
+                                                                                                  "y":  0,
+                                                                                                  "w":  32,
+                                                                                                  "h":  32
+                                                                                              },
+                                                                         "sourceSize":  {
+                                                                                            "w":  32,
+                                                                                            "h":  32
+                                                                                        },
+                                                                         "duration":  100
+                                                                     },
+                   "Jack Russel Terrier Sprite Sheet (Bite) 5.ase":  {
+                                                                         "frame":  {
+                                                                                       "x":  160,
+                                                                                       "y":  224,
+                                                                                       "w":  32,
+                                                                                       "h":  32
+                                                                                   },
+                                                                         "rotated":  false,
+                                                                         "trimmed":  false,
+                                                                         "spriteSourceSize":  {
+                                                                                                  "x":  0,
+                                                                                                  "y":  0,
+                                                                                                  "w":  32,
+                                                                                                  "h":  32
+                                                                                              },
+                                                                         "sourceSize":  {
+                                                                                            "w":  32,
+                                                                                            "h":  32
+                                                                                        },
+                                                                         "duration":  100
+                                                                     },
+                   "Jack Russel Terrier Sprite Sheet (Bite) 6.ase":  {
+                                                                         "frame":  {
+                                                                                       "x":  192,
+                                                                                       "y":  224,
+                                                                                       "w":  32,
+                                                                                       "h":  32
+                                                                                   },
+                                                                         "rotated":  false,
+                                                                         "trimmed":  false,
+                                                                         "spriteSourceSize":  {
+                                                                                                  "x":  0,
+                                                                                                  "y":  0,
+                                                                                                  "w":  32,
+                                                                                                  "h":  32
+                                                                                              },
+                                                                         "sourceSize":  {
+                                                                                            "w":  32,
+                                                                                            "h":  32
+                                                                                        },
+                                                                         "duration":  100
+                                                                     },
+                   "Jack Russel Terrier Sprite Sheet (Bite) 7.ase":  {
+                                                                         "frame":  {
+                                                                                       "x":  224,
+                                                                                       "y":  224,
+                                                                                       "w":  32,
+                                                                                       "h":  32
+                                                                                   },
+                                                                         "rotated":  false,
+                                                                         "trimmed":  false,
+                                                                         "spriteSourceSize":  {
+                                                                                                  "x":  0,
+                                                                                                  "y":  0,
+                                                                                                  "w":  32,
+                                                                                                  "h":  32
+                                                                                              },
+                                                                         "sourceSize":  {
+                                                                                            "w":  32,
+                                                                                            "h":  32
+                                                                                        },
+                                                                         "duration":  100
+                                                                     },
+                   "Jack Russel Terrier Sprite Sheet (Playful) 0.ase":  {
+                                                                            "frame":  {
+                                                                                          "x":  0,
+                                                                                          "y":  256,
+                                                                                          "w":  32,
+                                                                                          "h":  32
+                                                                                      },
+                                                                            "rotated":  false,
+                                                                            "trimmed":  false,
+                                                                            "spriteSourceSize":  {
+                                                                                                     "x":  0,
+                                                                                                     "y":  0,
+                                                                                                     "w":  32,
+                                                                                                     "h":  32
+                                                                                                 },
+                                                                            "sourceSize":  {
+                                                                                               "w":  32,
+                                                                                               "h":  32
+                                                                                           },
+                                                                            "duration":  100
+                                                                        },
+                   "Jack Russel Terrier Sprite Sheet (Playful) 1.ase":  {
+                                                                            "frame":  {
+                                                                                          "x":  32,
+                                                                                          "y":  256,
+                                                                                          "w":  32,
+                                                                                          "h":  32
+                                                                                      },
+                                                                            "rotated":  false,
+                                                                            "trimmed":  false,
+                                                                            "spriteSourceSize":  {
+                                                                                                     "x":  0,
+                                                                                                     "y":  0,
+                                                                                                     "w":  32,
+                                                                                                     "h":  32
+                                                                                                 },
+                                                                            "sourceSize":  {
+                                                                                               "w":  32,
+                                                                                               "h":  32
+                                                                                           },
+                                                                            "duration":  100
+                                                                        },
+                   "Jack Russel Terrier Sprite Sheet (Playful) 2.ase":  {
+                                                                            "frame":  {
+                                                                                          "x":  64,
+                                                                                          "y":  256,
+                                                                                          "w":  32,
+                                                                                          "h":  32
+                                                                                      },
+                                                                            "rotated":  false,
+                                                                            "trimmed":  false,
+                                                                            "spriteSourceSize":  {
+                                                                                                     "x":  0,
+                                                                                                     "y":  0,
+                                                                                                     "w":  32,
+                                                                                                     "h":  32
+                                                                                                 },
+                                                                            "sourceSize":  {
+                                                                                               "w":  32,
+                                                                                               "h":  32
+                                                                                           },
+                                                                            "duration":  100
+                                                                        },
+                   "Jack Russel Terrier Sprite Sheet (Playful) 3.ase":  {
+                                                                            "frame":  {
+                                                                                          "x":  96,
+                                                                                          "y":  256,
+                                                                                          "w":  32,
+                                                                                          "h":  32
+                                                                                      },
+                                                                            "rotated":  false,
+                                                                            "trimmed":  false,
+                                                                            "spriteSourceSize":  {
+                                                                                                     "x":  0,
+                                                                                                     "y":  0,
+                                                                                                     "w":  32,
+                                                                                                     "h":  32
+                                                                                                 },
+                                                                            "sourceSize":  {
+                                                                                               "w":  32,
+                                                                                               "h":  32
+                                                                                           },
+                                                                            "duration":  100
+                                                                        },
+                   "Jack Russel Terrier Sprite Sheet (Playful) 4.ase":  {
+                                                                            "frame":  {
+                                                                                          "x":  128,
+                                                                                          "y":  256,
+                                                                                          "w":  32,
+                                                                                          "h":  32
+                                                                                      },
+                                                                            "rotated":  false,
+                                                                            "trimmed":  false,
+                                                                            "spriteSourceSize":  {
+                                                                                                     "x":  0,
+                                                                                                     "y":  0,
+                                                                                                     "w":  32,
+                                                                                                     "h":  32
+                                                                                                 },
+                                                                            "sourceSize":  {
+                                                                                               "w":  32,
+                                                                                               "h":  32
+                                                                                           },
+                                                                            "duration":  100
+                                                                        },
+                   "Jack Russel Terrier Sprite Sheet (Playful) 5.ase":  {
+                                                                            "frame":  {
+                                                                                          "x":  160,
+                                                                                          "y":  256,
+                                                                                          "w":  32,
+                                                                                          "h":  32
+                                                                                      },
+                                                                            "rotated":  false,
+                                                                            "trimmed":  false,
+                                                                            "spriteSourceSize":  {
+                                                                                                     "x":  0,
+                                                                                                     "y":  0,
+                                                                                                     "w":  32,
+                                                                                                     "h":  32
+                                                                                                 },
+                                                                            "sourceSize":  {
+                                                                                               "w":  32,
+                                                                                               "h":  32
+                                                                                           },
+                                                                            "duration":  100
+                                                                        },
+                   "Jack Russel Terrier Sprite Sheet (Playful) 6.ase":  {
+                                                                            "frame":  {
+                                                                                          "x":  192,
+                                                                                          "y":  256,
+                                                                                          "w":  32,
+                                                                                          "h":  32
+                                                                                      },
+                                                                            "rotated":  false,
+                                                                            "trimmed":  false,
+                                                                            "spriteSourceSize":  {
+                                                                                                     "x":  0,
+                                                                                                     "y":  0,
+                                                                                                     "w":  32,
+                                                                                                     "h":  32
+                                                                                                 },
+                                                                            "sourceSize":  {
+                                                                                               "w":  32,
+                                                                                               "h":  32
+                                                                                           },
+                                                                            "duration":  100
+                                                                        },
+                   "Jack Russel Terrier Sprite Sheet (Playful) 7.ase":  {
+                                                                            "frame":  {
+                                                                                          "x":  224,
+                                                                                          "y":  256,
+                                                                                          "w":  32,
+                                                                                          "h":  32
+                                                                                      },
+                                                                            "rotated":  false,
+                                                                            "trimmed":  false,
+                                                                            "spriteSourceSize":  {
+                                                                                                     "x":  0,
+                                                                                                     "y":  0,
+                                                                                                     "w":  32,
+                                                                                                     "h":  32
+                                                                                                 },
+                                                                            "sourceSize":  {
+                                                                                               "w":  32,
+                                                                                               "h":  32
+                                                                                           },
+                                                                            "duration":  100
+                                                                        },
+                   "Jack Russel Terrier Sprite Sheet (Sleep) 0.ase":  {
+                                                                          "frame":  {
+                                                                                        "x":  0,
+                                                                                        "y":  288,
+                                                                                        "w":  32,
+                                                                                        "h":  32
+                                                                                    },
+                                                                          "rotated":  false,
+                                                                          "trimmed":  false,
+                                                                          "spriteSourceSize":  {
+                                                                                                   "x":  0,
+                                                                                                   "y":  0,
+                                                                                                   "w":  32,
+                                                                                                   "h":  32
+                                                                                               },
+                                                                          "sourceSize":  {
+                                                                                             "w":  32,
+                                                                                             "h":  32
+                                                                                         },
+                                                                          "duration":  100
+                                                                      },
+                   "Jack Russel Terrier Sprite Sheet (Sleep) 1.ase":  {
+                                                                          "frame":  {
+                                                                                        "x":  32,
+                                                                                        "y":  288,
+                                                                                        "w":  32,
+                                                                                        "h":  32
+                                                                                    },
+                                                                          "rotated":  false,
+                                                                          "trimmed":  false,
+                                                                          "spriteSourceSize":  {
+                                                                                                   "x":  0,
+                                                                                                   "y":  0,
+                                                                                                   "w":  32,
+                                                                                                   "h":  32
+                                                                                               },
+                                                                          "sourceSize":  {
+                                                                                             "w":  32,
+                                                                                             "h":  32
+                                                                                         },
+                                                                          "duration":  100
+                                                                      },
+                   "Jack Russel Terrier Sprite Sheet (Sleep) 2.ase":  {
+                                                                          "frame":  {
+                                                                                        "x":  64,
+                                                                                        "y":  288,
+                                                                                        "w":  32,
+                                                                                        "h":  32
+                                                                                    },
+                                                                          "rotated":  false,
+                                                                          "trimmed":  false,
+                                                                          "spriteSourceSize":  {
+                                                                                                   "x":  0,
+                                                                                                   "y":  0,
+                                                                                                   "w":  32,
+                                                                                                   "h":  32
+                                                                                               },
+                                                                          "sourceSize":  {
+                                                                                             "w":  32,
+                                                                                             "h":  32
+                                                                                         },
+                                                                          "duration":  100
+                                                                      },
+                   "Jack Russel Terrier Sprite Sheet (Sleep) 3.ase":  {
+                                                                          "frame":  {
+                                                                                        "x":  96,
+                                                                                        "y":  288,
+                                                                                        "w":  32,
+                                                                                        "h":  32
+                                                                                    },
+                                                                          "rotated":  false,
+                                                                          "trimmed":  false,
+                                                                          "spriteSourceSize":  {
+                                                                                                   "x":  0,
+                                                                                                   "y":  0,
+                                                                                                   "w":  32,
+                                                                                                   "h":  32
+                                                                                               },
+                                                                          "sourceSize":  {
+                                                                                             "w":  32,
+                                                                                             "h":  32
+                                                                                         },
+                                                                          "duration":  100
+                                                                      },
+                   "Jack Russel Terrier Sprite Sheet (Sleep) 4.ase":  {
+                                                                          "frame":  {
+                                                                                        "x":  128,
+                                                                                        "y":  288,
+                                                                                        "w":  32,
+                                                                                        "h":  32
+                                                                                    },
+                                                                          "rotated":  false,
+                                                                          "trimmed":  false,
+                                                                          "spriteSourceSize":  {
+                                                                                                   "x":  0,
+                                                                                                   "y":  0,
+                                                                                                   "w":  32,
+                                                                                                   "h":  32
+                                                                                               },
+                                                                          "sourceSize":  {
+                                                                                             "w":  32,
+                                                                                             "h":  32
+                                                                                         },
+                                                                          "duration":  100
+                                                                      },
+                   "Jack Russel Terrier Sprite Sheet (Sleep) 5.ase":  {
+                                                                          "frame":  {
+                                                                                        "x":  160,
+                                                                                        "y":  288,
+                                                                                        "w":  32,
+                                                                                        "h":  32
+                                                                                    },
+                                                                          "rotated":  false,
+                                                                          "trimmed":  false,
+                                                                          "spriteSourceSize":  {
+                                                                                                   "x":  0,
+                                                                                                   "y":  0,
+                                                                                                   "w":  32,
+                                                                                                   "h":  32
+                                                                                               },
+                                                                          "sourceSize":  {
+                                                                                             "w":  32,
+                                                                                             "h":  32
+                                                                                         },
+                                                                          "duration":  100
+                                                                      },
+                   "Jack Russel Terrier Sprite Sheet (Sleep) 6.ase":  {
+                                                                          "frame":  {
+                                                                                        "x":  192,
+                                                                                        "y":  288,
+                                                                                        "w":  32,
+                                                                                        "h":  32
+                                                                                    },
+                                                                          "rotated":  false,
+                                                                          "trimmed":  false,
+                                                                          "spriteSourceSize":  {
+                                                                                                   "x":  0,
+                                                                                                   "y":  0,
+                                                                                                   "w":  32,
+                                                                                                   "h":  32
+                                                                                               },
+                                                                          "sourceSize":  {
+                                                                                             "w":  32,
+                                                                                             "h":  32
+                                                                                         },
+                                                                          "duration":  100
+                                                                      },
+                   "Jack Russel Terrier Sprite Sheet (Sleep) 7.ase":  {
+                                                                          "frame":  {
+                                                                                        "x":  224,
+                                                                                        "y":  288,
+                                                                                        "w":  32,
+                                                                                        "h":  32
+                                                                                    },
+                                                                          "rotated":  false,
+                                                                          "trimmed":  false,
+                                                                          "spriteSourceSize":  {
+                                                                                                   "x":  0,
+                                                                                                   "y":  0,
+                                                                                                   "w":  32,
+                                                                                                   "h":  32
+                                                                                               },
+                                                                          "sourceSize":  {
+                                                                                             "w":  32,
+                                                                                             "h":  32
+                                                                                         },
+                                                                          "duration":  100
+                                                                      }
+               },
+    "meta":  {
+                 "app":  "https://www.aseprite.org/",
+                 "version":  "1.3.8.1-x64",
+                 "image":  "Jack Russel Terrier Sprite Sheet.png",
+                 "format":  "RGBA8888",
+                 "size":  {
+                              "w":  256,
+                              "h":  320
+                          },
+                 "scale":  "1",
+                 "frameTags":  [
+
+                               ],
+                 "layers":  [
+                                {
+                                    "name":  "Idle",
+                                    "opacity":  255,
+                                    "blendMode":  "normal"
+                                },
+                                {
+                                    "name":  "Sit Idle",
+                                    "opacity":  255,
+                                    "blendMode":  "normal"
+                                },
+                                {
+                                    "name":  "Movement",
+                                    "opacity":  255,
+                                    "blendMode":  "normal"
+                                },
+                                {
+                                    "name":  "Dash",
+                                    "opacity":  255,
+                                    "blendMode":  "normal"
+                                },
+                                {
+                                    "name":  "Movement- Ball",
+                                    "opacity":  255,
+                                    "blendMode":  "normal"
+                                },
+                                {
+                                    "name":  "Dash- Ball",
+                                    "opacity":  255,
+                                    "blendMode":  "normal"
+                                },
+                                {
+                                    "name":  "Bark",
+                                    "opacity":  255,
+                                    "blendMode":  "normal"
+                                },
+                                {
+                                    "name":  "Bite",
+                                    "opacity":  255,
+                                    "blendMode":  "normal"
+                                },
+                                {
+                                    "name":  "Playful",
+                                    "opacity":  255,
+                                    "blendMode":  "normal"
+                                },
+                                {
+                                    "name":  "Sleep",
+                                    "opacity":  255,
+                                    "blendMode":  "normal"
+                                }
+                            ],
+                 "slices":  [
+
+                            ]
+             }
+}
