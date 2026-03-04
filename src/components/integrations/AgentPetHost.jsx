@@ -29,6 +29,29 @@ function AgentPetHost() {
     ? `${getPetIframeUrl()}&debug=1`
     : getPetIframeUrl();
 
+  function postMessageToPet(payload) {
+    const contentWindow = iframeRef.current?.contentWindow;
+    if (!contentWindow) {
+      return false;
+    }
+
+    contentWindow.postMessage(payload, "*");
+    return true;
+  }
+
+  function pushPetContext() {
+    postMessageToPet({ type: "azdes.pet.refresh" });
+    postMessageToPet({
+      type: "azdes.pet.context",
+      context: {
+        pathname: location.pathname,
+        checklistCompleted: checklistProgress.completed,
+        checklistTotal: checklistProgress.total,
+        topSafeInset,
+      },
+    });
+  }
+
   useEffect(() => {
     if (!isPetSystemEnabled) {
       return;
@@ -47,11 +70,7 @@ function AgentPetHost() {
       toolPath: pathname,
     });
 
-    if (!iframeRef.current?.contentWindow) {
-      return;
-    }
-
-    iframeRef.current.contentWindow.postMessage(
+    postMessageToPet(
       {
         type: "azdes.pet.tool-start",
         context: {
@@ -78,27 +97,7 @@ function AgentPetHost() {
       return;
     }
 
-    if (!iframeRef.current?.contentWindow) {
-      return;
-    }
-
-    iframeRef.current.contentWindow.postMessage(
-      { type: "azdes.pet.refresh" },
-      "*",
-    );
-
-    iframeRef.current.contentWindow.postMessage(
-      {
-        type: "azdes.pet.context",
-        context: {
-          pathname: location.pathname,
-          checklistCompleted: checklistProgress.completed,
-          checklistTotal: checklistProgress.total,
-          topSafeInset,
-        },
-      },
-      "*",
-    );
+    pushPetContext();
   }, [
     checklistProgress.completed,
     checklistProgress.total,
@@ -138,12 +137,12 @@ function AgentPetHost() {
   }, [isPetSystemEnabled]);
 
   useEffect(() => {
-    if (!isPetSystemEnabled || !isDebugPetUi) {
+    if (!isPetSystemEnabled || !petState.profile.enabled || !selectedPetId) {
       return;
     }
 
     const handleWindowClick = (event) => {
-      if (!iframeRef.current?.contentWindow || !iframeRef.current) {
+      if (!iframeRef.current) {
         return;
       }
 
@@ -164,14 +163,11 @@ function AgentPetHost() {
       const localX = event.clientX - bounds.left;
       const localY = event.clientY - bounds.top;
 
-      iframeRef.current.contentWindow.postMessage(
-        {
-          type: "azdes.pet.click",
-          x: localX,
-          y: localY,
-        },
-        "*",
-      );
+      postMessageToPet({
+        type: "azdes.pet.click",
+        x: localX,
+        y: localY,
+      });
     };
 
     window.addEventListener("click", handleWindowClick, true);
@@ -179,7 +175,24 @@ function AgentPetHost() {
     return () => {
       window.removeEventListener("click", handleWindowClick, true);
     };
-  }, [isPetSystemEnabled, isDebugPetUi]);
+  }, [isPetSystemEnabled, petState.profile.enabled, selectedPetId]);
+
+  function handlePetIframeLoad() {
+    pushPetContext();
+
+    const pathname = String(location.pathname || "");
+    if (!pathname || pathname === "/") {
+      return;
+    }
+
+    postMessageToPet({
+      type: "azdes.pet.tool-start",
+      context: {
+        pathname,
+        startedAt: Date.now(),
+      },
+    });
+  }
 
   function handleSimulateInteraction() {
     simulatePetRewardForTesting(5);
@@ -218,6 +231,7 @@ function AgentPetHost() {
         className={`agent-pet-roamer-layer${isDebugPetUi ? " agent-pet-roamer-layer--interactive" : ""}`}
         title="Agent companion roamer"
         src={iframeSrc}
+        onLoad={handlePetIframeLoad}
       />
       {devQuickSimButton}
     </>

@@ -808,7 +808,7 @@ function init() {
       }
 
       if (event?.data?.type === "azdes.pet.tool-start") {
-        engine.triggerTaskCompletionEmotionBurst();
+        engine.triggerTaskCompletionEmotionBurst?.();
       }
     } catch (error) {
       runtimeDiagnostics.logError(

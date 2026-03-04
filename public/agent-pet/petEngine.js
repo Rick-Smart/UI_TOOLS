@@ -408,6 +408,7 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
       start: () => {},
       stop: () => {},
       handleViewportClick: () => {},
+      triggerTaskCompletionEmotionBurst: () => {},
     };
   }
 
