@@ -32,6 +32,14 @@ function TopBar({
   const showPetControls = Boolean(petState?.profile?.unlocked);
   const isPetVisible = Boolean(petState?.profile?.enabled);
   const selectedPetId = petState?.profile?.selectedPetId || "";
+  const toggleCompanionVisibility = () => {
+    if (isPetVisible) {
+      dismissPet();
+      return;
+    }
+
+    showPet();
+  };
 
   return (
     <header className="top-bar" aria-label="Application top bar">
@@ -75,41 +83,39 @@ function TopBar({
 
       <div className="top-bar-actions">
         {showPetControls ? (
-          <div className="top-bar-pet-menu" aria-label="Pet controls">
-            <span className="pill">Pet</span>
-            <label className="sr-only" htmlFor="pet-selector">
-              Choose pet
-            </label>
-            <select
-              id="pet-selector"
-              className="top-bar-pet-select"
-              value={selectedPetId}
-              onChange={(event) => choosePet(event.target.value)}
-            >
-              <option value="">Choose pet</option>
-              {petCatalog.map((pet) => (
-                <option key={pet.id} value={pet.id}>
-                  {pet.name}
-                </option>
-              ))}
-            </select>
+          <div className="top-bar-pet-menu" aria-label="Companion controls">
+            <span className="pill">Companion</span>
             {isPetVisible ? (
-              <AppButton
-                type="button"
-                className="button-secondary"
-                onClick={dismissPet}
-              >
-                Dismiss pet
-              </AppButton>
-            ) : (
-              <AppButton
-                type="button"
-                className="button-secondary"
-                onClick={showPet}
-              >
-                Show pet
-              </AppButton>
-            )}
+              <>
+                <label className="sr-only" htmlFor="pet-selector">
+                  Choose companion
+                </label>
+                <select
+                  id="pet-selector"
+                  className="top-bar-pet-select"
+                  value={selectedPetId}
+                  onChange={(event) => choosePet(event.target.value)}
+                >
+                  <option value="">Choose companion</option>
+                  {petCatalog.map((pet) => (
+                    <option key={pet.id} value={pet.id}>
+                      {pet.name}
+                    </option>
+                  ))}
+                </select>
+              </>
+            ) : null}
+            <AppButton
+              type="button"
+              className="button-secondary"
+              onClick={toggleCompanionVisibility}
+              aria-pressed={isPetVisible}
+              aria-label={
+                isPetVisible ? "Turn companion off" : "Turn companion on"
+              }
+            >
+              Companion
+            </AppButton>
           </div>
         ) : null}
 

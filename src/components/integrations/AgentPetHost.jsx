@@ -180,7 +180,7 @@ function AgentPetHost() {
       <iframe
         ref={iframeRef}
         className={`agent-pet-roamer-layer${isDebugPetUi ? " agent-pet-roamer-layer--interactive" : ""}`}
-        title="Agent pet roamer"
+        title="Agent companion roamer"
         src={iframeSrc}
       />
       {devQuickSimButton}

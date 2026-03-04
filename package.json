@@ -4,7 +4,7 @@
   "version": "2.1.0",
   "type": "module",
   "featureFlags": {
-    "petSystemEnabled": false
+    "petSystemEnabled": true
   },
   "scripts": {
     "dev": "vite",
