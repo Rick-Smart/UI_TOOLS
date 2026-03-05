@@ -1,4 +1,5 @@
 export const beaverBehavior = {
+  capabilities: { propForage: true },
   driftX: 0.0006,
   driftY: 0.00048,
   maxSpeedX: 1.3,

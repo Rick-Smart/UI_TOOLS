@@ -1,4 +1,5 @@
 export const fishBehavior = {
+  capabilities: { schooling: true },
   driftX: 0.0045,
   driftY: 0.0045,
   maxSpeedX: 9,

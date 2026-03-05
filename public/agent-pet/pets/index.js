@@ -12,6 +12,7 @@ import { seagullBehavior } from "./seagull/logic.js";
 import { wolfBehavior } from "./wolf/logic.js";
 import { crowBehavior } from "./crow/logic.js";
 import { foxBehavior } from "./fox/logic.js";
+import { createForagePlugin } from "./beaver/foragePlugin.js";
 
 const PET_BEHAVIOR_PROFILES = {
   "sphynx-cat": sphynxCatBehavior,
@@ -34,4 +35,12 @@ const DEFAULT_PET_ID = Object.keys(PET_BEHAVIOR_PROFILES)[0];
 
 export function getPetBehaviorProfile(petId) {
   return PET_BEHAVIOR_PROFILES[petId] || PET_BEHAVIOR_PROFILES[DEFAULT_PET_ID];
+}
+
+const PET_PLUGINS = {
+  beaver: createForagePlugin,
+};
+
+export function getPetPlugin(petId) {
+  return PET_PLUGINS[petId] || null;
 }
