@@ -1,0 +1,1200 @@
+﻿{
+    "frames":  {
+                   "Wolf Sprite Sheet (Idle) 29.ase":  {
+                                                           "frame":  {
+                                                                         "y":  96,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  160
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 51.ase":  {
+                                                           "frame":  {
+                                                                         "y":  192,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  96
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 2.ase":  {
+                                                          "frame":  {
+                                                                        "y":  0,
+                                                                        "w":  32,
+                                                                        "h":  32,
+                                                                        "x":  64
+                                                                    },
+                                                          "rotated":  false,
+                                                          "spriteSourceSize":  {
+                                                                                   "y":  0,
+                                                                                   "w":  32,
+                                                                                   "h":  32,
+                                                                                   "x":  0
+                                                                               },
+                                                          "trimmed":  false,
+                                                          "sourceSize":  {
+                                                                             "h":  32,
+                                                                             "w":  32
+                                                                         },
+                                                          "duration":  100
+                                                      },
+                   "Wolf Sprite Sheet (Idle) 5.ase":  {
+                                                          "frame":  {
+                                                                        "y":  0,
+                                                                        "w":  32,
+                                                                        "h":  32,
+                                                                        "x":  160
+                                                                    },
+                                                          "rotated":  false,
+                                                          "spriteSourceSize":  {
+                                                                                   "y":  0,
+                                                                                   "w":  32,
+                                                                                   "h":  32,
+                                                                                   "x":  0
+                                                                               },
+                                                          "trimmed":  false,
+                                                          "sourceSize":  {
+                                                                             "h":  32,
+                                                                             "w":  32
+                                                                         },
+                                                          "duration":  100
+                                                      },
+                   "Wolf Sprite Sheet (Idle) 24.ase":  {
+                                                           "frame":  {
+                                                                         "y":  96,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  0
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 26.ase":  {
+                                                           "frame":  {
+                                                                         "y":  96,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  64
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 15.ase":  {
+                                                           "frame":  {
+                                                                         "y":  32,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  224
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 23.ase":  {
+                                                           "frame":  {
+                                                                         "y":  64,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  224
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 53.ase":  {
+                                                           "frame":  {
+                                                                         "y":  192,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  160
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 37.ase":  {
+                                                           "frame":  {
+                                                                         "y":  128,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  160
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 49.ase":  {
+                                                           "frame":  {
+                                                                         "y":  192,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  32
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 46.ase":  {
+                                                           "frame":  {
+                                                                         "y":  160,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  192
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 43.ase":  {
+                                                           "frame":  {
+                                                                         "y":  160,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  96
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 38.ase":  {
+                                                           "frame":  {
+                                                                         "y":  128,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  192
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 34.ase":  {
+                                                           "frame":  {
+                                                                         "y":  128,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  64
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 45.ase":  {
+                                                           "frame":  {
+                                                                         "y":  160,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  160
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 30.ase":  {
+                                                           "frame":  {
+                                                                         "y":  96,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  192
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 52.ase":  {
+                                                           "frame":  {
+                                                                         "y":  192,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  128
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 25.ase":  {
+                                                           "frame":  {
+                                                                         "y":  96,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  32
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 40.ase":  {
+                                                           "frame":  {
+                                                                         "y":  160,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  0
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 41.ase":  {
+                                                           "frame":  {
+                                                                         "y":  160,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  32
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 9.ase":  {
+                                                          "frame":  {
+                                                                        "y":  32,
+                                                                        "w":  32,
+                                                                        "h":  32,
+                                                                        "x":  32
+                                                                    },
+                                                          "rotated":  false,
+                                                          "spriteSourceSize":  {
+                                                                                   "y":  0,
+                                                                                   "w":  32,
+                                                                                   "h":  32,
+                                                                                   "x":  0
+                                                                               },
+                                                          "trimmed":  false,
+                                                          "sourceSize":  {
+                                                                             "h":  32,
+                                                                             "w":  32
+                                                                         },
+                                                          "duration":  100
+                                                      },
+                   "Wolf Sprite Sheet (Idle) 1.ase":  {
+                                                          "frame":  {
+                                                                        "y":  0,
+                                                                        "w":  32,
+                                                                        "h":  32,
+                                                                        "x":  32
+                                                                    },
+                                                          "rotated":  false,
+                                                          "spriteSourceSize":  {
+                                                                                   "y":  0,
+                                                                                   "w":  32,
+                                                                                   "h":  32,
+                                                                                   "x":  0
+                                                                               },
+                                                          "trimmed":  false,
+                                                          "sourceSize":  {
+                                                                             "h":  32,
+                                                                             "w":  32
+                                                                         },
+                                                          "duration":  100
+                                                      },
+                   "Wolf Sprite Sheet (Idle) 8.ase":  {
+                                                          "frame":  {
+                                                                        "y":  32,
+                                                                        "w":  32,
+                                                                        "h":  32,
+                                                                        "x":  0
+                                                                    },
+                                                          "rotated":  false,
+                                                          "spriteSourceSize":  {
+                                                                                   "y":  0,
+                                                                                   "w":  32,
+                                                                                   "h":  32,
+                                                                                   "x":  0
+                                                                               },
+                                                          "trimmed":  false,
+                                                          "sourceSize":  {
+                                                                             "h":  32,
+                                                                             "w":  32
+                                                                         },
+                                                          "duration":  100
+                                                      },
+                   "Wolf Sprite Sheet (Idle) 47.ase":  {
+                                                           "frame":  {
+                                                                         "y":  160,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  224
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 18.ase":  {
+                                                           "frame":  {
+                                                                         "y":  64,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  64
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 48.ase":  {
+                                                           "frame":  {
+                                                                         "y":  192,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  0
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 55.ase":  {
+                                                           "frame":  {
+                                                                         "y":  192,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  224
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 13.ase":  {
+                                                           "frame":  {
+                                                                         "y":  32,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  160
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 20.ase":  {
+                                                           "frame":  {
+                                                                         "y":  64,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  128
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 16.ase":  {
+                                                           "frame":  {
+                                                                         "y":  64,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  0
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 31.ase":  {
+                                                           "frame":  {
+                                                                         "y":  96,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  224
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 10.ase":  {
+                                                           "frame":  {
+                                                                         "y":  32,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  64
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 22.ase":  {
+                                                           "frame":  {
+                                                                         "y":  64,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  192
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 27.ase":  {
+                                                           "frame":  {
+                                                                         "y":  96,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  96
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 39.ase":  {
+                                                           "frame":  {
+                                                                         "y":  128,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  224
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 42.ase":  {
+                                                           "frame":  {
+                                                                         "y":  160,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  64
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 6.ase":  {
+                                                          "frame":  {
+                                                                        "y":  0,
+                                                                        "w":  32,
+                                                                        "h":  32,
+                                                                        "x":  192
+                                                                    },
+                                                          "rotated":  false,
+                                                          "spriteSourceSize":  {
+                                                                                   "y":  0,
+                                                                                   "w":  32,
+                                                                                   "h":  32,
+                                                                                   "x":  0
+                                                                               },
+                                                          "trimmed":  false,
+                                                          "sourceSize":  {
+                                                                             "h":  32,
+                                                                             "w":  32
+                                                                         },
+                                                          "duration":  100
+                                                      },
+                   "Wolf Sprite Sheet (Idle) 3.ase":  {
+                                                          "frame":  {
+                                                                        "y":  0,
+                                                                        "w":  32,
+                                                                        "h":  32,
+                                                                        "x":  96
+                                                                    },
+                                                          "rotated":  false,
+                                                          "spriteSourceSize":  {
+                                                                                   "y":  0,
+                                                                                   "w":  32,
+                                                                                   "h":  32,
+                                                                                   "x":  0
+                                                                               },
+                                                          "trimmed":  false,
+                                                          "sourceSize":  {
+                                                                             "h":  32,
+                                                                             "w":  32
+                                                                         },
+                                                          "duration":  100
+                                                      },
+                   "Wolf Sprite Sheet (Idle) 44.ase":  {
+                                                           "frame":  {
+                                                                         "y":  160,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  128
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 35.ase":  {
+                                                           "frame":  {
+                                                                         "y":  128,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  96
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 12.ase":  {
+                                                           "frame":  {
+                                                                         "y":  32,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  128
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 33.ase":  {
+                                                           "frame":  {
+                                                                         "y":  128,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  32
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 36.ase":  {
+                                                           "frame":  {
+                                                                         "y":  128,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  128
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 0.ase":  {
+                                                          "frame":  {
+                                                                        "y":  0,
+                                                                        "w":  32,
+                                                                        "h":  32,
+                                                                        "x":  0
+                                                                    },
+                                                          "rotated":  false,
+                                                          "spriteSourceSize":  {
+                                                                                   "y":  0,
+                                                                                   "w":  32,
+                                                                                   "h":  32,
+                                                                                   "x":  0
+                                                                               },
+                                                          "trimmed":  false,
+                                                          "sourceSize":  {
+                                                                             "h":  32,
+                                                                             "w":  32
+                                                                         },
+                                                          "duration":  100
+                                                      },
+                   "Wolf Sprite Sheet (Idle) 28.ase":  {
+                                                           "frame":  {
+                                                                         "y":  96,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  128
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 32.ase":  {
+                                                           "frame":  {
+                                                                         "y":  128,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  0
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 19.ase":  {
+                                                           "frame":  {
+                                                                         "y":  64,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  96
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 54.ase":  {
+                                                           "frame":  {
+                                                                         "y":  192,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  192
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 7.ase":  {
+                                                          "frame":  {
+                                                                        "y":  0,
+                                                                        "w":  32,
+                                                                        "h":  32,
+                                                                        "x":  224
+                                                                    },
+                                                          "rotated":  false,
+                                                          "spriteSourceSize":  {
+                                                                                   "y":  0,
+                                                                                   "w":  32,
+                                                                                   "h":  32,
+                                                                                   "x":  0
+                                                                               },
+                                                          "trimmed":  false,
+                                                          "sourceSize":  {
+                                                                             "h":  32,
+                                                                             "w":  32
+                                                                         },
+                                                          "duration":  100
+                                                      },
+                   "Wolf Sprite Sheet (Idle) 17.ase":  {
+                                                           "frame":  {
+                                                                         "y":  64,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  32
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 21.ase":  {
+                                                           "frame":  {
+                                                                         "y":  64,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  160
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 4.ase":  {
+                                                          "frame":  {
+                                                                        "y":  0,
+                                                                        "w":  32,
+                                                                        "h":  32,
+                                                                        "x":  128
+                                                                    },
+                                                          "rotated":  false,
+                                                          "spriteSourceSize":  {
+                                                                                   "y":  0,
+                                                                                   "w":  32,
+                                                                                   "h":  32,
+                                                                                   "x":  0
+                                                                               },
+                                                          "trimmed":  false,
+                                                          "sourceSize":  {
+                                                                             "h":  32,
+                                                                             "w":  32
+                                                                         },
+                                                          "duration":  100
+                                                      },
+                   "Wolf Sprite Sheet (Idle) 50.ase":  {
+                                                           "frame":  {
+                                                                         "y":  192,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  64
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 11.ase":  {
+                                                           "frame":  {
+                                                                         "y":  32,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  96
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       },
+                   "Wolf Sprite Sheet (Idle) 14.ase":  {
+                                                           "frame":  {
+                                                                         "y":  32,
+                                                                         "w":  32,
+                                                                         "h":  32,
+                                                                         "x":  192
+                                                                     },
+                                                           "rotated":  false,
+                                                           "spriteSourceSize":  {
+                                                                                    "y":  0,
+                                                                                    "w":  32,
+                                                                                    "h":  32,
+                                                                                    "x":  0
+                                                                                },
+                                                           "trimmed":  false,
+                                                           "sourceSize":  {
+                                                                              "h":  32,
+                                                                              "w":  32
+                                                                          },
+                                                           "duration":  100
+                                                       }
+               },
+    "meta":  {
+                 "image":  "Wolf Cub Sprite Sheet.png",
+                 "size":  {
+                              "h":  224,
+                              "w":  256
+                          },
+                 "version":  "1.0",
+                 "format":  "RGBA8888",
+                 "slices":  [
+
+                            ],
+                 "scale":  "1",
+                 "app":  "generated-import-crawler",
+                 "frameTags":  [
+
+                               ],
+                 "layers":  [
+
+                            ]
+             }
+}

@@ -20,12 +20,13 @@ const PET_CATALOG = [
   { id: "raccoon", name: "Raccoon", mythical: false },
   { id: "seagull", name: "Seagull", mythical: false },
   { id: "wolf", name: "Wolf", mythical: false },
+  { id: "crow", name: "Crow", mythical: false },
+  { id: "fox", name: "Fox", mythical: false },
 ];
 
 const LEGACY_PET_ID_MAP = {
   cat: "sphynx-cat",
   dog: "jack-russell",
-  crow: "pidgeon",
   raccoon: "raccoon",
   dragonling: "beaver",
 };

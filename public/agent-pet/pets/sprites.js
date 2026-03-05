@@ -10,18 +10,22 @@ import { koalaSprite } from "./koala/sprite.js";
 import { raccoonSprite } from "./raccoon/sprite.js";
 import { seagullSprite } from "./seagull/sprite.js";
 import { wolfSprite } from "./wolf/sprite.js";
+import { crowSprite } from "./crow/sprite.js";
+import { foxSprite } from "./fox/sprite.js";
 
 export const PET_SPRITES = {
   "sphynx-cat": sphynxCatSprite,
   "jack-russell": jackRussellSprite,
-  "pidgeon": pidgeonSprite,
+  pidgeon: pidgeonSprite,
   "red-panda": redPandaSprite,
-  "beaver": beaverSprite,
-  "chameleon": chameleonSprite,
-  "ferret": ferretSprite,
-  "fish": fishSprite,
-  "koala": koalaSprite,
-  "raccoon": raccoonSprite,
-  "seagull": seagullSprite,
-  "wolf": wolfSprite,
+  beaver: beaverSprite,
+  chameleon: chameleonSprite,
+  ferret: ferretSprite,
+  fish: fishSprite,
+  koala: koalaSprite,
+  raccoon: raccoonSprite,
+  seagull: seagullSprite,
+  wolf: wolfSprite,
+  crow: crowSprite,
+  fox: foxSprite,
 };

@@ -52,7 +52,6 @@ const DEFAULT_PET_ID = Object.keys(PET_CATALOG)[0];
 const LEGACY_PET_ID_MAP = {
   cat: "sphynx-cat",
   dog: "jack-russell",
-  crow: "pidgeon",
   raccoon: "raccoon",
   dragonling: "beaver",
 };

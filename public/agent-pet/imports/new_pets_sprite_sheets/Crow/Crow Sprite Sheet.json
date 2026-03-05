@@ -1,0 +1,137 @@
+﻿{
+    "image":  "Crow Sprite Sheet.png",
+    "frameWidth":  64,
+    "frameHeight":  64,
+    "rowPadding":  8,
+    "maxFramesPerRow":  20,
+    "animations":  {
+                       "crow_bothered_ground":  {
+                                                    "row":  0,
+                                                    "frames":  6,
+                                                    "fps":  10,
+                                                    "loop":  true,
+                                                    "pivotMode":  "baseline",
+                                                    "pivot":  {
+                                                                  "x":  32,
+                                                                  "y":  56
+                                                              },
+                                                    "startX":  0,
+                                                    "startY":  0,
+                                                    "spacingX":  0,
+                                                    "spacingY":  8,
+                                                    "notes":  "Strip-packed from approved animation strips; frames left→right."
+                                                },
+                       "crow_idle_forward":  {
+                                                 "row":  1,
+                                                 "frames":  20,
+                                                 "fps":  10,
+                                                 "loop":  true,
+                                                 "pivotMode":  "baseline",
+                                                 "pivot":  {
+                                                               "x":  32,
+                                                               "y":  56
+                                                           },
+                                                 "startX":  0,
+                                                 "startY":  72,
+                                                 "spacingX":  0,
+                                                 "spacingY":  8,
+                                                 "notes":  "Strip-packed from approved animation strips; frames left→right."
+                                             },
+                       "crow_idle_away":  {
+                                              "row":  2,
+                                              "frames":  16,
+                                              "fps":  10,
+                                              "loop":  true,
+                                              "pivotMode":  "baseline",
+                                              "pivot":  {
+                                                            "x":  32,
+                                                            "y":  56
+                                                        },
+                                              "startX":  0,
+                                              "startY":  144,
+                                              "spacingX":  0,
+                                              "spacingY":  8,
+                                              "notes":  "Strip-packed from approved animation strips; frames left→right."
+                                          },
+                       "crow_fly_S":  {
+                                          "row":  3,
+                                          "frames":  8,
+                                          "fps":  10,
+                                          "loop":  true,
+                                          "pivotMode":  "com",
+                                          "pivot":  {
+                                                        "x":  32,
+                                                        "y":  32
+                                                    },
+                                          "startX":  0,
+                                          "startY":  216,
+                                          "spacingX":  0,
+                                          "spacingY":  8,
+                                          "notes":  "Strip-packed from approved animation strips; frames left→right."
+                                      },
+                       "crow_fly_W":  {
+                                          "row":  4,
+                                          "frames":  8,
+                                          "fps":  10,
+                                          "loop":  true,
+                                          "pivotMode":  "com",
+                                          "pivot":  {
+                                                        "x":  32,
+                                                        "y":  32
+                                                    },
+                                          "startX":  0,
+                                          "startY":  288,
+                                          "spacingX":  0,
+                                          "spacingY":  8,
+                                          "notes":  "Strip-packed from approved animation strips; frames left→right."
+                                      },
+                       "crow_fly_SW":  {
+                                           "row":  5,
+                                           "frames":  8,
+                                           "fps":  10,
+                                           "loop":  true,
+                                           "pivotMode":  "com",
+                                           "pivot":  {
+                                                         "x":  32,
+                                                         "y":  32
+                                                     },
+                                           "startX":  0,
+                                           "startY":  360,
+                                           "spacingX":  0,
+                                           "spacingY":  8,
+                                           "notes":  "Strip-packed from approved animation strips; frames left→right."
+                                       },
+                       "crow_fly_NW":  {
+                                           "row":  6,
+                                           "frames":  8,
+                                           "fps":  10,
+                                           "loop":  true,
+                                           "pivotMode":  "com",
+                                           "pivot":  {
+                                                         "x":  32,
+                                                         "y":  32
+                                                     },
+                                           "startX":  0,
+                                           "startY":  432,
+                                           "spacingX":  0,
+                                           "spacingY":  8,
+                                           "notes":  "Strip-packed from approved animation strips; frames left→right."
+                                       },
+                       "crow_fly_N":  {
+                                          "row":  7,
+                                          "frames":  8,
+                                          "fps":  10,
+                                          "loop":  true,
+                                          "pivotMode":  "com",
+                                          "pivot":  {
+                                                        "x":  32,
+                                                        "y":  32
+                                                    },
+                                          "startX":  0,
+                                          "startY":  504,
+                                          "spacingX":  0,
+                                          "spacingY":  8,
+                                          "notes":  "Strip-packed from approved animation strips; frames left→right."
+                                      }
+                   }
+}

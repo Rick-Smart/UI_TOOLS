@@ -1201,7 +1201,12 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
       );
   }
 
-  function pickAnimationPoolVariant(petId, poolName, keys) {
+  function pickAnimationPoolVariant(
+    petId,
+    poolName,
+    keys,
+    weightsByKey = null,
+  ) {
     const normalizedKeys = Array.isArray(keys)
       ? keys.map((key) => String(key || "").trim()).filter(Boolean)
       : [];
@@ -1219,6 +1224,64 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
       index: -1,
       lastKey: "",
     };
+
+    const hasWeights =
+      weightsByKey &&
+      typeof weightsByKey === "object" &&
+      !Array.isArray(weightsByKey);
+
+    if (hasWeights) {
+      const weightedCandidates = normalizedKeys
+        .map((key) => {
+          const rawWeight = Number(weightsByKey[key]);
+          const safeWeight = Number.isFinite(rawWeight)
+            ? Math.max(0, rawWeight)
+            : 1;
+          return {
+            key,
+            weight: safeWeight,
+          };
+        })
+        .filter((item) => item.weight > 0);
+
+      if (weightedCandidates.length) {
+        const dampened = weightedCandidates.map((item) => ({ ...item }));
+        if (dampened.length > 1 && poolState.lastKey) {
+          const lastItem = dampened.find(
+            (item) => item.key === poolState.lastKey,
+          );
+          if (lastItem) {
+            lastItem.weight *= 0.2;
+          }
+        }
+
+        const totalWeight = dampened.reduce(
+          (sum, item) => sum + Math.max(0, item.weight),
+          0,
+        );
+
+        if (totalWeight > 0) {
+          const roll = nextRandom() * totalWeight;
+          let cumulative = 0;
+          let weightedPick = dampened[dampened.length - 1].key;
+          for (const item of dampened) {
+            cumulative += Math.max(0, item.weight);
+            if (roll <= cumulative) {
+              weightedPick = item.key;
+              break;
+            }
+          }
+
+          petBucket.set(poolName, {
+            index: normalizedKeys.indexOf(weightedPick),
+            lastKey: weightedPick,
+          });
+          animationPoolStateByPet.set(petId, petBucket);
+
+          return weightedPick;
+        }
+      }
+    }
 
     let nextIndex = (poolState.index + 1) % normalizedKeys.length;
     let candidate = normalizedKeys[nextIndex];
@@ -1294,6 +1357,109 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
     }
 
     return false;
+  }
+
+  function resolveDirectionalFlightVisual({
+    selectedAnimationKey,
+    activeAnimationKey,
+    animationSet,
+    profile,
+    velocityX,
+    velocityY,
+  }) {
+    const config = profile?.directionalFlight || {};
+    if (config.enabled !== true || !animationSet) {
+      return null;
+    }
+
+    const allowedActionKeys = new Set(
+      Array.isArray(config.actionKeys)
+        ? config.actionKeys.map((item) => toActionKey(item)).filter(Boolean)
+        : [],
+    );
+    const normalizedSelectedKey = toActionKey(selectedAnimationKey);
+    if (
+      allowedActionKeys.size > 0 &&
+      !allowedActionKeys.has(normalizedSelectedKey)
+    ) {
+      return null;
+    }
+
+    const headingX = Number(velocityX) || 0;
+    const headingY = Number(velocityY) || 0;
+    const headingSpeed = Math.hypot(headingX, headingY);
+    const minSpeed = Math.max(0.01, Number(config.minSpeed ?? 0.2));
+    if (headingSpeed < minSpeed) {
+      return null;
+    }
+
+    const northKey = toActionKey(config.northKey || "");
+    const southKey = toActionKey(config.southKey || "");
+    const westKey = toActionKey(config.westKey || "");
+    const northWestKey = toActionKey(config.northWestKey || "");
+    const southWestKey = toActionKey(config.southWestKey || "");
+    const activeDirectionalKey = toActionKey(activeAnimationKey);
+    const directionalKeys = new Set(
+      [northKey, southKey, westKey, northWestKey, southWestKey].filter(Boolean),
+    );
+    const mirrorEast = config.mirrorEast !== false;
+
+    const hasFrames = (key) =>
+      Boolean(key && animationSet?.[key]?.frames?.length);
+    if (headingSpeed < minSpeed) {
+      if (
+        directionalKeys.has(activeDirectionalKey) &&
+        hasFrames(activeDirectionalKey)
+      ) {
+        return {
+          animationKey: activeDirectionalKey,
+          forceFlipHorizontal: null,
+          disableTilt: config.disableTilt === true,
+        };
+      }
+
+      return null;
+    }
+
+    const headingDeg =
+      ((Math.atan2(-headingY, headingX) * 180) / Math.PI + 360) % 360;
+
+    let directionalKey = "";
+    let forceFlipHorizontal = null;
+
+    if (headingDeg >= 22.5 && headingDeg < 67.5) {
+      directionalKey = northWestKey;
+      forceFlipHorizontal = mirrorEast ? true : null;
+    } else if (headingDeg >= 67.5 && headingDeg < 112.5) {
+      directionalKey = northKey;
+    } else if (headingDeg >= 112.5 && headingDeg < 157.5) {
+      directionalKey = northWestKey;
+      forceFlipHorizontal = false;
+    } else if (headingDeg >= 157.5 && headingDeg < 202.5) {
+      directionalKey = westKey;
+      forceFlipHorizontal = false;
+    } else if (headingDeg >= 202.5 && headingDeg < 247.5) {
+      directionalKey = southWestKey;
+      forceFlipHorizontal = false;
+    } else if (headingDeg >= 247.5 && headingDeg < 292.5) {
+      directionalKey = southKey;
+    } else if (headingDeg >= 292.5 && headingDeg < 337.5) {
+      directionalKey = southWestKey;
+      forceFlipHorizontal = mirrorEast ? true : null;
+    } else {
+      directionalKey = westKey;
+      forceFlipHorizontal = mirrorEast ? true : null;
+    }
+
+    if (!hasFrames(directionalKey)) {
+      return null;
+    }
+
+    return {
+      animationKey: directionalKey,
+      forceFlipHorizontal,
+      disableTilt: config.disableTilt === true,
+    };
   }
 
   function reseedForPet(petId) {
@@ -2312,7 +2478,7 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
             environmentDesiredState,
           );
           const transitionAnimationKey = toActionKey(transitionSpec?.key);
-          const transitionDurationMs = Math.max(
+          let transitionDurationMs = Math.max(
             280,
             Math.round(pickInRange(transitionSpec?.durationMs || [420, 760])),
           );
@@ -2325,6 +2491,25 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
               key: transitionAnimationKey,
               sequenceState: null,
             });
+
+          if (
+            canUseTransitionAnimation &&
+            transitionSpec?.requireFullAnimation
+          ) {
+            const transitionAnimation = animationSet?.[transitionAnimationKey];
+            const transitionLoops = Math.max(
+              1,
+              Number(transitionSpec?.fullAnimationLoops || 1),
+            );
+            const fullDurationMs = estimateAnimationDurationMs(
+              transitionAnimation,
+              transitionLoops,
+            );
+            transitionDurationMs = Math.max(
+              transitionDurationMs,
+              Math.round(fullDurationMs),
+            );
+          }
 
           if (canUseTransitionAnimation) {
             environmentTransitionState = {
@@ -2471,7 +2656,12 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
         playfulActionKey: beaverLogCycleActionKey || playfulActionKey,
         animationPools: behaviorProfile?.animationPools || {},
         pickPoolKey: (poolName, keys) =>
-          pickAnimationPoolVariant(state.selectedPetId, poolName, keys),
+          pickAnimationPoolVariant(
+            state.selectedPetId,
+            poolName,
+            keys,
+            behaviorProfile?.animationPoolWeights?.[poolName] || null,
+          ),
         isAnimationAllowed: (key) =>
           isAnimationSelectableOutsideSequence({
             petId: state.selectedPetId,
@@ -2545,8 +2735,30 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
       animationStateReason = resolvedAnimationState.nextState.reason;
       animationStatePriority = resolvedAnimationState.nextState.priority;
       animationStateUntil = resolvedAnimationState.nextState.until;
-      const selectedAnimationKey = resolvedAnimationState.key;
-      const animationReason = resolvedAnimationState.reason;
+      let selectedAnimationKey = resolvedAnimationState.key;
+      let animationReason = resolvedAnimationState.reason;
+      const isHardLockedAnimation =
+        Boolean(forcedAnimationKey && animationSet?.[forcedAnimationKey]) ||
+        canForceSequenceAnimation ||
+        canForceEnvironmentTransition;
+
+      const directionalFlightVisual = isHardLockedAnimation
+        ? null
+        : resolveDirectionalFlightVisual({
+            selectedAnimationKey,
+            activeAnimationKey,
+            animationSet,
+            profile: behaviorProfile,
+            velocityX: velocity.x,
+            velocityY: velocity.y,
+          });
+      const directionalFlightVisualActive = Boolean(
+        directionalFlightVisual?.animationKey,
+      );
+      if (directionalFlightVisualActive) {
+        selectedAnimationKey = directionalFlightVisual.animationKey;
+        animationReason = `${animationReason}|directional-flight`;
+      }
 
       const selectedAnimation =
         selectedAnimationKey && animationSet
@@ -2611,7 +2823,9 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
       const sprite = safeFrameSource[frameIndex] || safeFrameSource[0];
 
       const scale = atlasEnabled ? DEFAULT_ATLAS_SCALE : 4;
-      const tunedScale = scale * scaleMultiplier * PET_SIZE_MULTIPLIER;
+      const petSizeMultiplier = Math.max(0.2, Number(pet?.sizeMultiplier || 1));
+      const tunedScale =
+        scale * scaleMultiplier * PET_SIZE_MULTIPLIER * petSizeMultiplier;
       const spriteHeight = atlasEnabled
         ? (Number(sprite?.h) || 16) * tunedScale
         : sprite.length * tunedScale;
@@ -3181,7 +3395,10 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
         fishVisualTiltRad = lerp(fishVisualTiltRad, 0, 0.32);
       }
 
-      const birdTiltEnabled = isFlightBoidsPet && isBirdInFlightAction;
+      const birdTiltEnabled =
+        isFlightBoidsPet &&
+        isBirdInFlightAction &&
+        !directionalFlightVisual?.disableTilt;
       const birdTiltSmoothing = 0.2;
       const birdTiltMinSpeed = 0.16;
 
@@ -3244,6 +3461,14 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
       const visibleCenterX = frameMetrics
         ? (frameMetrics.minX + frameMetrics.visibleWidth * 0.5) * tunedScale
         : spriteWidth * 0.5;
+      const groundAnchorRatioRaw = Number(shadow.groundAnchorRatio);
+      const airborneAnchorRatioRaw = Number(shadow.airborneAnchorRatio);
+      const groundAnchorRatio = Number.isFinite(groundAnchorRatioRaw)
+        ? clamp01(groundAnchorRatioRaw)
+        : null;
+      const airborneAnchorRatio = Number.isFinite(airborneAnchorRatioRaw)
+        ? clamp01(airborneAnchorRatioRaw)
+        : null;
 
       const groundedWidth = Math.max(14, visibleWidth - groundWidthPad);
       const airborneWidthRaw = Math.max(10, visibleWidth - airborneWidthPad);
@@ -3251,9 +3476,22 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
 
       const shadowOffset = lerp(groundOffset, airborneOffset, shadowLift);
       const shadowWidth = lerp(groundedWidth, airborneWidth, shadowLift);
+      const groundShadowBaseY =
+        groundAnchorRatio === null
+          ? originY + visibleBottom
+          : originY + spriteHeight * groundAnchorRatio;
+      const airborneShadowBaseY =
+        airborneAnchorRatio === null
+          ? groundShadowBaseY
+          : originY + spriteHeight * airborneAnchorRatio;
+      const shadowBaseY = lerp(
+        groundShadowBaseY,
+        airborneShadowBaseY,
+        shadowLift,
+      );
       const shadowX = Math.round(originX + visibleCenterX - shadowWidth / 2);
       const shadowY = Math.round(
-        originY + visibleBottom + shadowOffset + shadowOffsetAdjust,
+        shadowBaseY + shadowOffset + shadowOffsetAdjust,
       );
 
       if (!sequenceHiddenStage) {
@@ -3303,9 +3541,13 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
           const defaultFacing = String(
             pet?.atlas?.facing || "right",
           ).toLowerCase();
-          const flipHorizontal =
+          const naturalFlipHorizontal =
             (defaultFacing === "right" && facingDirection === "left") ||
             (defaultFacing === "left" && facingDirection === "right");
+          const flipHorizontal =
+            typeof directionalFlightVisual?.forceFlipHorizontal === "boolean"
+              ? directionalFlightVisual.forceFlipHorizontal
+              : naturalFlipHorizontal;
           if (atlasImage?.complete) {
             const leadTiltRad = fishTiltEnabled
               ? leadFishTiltRad
@@ -3476,6 +3718,15 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
           availableAnimationKeys,
           frameSourceKind: safeFrameSourceKind,
           forcedAnimationKey: forcedAnimationKey || null,
+          directionalFlight: {
+            active: directionalFlightVisualActive,
+            key: directionalFlightVisual?.animationKey || null,
+            forcedFlip:
+              typeof directionalFlightVisual?.forceFlipHorizontal === "boolean"
+                ? directionalFlightVisual.forceFlipHorizontal
+                : null,
+            hardLocked: isHardLockedAnimation,
+          },
           baseSpeedMultiplier: BASE_PET_SPEED_MULTIPLIER,
           baseAtlasScale: DEFAULT_ATLAS_SCALE,
           effectiveSpeedMultiplier: Number(speedMultiplier.toFixed(3)),

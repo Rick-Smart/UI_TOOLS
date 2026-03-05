@@ -10,20 +10,24 @@ import { koalaBehavior } from "./koala/logic.js";
 import { raccoonBehavior } from "./raccoon/logic.js";
 import { seagullBehavior } from "./seagull/logic.js";
 import { wolfBehavior } from "./wolf/logic.js";
+import { crowBehavior } from "./crow/logic.js";
+import { foxBehavior } from "./fox/logic.js";
 
 const PET_BEHAVIOR_PROFILES = {
   "sphynx-cat": sphynxCatBehavior,
   "jack-russell": jackRussellBehavior,
-  "pidgeon": pidgeonBehavior,
+  pidgeon: pidgeonBehavior,
   "red-panda": redPandaBehavior,
-  "beaver": beaverBehavior,
-  "chameleon": chameleonBehavior,
-  "ferret": ferretBehavior,
-  "fish": fishBehavior,
-  "koala": koalaBehavior,
-  "raccoon": raccoonBehavior,
-  "seagull": seagullBehavior,
-  "wolf": wolfBehavior,
+  beaver: beaverBehavior,
+  chameleon: chameleonBehavior,
+  ferret: ferretBehavior,
+  fish: fishBehavior,
+  koala: koalaBehavior,
+  raccoon: raccoonBehavior,
+  seagull: seagullBehavior,
+  wolf: wolfBehavior,
+  crow: crowBehavior,
+  fox: foxBehavior,
 };
 
 const DEFAULT_PET_ID = Object.keys(PET_BEHAVIOR_PROFILES)[0];

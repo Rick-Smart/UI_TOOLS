@@ -1,0 +1,192 @@
+﻿{
+    "frames":  {
+                   "Raccoon Sprite Sheet (Idle) 1.ase":  {
+                                                             "frame":  {
+                                                                           "y":  0,
+                                                                           "w":  64,
+                                                                           "h":  64,
+                                                                           "x":  64
+                                                                       },
+                                                             "rotated":  false,
+                                                             "spriteSourceSize":  {
+                                                                                      "y":  0,
+                                                                                      "w":  64,
+                                                                                      "h":  64,
+                                                                                      "x":  0
+                                                                                  },
+                                                             "trimmed":  false,
+                                                             "sourceSize":  {
+                                                                                "h":  64,
+                                                                                "w":  64
+                                                                            },
+                                                             "duration":  100
+                                                         },
+                   "Raccoon Sprite Sheet (Idle) 0.ase":  {
+                                                             "frame":  {
+                                                                           "y":  0,
+                                                                           "w":  64,
+                                                                           "h":  64,
+                                                                           "x":  0
+                                                                       },
+                                                             "rotated":  false,
+                                                             "spriteSourceSize":  {
+                                                                                      "y":  0,
+                                                                                      "w":  64,
+                                                                                      "h":  64,
+                                                                                      "x":  0
+                                                                                  },
+                                                             "trimmed":  false,
+                                                             "sourceSize":  {
+                                                                                "h":  64,
+                                                                                "w":  64
+                                                                            },
+                                                             "duration":  100
+                                                         },
+                   "Raccoon Sprite Sheet (Idle) 2.ase":  {
+                                                             "frame":  {
+                                                                           "y":  0,
+                                                                           "w":  64,
+                                                                           "h":  64,
+                                                                           "x":  128
+                                                                       },
+                                                             "rotated":  false,
+                                                             "spriteSourceSize":  {
+                                                                                      "y":  0,
+                                                                                      "w":  64,
+                                                                                      "h":  64,
+                                                                                      "x":  0
+                                                                                  },
+                                                             "trimmed":  false,
+                                                             "sourceSize":  {
+                                                                                "h":  64,
+                                                                                "w":  64
+                                                                            },
+                                                             "duration":  100
+                                                         },
+                   "Raccoon Sprite Sheet (Idle) 4.ase":  {
+                                                             "frame":  {
+                                                                           "y":  64,
+                                                                           "w":  64,
+                                                                           "h":  64,
+                                                                           "x":  0
+                                                                       },
+                                                             "rotated":  false,
+                                                             "spriteSourceSize":  {
+                                                                                      "y":  0,
+                                                                                      "w":  64,
+                                                                                      "h":  64,
+                                                                                      "x":  0
+                                                                                  },
+                                                             "trimmed":  false,
+                                                             "sourceSize":  {
+                                                                                "h":  64,
+                                                                                "w":  64
+                                                                            },
+                                                             "duration":  100
+                                                         },
+                   "Raccoon Sprite Sheet (Idle) 6.ase":  {
+                                                             "frame":  {
+                                                                           "y":  64,
+                                                                           "w":  64,
+                                                                           "h":  64,
+                                                                           "x":  128
+                                                                       },
+                                                             "rotated":  false,
+                                                             "spriteSourceSize":  {
+                                                                                      "y":  0,
+                                                                                      "w":  64,
+                                                                                      "h":  64,
+                                                                                      "x":  0
+                                                                                  },
+                                                             "trimmed":  false,
+                                                             "sourceSize":  {
+                                                                                "h":  64,
+                                                                                "w":  64
+                                                                            },
+                                                             "duration":  100
+                                                         },
+                   "Raccoon Sprite Sheet (Idle) 7.ase":  {
+                                                             "frame":  {
+                                                                           "y":  64,
+                                                                           "w":  64,
+                                                                           "h":  64,
+                                                                           "x":  192
+                                                                       },
+                                                             "rotated":  false,
+                                                             "spriteSourceSize":  {
+                                                                                      "y":  0,
+                                                                                      "w":  64,
+                                                                                      "h":  64,
+                                                                                      "x":  0
+                                                                                  },
+                                                             "trimmed":  false,
+                                                             "sourceSize":  {
+                                                                                "h":  64,
+                                                                                "w":  64
+                                                                            },
+                                                             "duration":  100
+                                                         },
+                   "Raccoon Sprite Sheet (Idle) 3.ase":  {
+                                                             "frame":  {
+                                                                           "y":  0,
+                                                                           "w":  64,
+                                                                           "h":  64,
+                                                                           "x":  192
+                                                                       },
+                                                             "rotated":  false,
+                                                             "spriteSourceSize":  {
+                                                                                      "y":  0,
+                                                                                      "w":  64,
+                                                                                      "h":  64,
+                                                                                      "x":  0
+                                                                                  },
+                                                             "trimmed":  false,
+                                                             "sourceSize":  {
+                                                                                "h":  64,
+                                                                                "w":  64
+                                                                            },
+                                                             "duration":  100
+                                                         },
+                   "Raccoon Sprite Sheet (Idle) 5.ase":  {
+                                                             "frame":  {
+                                                                           "y":  64,
+                                                                           "w":  64,
+                                                                           "h":  64,
+                                                                           "x":  64
+                                                                       },
+                                                             "rotated":  false,
+                                                             "spriteSourceSize":  {
+                                                                                      "y":  0,
+                                                                                      "w":  64,
+                                                                                      "h":  64,
+                                                                                      "x":  0
+                                                                                  },
+                                                             "trimmed":  false,
+                                                             "sourceSize":  {
+                                                                                "h":  64,
+                                                                                "w":  64
+                                                                            },
+                                                             "duration":  100
+                                                         }
+               },
+    "meta":  {
+                 "image":  "Raccoon Sprite Sheet.png",
+                 "size":  {
+                              "h":  128,
+                              "w":  256
+                          },
+                 "version":  "1.0",
+                 "format":  "RGBA8888",
+                 "slices":  [
+
+                            ],
+                 "scale":  "1",
+                 "app":  "generated-import-crawler",
+                 "frameTags":  [
+
+                               ],
+                 "layers":  [
+
+                            ]
+             }
+}

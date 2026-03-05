@@ -1,0 +1,50 @@
+{
+  "fox_idle_stand": {
+    "row": 0,
+    "frames": 6,
+    "frameWidth": 64,
+    "frameHeight": 64
+  },
+  "fox_stand_to_stretch": {
+    "row": 1,
+    "frames": 6,
+    "frameWidth": 64,
+    "frameHeight": 64
+  },
+  "fox_stretch_to_stand": {
+    "row": 2,
+    "frames": 6,
+    "frameWidth": 64,
+    "frameHeight": 64
+  },
+  "fox_stand_to_lie": {
+    "row": 3,
+    "frames": 6,
+    "frameWidth": 64,
+    "frameHeight": 64
+  },
+  "fox_sleep_idle": {
+    "row": 4,
+    "frames": 6,
+    "frameWidth": 64,
+    "frameHeight": 64
+  },
+  "fox_lie_to_stand": {
+    "row": 5,
+    "frames": 6,
+    "frameWidth": 64,
+    "frameHeight": 64
+  },
+  "fox_walk": {
+    "row": 6,
+    "frames": 6,
+    "frameWidth": 64,
+    "frameHeight": 64
+  },
+  "fox_inspect": {
+    "row": 7,
+    "frames": 6,
+    "frameWidth": 64,
+    "frameHeight": 64
+  }
+}
