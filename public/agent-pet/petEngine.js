@@ -593,7 +593,10 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
             safeFrameSource,
             activeAnimationTick,
             frameDuration,
-            { holdOnLastFrame: Boolean(selectedAnimation?.holdOnLastFrame) },
+            {
+              holdOnLastFrame: Boolean(selectedAnimation?.holdOnLastFrame),
+              segments: selectedAnimation?.segments ?? null,
+            },
           )
         : Math.floor(frame / frameDuration) % safeFrameSource.length;
       const sprite = safeFrameSource[frameIndex] || safeFrameSource[0];
@@ -991,7 +994,9 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
       }
 
       // ── Frame bookkeeping ─────────────────────────────────────────────────
-      if (!forceFreeze) activeAnimationTick += 1;
+      // Normalize by target frame time so animations run at consistent speed
+      // regardless of actual frame rate (30fps, 60fps, 120fps, etc.).
+      if (!forceFreeze) activeAnimationTick += deltaMs / (1000 / 60);
       frame += 1;
       rafId = window.requestAnimationFrame(render);
     } catch (error) {

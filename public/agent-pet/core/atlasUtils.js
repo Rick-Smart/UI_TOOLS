@@ -12,8 +12,105 @@ function clamp01(v) {
 }
 
 /**
+ * Build the ordered list of frame indices for one segment's playback.
+ *
+ * mode "forward"  — plays frameIndices once (or N times for loops > 1)
+ * mode "pingpong" — seamless bounce: [0,1,2,1] repeating, always exits at
+ *                   the start of the range after N full cycles.
+ *                   For a 2-element range this degrades to forward looping.
+ *                   For a 1-element range this holds on that frame.
+ */
+function buildSegmentSequence(frames, frameIndices, mode, loops, defaultDuration) {
+  const n = Math.max(1, Math.round(Number(loops) || 1));
+  const indices = (Array.isArray(frameIndices) ? frameIndices : []).map((i) =>
+    Math.max(0, Math.min(frames.length - 1, Number(i) || 0)),
+  );
+  if (!indices.length) return [];
+
+  if (mode === "pingpong") {
+    if (indices.length === 1) {
+      // single frame — just hold it
+      return Array.from({ length: n }, () => indices[0]).flat();
+    }
+    // Seamless unit: fwd + inner-reverse (exclude both turnaround endpoints).
+    // e.g. [3,4,5] → unit = [3,4,5,4], looped gives [3,4,5,4, 3,4,5,4, …]
+    const reversed = [...indices].reverse();
+    const returnInner = reversed.slice(1, -1); // exclude first (far end) and last (near end)
+    const unit = [...indices, ...returnInner];
+    return Array.from({ length: n }, () => unit).flat();
+  }
+
+  // "forward" (default)
+  return Array.from({ length: n }, () => indices).flat();
+}
+
+/**
+ * Resolve frame index using an explicit segments definition.
+ * Segments are walked in order; the animation proceeds through each segment's
+ * full tick budget before advancing to the next.
+ * The last segment loops (or holds, if holdOnLastFrame / seg.holdOnLastFrame).
+ */
+function resolveSegmentedFrame(frames, segments, tickCount, defaultDuration, holdOnLastFrame) {
+  let elapsed = 0;
+
+  for (let si = 0; si < segments.length; si += 1) {
+    const seg = segments[si];
+    const isLast = si === segments.length - 1;
+    const mode = String(seg.mode || "forward");
+    const loops = Math.max(1, Number(seg.loops) || 1);
+    const sequence = buildSegmentSequence(frames, seg.frameIndices, mode, loops, defaultDuration);
+    if (!sequence.length) continue;
+
+    const segTicks = sequence.reduce(
+      (sum, fi) => sum + Math.max(1, Number(frames[fi]?.ticks) || defaultDuration),
+      0,
+    );
+    const segEnd = elapsed + segTicks;
+    const holdThis = isLast && (holdOnLastFrame || Boolean(seg.holdOnLastFrame));
+
+    if (tickCount < segEnd || holdThis) {
+      if (holdThis && tickCount >= segEnd) {
+        return sequence[sequence.length - 1];
+      }
+      const localTick = tickCount - elapsed;
+      let acc = 0;
+      for (const fi of sequence) {
+        acc += Math.max(1, Number(frames[fi]?.ticks) || defaultDuration);
+        if (localTick < acc) return fi;
+      }
+      return sequence[sequence.length - 1];
+    }
+
+    if (isLast) {
+      // Past all segments with no hold — loop the last segment
+      const localTick = (tickCount - elapsed) % segTicks;
+      let acc = 0;
+      for (const fi of sequence) {
+        acc += Math.max(1, Number(frames[fi]?.ticks) || defaultDuration);
+        if (localTick < acc) return fi;
+      }
+      return sequence[sequence.length - 1];
+    }
+
+    elapsed = segEnd;
+  }
+
+  return 0;
+}
+
+/**
  * Resolve which frame index to display given accumulated animation ticks.
- * Supports per-frame variable duration via frameRect.ticks and holdOnLastFrame.
+ *
+ * Standard mode (no segments): plays frames in order, loops, with optional
+ * per-frame variable duration via frameRect.ticks and holdOnLastFrame.
+ *
+ * Segmented mode (options.segments present): plays named segments in sequence,
+ * each with its own frameIndices subset, playback mode, and loop count.
+ * Segment modes:
+ *   "forward"  — play frameIndices once (or loops times)
+ *   "pingpong" — seamless bounce between frameIndices, N full cycles
+ * The last segment loops forever unless holdOnLastFrame or seg.holdOnLastFrame
+ * is set, in which case it freezes on the final frame.
  */
 export function resolveFrameIndexByTicks(
   frames,
@@ -25,6 +122,11 @@ export function resolveFrameIndexByTicks(
     return 0;
   }
   const holdOnLastFrame = Boolean(options.holdOnLastFrame);
+
+  if (Array.isArray(options.segments) && options.segments.length) {
+    return resolveSegmentedFrame(frames, options.segments, tickCount, defaultDuration, holdOnLastFrame);
+  }
+
   const totalTicks = frames.reduce(
     (sum, f) => sum + Math.max(1, Number(f?.ticks) || defaultDuration),
     0,
