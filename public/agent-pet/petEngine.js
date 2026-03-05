@@ -442,6 +442,7 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
   let fishSchoolTargetCount = 0;
   let fishSchoolFollowers = [];
   let fishVisualTiltRad = 0;
+  let birdVisualTiltRad = 0;
   let fishPathTracePoints = [];
   let fishPathTraceLastAt = 0;
   let fishFollowerPathTraces = [];
@@ -988,12 +989,6 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
         separationY += (position.y - Number(fish.y || 0)) / distance;
         separationSamples += 1;
       }
-    }
-
-    if (!neighbors) {
-      velocity.x *= 0.985;
-      velocity.y *= 0.985;
-      return;
     }
 
     const limitVector = (valueX, valueY, maxMagnitude) => {
@@ -1952,6 +1947,7 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
         fishSchoolFollowers = [];
         fishFollowerTraceSeed = 0;
         fishVisualTiltRad = 0;
+        birdVisualTiltRad = 0;
         fishPathTracePoints = [];
         fishPathTraceLastAt = 0;
         fishFollowerPathTraces = [];
@@ -2664,9 +2660,24 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
         allowMovementByAnimation &&
         effectiveMovementIntent;
       const isFishSelected = state.selectedPetId === "fish";
+      const inFlightBoidsConfig = behaviorProfile?.inFlightBoids || {};
+      const isFlightBoidsPet =
+        !isFishSelected && inFlightBoidsConfig.enabled === true;
+      const inFlightBoidsActionKeys = Array.isArray(
+        inFlightBoidsConfig.actionKeys,
+      )
+        ? inFlightBoidsConfig.actionKeys
+            .map((item) => toActionKey(item))
+            .filter(Boolean)
+        : ["flap", "glide", "glide-2", "flight"];
+      const isBirdInFlightAction =
+        inFlightBoidsActionKeys.includes(currentActionKey);
+      const useBirdInFlightBoids =
+        isFlightBoidsPet && isBirdInFlightAction && movementActive;
 
       updateMotion(spriteWidth, spriteHeight, state, {
-        allowMovement: isFishSelected ? false : movementActive,
+        allowMovement:
+          isFishSelected || useBirdInFlightBoids ? false : movementActive,
         speedMultiplier,
         profile: behaviorProfile,
         overrideTarget:
@@ -2685,6 +2696,22 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
         overrideTargetPull:
           beaverLogCyclePhase === "approach" ? 0.0062 : 0.0038,
       });
+
+      if (useBirdInFlightBoids) {
+        if (fishSchoolFollowers.length) {
+          fishSchoolFollowers = [];
+          fishSchoolTargetCount = 0;
+          fishFollowerPathTraces = [];
+          fishFollowerTraceSeed = 0;
+        }
+
+        updateLeadFishWithBoids({
+          spriteWidth,
+          spriteHeight,
+          deltaMs,
+          boidConfig: behaviorProfile?.boids || {},
+        });
+      }
 
       const shadow = pet.shadow || {};
       const airborneActions = Array.isArray(shadow.airborneActions)
@@ -2889,8 +2916,6 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
           );
       }
 
-      const isBirdSelected =
-        state.selectedPetId === "seagull" || state.selectedPetId === "pidgeon";
       const birdWindConfig = behaviorProfile?.effects?.windTrail || {};
       const birdLandingConfig = behaviorProfile?.effects?.landingDust || {};
       const isBirdAirborneAction = /flight|flap|glide/.test(currentActionKey);
@@ -2898,7 +2923,7 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
       const isBirdIdleAction = /^idle($|-)/.test(currentActionKey);
 
       if (
-        isBirdSelected &&
+        isFlightBoidsPet &&
         birdWindConfig.enabled !== false &&
         isBirdAirborneAction &&
         movementActive &&
@@ -2933,7 +2958,7 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
       }
 
       if (
-        isBirdSelected &&
+        isFlightBoidsPet &&
         birdLandingConfig.enabled !== false &&
         now >= birdLandingDustCooldownUntil &&
         wasBirdAirborneAction &&
@@ -3156,6 +3181,27 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
         fishVisualTiltRad = lerp(fishVisualTiltRad, 0, 0.32);
       }
 
+      const birdTiltEnabled = isFlightBoidsPet && isBirdInFlightAction;
+      const birdTiltSmoothing = 0.2;
+      const birdTiltMinSpeed = 0.16;
+
+      let leadBirdTiltRad = 0;
+      if (birdTiltEnabled) {
+        const leadSpeed = Math.hypot(velocity.x, velocity.y);
+        const leadRawTilt =
+          leadSpeed >= birdTiltMinSpeed
+            ? Math.atan2(velocity.y, Math.max(Math.abs(velocity.x), 0.0001))
+            : 0;
+        birdVisualTiltRad = lerp(
+          birdVisualTiltRad,
+          leadRawTilt,
+          birdTiltSmoothing,
+        );
+        leadBirdTiltRad = birdVisualTiltRad;
+      } else {
+        birdVisualTiltRad = lerp(birdVisualTiltRad, 0, 0.28);
+      }
+
       lastBounds = {
         x: originX,
         y: originY,
@@ -3261,10 +3307,12 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
             (defaultFacing === "right" && facingDirection === "left") ||
             (defaultFacing === "left" && facingDirection === "right");
           if (atlasImage?.complete) {
-            const leadRenderTilt = flipHorizontal
-              ? -leadFishTiltRad
-              : leadFishTiltRad;
-            if (fishTiltEnabled) {
+            const leadTiltRad = fishTiltEnabled
+              ? leadFishTiltRad
+              : leadBirdTiltRad;
+            const leadRenderTilt = flipHorizontal ? -leadTiltRad : leadTiltRad;
+            const leadTiltEnabled = fishTiltEnabled || birdTiltEnabled;
+            if (leadTiltEnabled) {
               drawAtlasFrameTransformed(
                 ctx,
                 atlasImage,
