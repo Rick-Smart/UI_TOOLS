@@ -2,8 +2,26 @@ import { createPetEngine } from "./petEngine.js";
 import { buildPetState, queryAgentId } from "./petState.js";
 
 function shouldShowDebugOverlay() {
-  return false;
+  try {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("debug") === "1";
+  } catch {
+    return false;
+  }
 }
+
+function applyLabBackground() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("lab") === "1") {
+      document.body.style.background = "#2d2d35";
+    }
+  } catch {
+    // ignore
+  }
+}
+
+applyLabBackground();
 
 function createTuningPanel() {
   const cloneValue = (value) => {

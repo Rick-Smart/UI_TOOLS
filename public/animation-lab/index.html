@@ -1,0 +1,2278 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Animation Lab</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #1a1a24;
+        --surface: #22223a;
+        --surface2: #2a2a40;
+        --border: rgba(148, 163, 184, 0.15);
+        --border-hi: rgba(99, 179, 237, 0.5);
+        --text: #e2e8f0;
+        --muted: #64748b;
+        --accent: #3b82f6;
+        --accent-hi: #60a5fa;
+        --danger: #ef4444;
+        --green: #22c55e;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family:
+          system-ui,
+          -apple-system,
+          sans-serif;
+        font-size: 13px;
+        display: grid;
+        grid-template-rows: auto 1fr;
+        grid-template-columns: 1fr;
+        height: 100dvh;
+        overflow: hidden;
+      }
+
+      /* ── HEADER ── */
+      header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 8px 14px;
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+      }
+      header h1 {
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        color: var(--accent-hi);
+        white-space: nowrap;
+      }
+      .tab-bar {
+        display: flex;
+        gap: 2px;
+      }
+      .tab {
+        padding: 4px 14px;
+        border-radius: 5px;
+        border: 1px solid transparent;
+        cursor: pointer;
+        background: transparent;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 600;
+        transition: all 0.15s;
+      }
+      .tab.active {
+        background: var(--accent);
+        color: #fff;
+        border-color: var(--accent);
+      }
+      .tab:not(.active):hover {
+        background: var(--surface2);
+        color: var(--text);
+      }
+
+      select,
+      input[type="text"],
+      input[type="number"] {
+        background: var(--surface2);
+        color: var(--text);
+        border: 1px solid var(--border);
+        border-radius: 5px;
+        padding: 3px 7px;
+        font-size: 12px;
+      }
+      select:focus,
+      input:focus {
+        outline: 2px solid var(--border-hi);
+        outline-offset: 1px;
+      }
+
+      button {
+        padding: 4px 12px;
+        border-radius: 5px;
+        border: 1px solid var(--border);
+        background: var(--surface2);
+        color: var(--text);
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      button:hover {
+        background: var(--surface);
+        border-color: rgba(148, 163, 184, 0.4);
+      }
+      button.primary {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+      }
+      button.primary:hover {
+        background: var(--accent-hi);
+      }
+      button.danger {
+        background: transparent;
+        border-color: var(--danger);
+        color: var(--danger);
+      }
+      button.danger:hover {
+        background: var(--danger);
+        color: #fff;
+      }
+      button.success {
+        background: var(--green);
+        border-color: var(--green);
+        color: #fff;
+      }
+
+      /* ── MAIN AREA ── */
+      main {
+        display: grid;
+        overflow: hidden;
+      }
+
+      /* ── TAB: VIEWER ── */
+      #tab-viewer {
+        display: grid;
+        grid-template-columns: 1fr;
+        overflow: hidden;
+      }
+      .viewer-wrap {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        height: 100%;
+      }
+      .viewer-toolbar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 6px 10px;
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+      }
+      .viewer-toolbar label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--muted);
+      }
+      #pet-frame-wrap {
+        flex: 1;
+        position: relative;
+        overflow: hidden;
+        background: #2d2d35;
+      }
+      #pet-frame-wrap iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+      }
+
+      /* ── TAB: BUILDER ── */
+      #tab-builder {
+        display: none;
+        grid-template-columns: 1fr var(--preview-w, 300px) 460px;
+        grid-template-rows: 1fr;
+        overflow: hidden;
+        gap: 0;
+        transition: grid-template-columns 0.2s ease;
+      }
+      #tab-builder.active {
+        display: grid;
+      }
+      #tab-builder.sheet-collapsed {
+        grid-template-columns: 32px 1fr 1fr;
+      }
+      #tab-builder.resizing {
+        transition: none;
+      }
+
+      #panel-sheet.collapsed .panel-body {
+        display: none;
+      }
+      #panel-sheet.collapsed .panel-header {
+        writing-mode: vertical-rl;
+        justify-content: flex-start;
+        gap: 6px;
+        padding: 10px 8px;
+        cursor: pointer;
+      }
+      #panel-sheet.collapsed .panel-header .sheet-header-right {
+        display: none;
+      }
+      #btn-collapse-sheet {
+        background: transparent;
+        border: none;
+        color: var(--muted);
+        font-size: 14px;
+        padding: 0 2px;
+        cursor: pointer;
+        line-height: 1;
+        flex-shrink: 0;
+      }
+      #btn-collapse-sheet:hover {
+        color: var(--text);
+      }
+
+      /* ── Column resize handle ── */
+      #panel-preview {
+        position: relative;
+      }
+      .col-resizer {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 8px;
+        cursor: col-resize;
+        transform: translateX(-4px);
+        z-index: 20;
+        display: flex;
+        align-items: stretch;
+        justify-content: center;
+      }
+      .col-resizer::after {
+        content: "";
+        width: 2px;
+        background: transparent;
+        border-radius: 1px;
+        transition: background 0.15s;
+      }
+      .col-resizer:hover::after,
+      .col-resizer.dragging::after {
+        background: var(--accent);
+      }
+
+      /* Panel shared styles */
+      .panel {
+        display: flex;
+        flex-direction: column;
+        border-right: 1px solid var(--border);
+        overflow: hidden;
+        background: var(--surface);
+      }
+      .panel:last-child {
+        border-right: none;
+      }
+      .panel-header {
+        padding: 8px 12px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--muted);
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .panel-header span {
+        margin-left: auto;
+      }
+      .panel-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 10px;
+      }
+
+      /* ── LEFT: Sprite sheet picker ── */
+      .sheet-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 8px 10px;
+        border-bottom: 1px solid var(--border);
+        background: var(--surface);
+        flex-shrink: 0;
+      }
+      .sheet-meta-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .sheet-meta-row label {
+        color: var(--muted);
+        min-width: 70px;
+      }
+
+      #sheet-canvas-wrap {
+        position: relative;
+        display: inline-block;
+        cursor: crosshair;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        overflow: hidden;
+        line-height: 0;
+      }
+      #sheet-canvas {
+        display: block;
+        image-rendering: pixelated;
+      }
+      #sheet-overlay {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+
+      /* ── MIDDLE: Sequence ── */
+      .anim-meta {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+        padding: 8px 10px;
+        border-bottom: 1px solid var(--border);
+        background: var(--surface);
+        flex-shrink: 0;
+      }
+      .anim-meta .full {
+        grid-column: 1 / -1;
+      }
+      .meta-field {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
+      .meta-field label {
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .meta-field input,
+      .meta-field select {
+        width: 100%;
+      }
+
+      #sequence-list {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .seq-frame {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 5px 8px;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 5px;
+        transition:
+          background 0.1s,
+          border-color 0.1s;
+      }
+      .seq-frame.active-frame {
+        background: rgba(59, 130, 246, 0.2);
+        border-color: var(--accent);
+      }
+      .seq-frame canvas {
+        image-rendering: pixelated;
+        border-radius: 3px;
+        flex-shrink: 0;
+      }
+      .seq-frame .frame-info {
+        flex: 1;
+        min-width: 0;
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .seq-frame .frame-ticks {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .seq-frame .frame-ticks label {
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .seq-frame .frame-ticks input {
+        width: 44px;
+      }
+      .frame-offsets {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        font-size: 10px;
+        color: var(--muted);
+      }
+      .frame-offsets input {
+        width: 38px;
+        font-size: 10px;
+        padding: 2px 4px;
+        background: var(--surface);
+        border-color: transparent;
+      }
+      .frame-offsets input:not([value="0"]) {
+        border-color: rgba(250, 204, 21, 0.5);
+        color: #facc15;
+      }
+      .seq-frame-btns {
+        display: flex;
+        gap: 3px;
+      }
+      .seq-frame-btns button {
+        padding: 2px 6px;
+        font-size: 11px;
+      }
+      .empty-seq {
+        color: var(--muted);
+        font-size: 12px;
+        text-align: center;
+        padding: 24px 0;
+      }
+
+      .seq-actions {
+        display: flex;
+        gap: 6px;
+        padding: 8px 10px;
+        border-top: 1px solid var(--border);
+        flex-shrink: 0;
+      }
+
+      /* ── RIGHT: Preview + output ── */
+      .preview-canvas-wrap {
+        background: #2d2d35;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-bottom: 1px solid var(--border);
+        flex: 0 0 var(--canvas-sz, 280px);
+        position: relative;
+        overflow: hidden;
+      }
+      #preview-canvas {
+        image-rendering: pixelated;
+        display: block;
+        width: var(--canvas-sz, 280px);
+        height: var(--canvas-sz, 280px);
+      }
+      .preview-info {
+        font-size: 11px;
+        color: var(--muted);
+        text-align: center;
+        padding: 4px 6px 2px;
+        flex-shrink: 0;
+      }
+      #preview-scrub {
+        padding: 2px 10px 6px;
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+      }
+      #scrub-slider {
+        width: 100%;
+        accent-color: var(--accent);
+        cursor: pointer;
+      }
+      .preview-controls {
+        display: flex;
+        gap: 5px;
+        flex-wrap: wrap;
+        padding: 8px 10px;
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+      }
+      .preview-controls button {
+        flex: 1;
+        min-width: 0;
+        font-size: 11px;
+        padding: 4px 6px;
+      }
+      #output-strip {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        min-height: 0;
+      }
+      #output-box {
+        flex: 1;
+        width: 100%;
+        resize: none;
+        background: #111118;
+        color: #a5f3a0;
+        border: none;
+        padding: 8px 10px;
+        font-family: "Cascadia Code", "Fira Code", monospace;
+        font-size: 10px;
+        line-height: 1.5;
+        overflow-y: auto;
+        min-height: 0;
+      }
+      .paste-hint {
+        font-size: 10px;
+        color: var(--muted);
+        padding: 5px 10px;
+        border-top: 1px solid var(--border);
+        line-height: 1.5;
+        flex-shrink: 0;
+      }
+      .paste-hint code {
+        color: var(--accent-hi);
+        background: var(--surface2);
+        padding: 1px 4px;
+        border-radius: 3px;
+      }
+
+      /* ── BG swatches ── */
+      .bg-swatches {
+        display: flex;
+        gap: 4px;
+        align-items: center;
+      }
+      .bg-swatch {
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+        border: 2px solid transparent;
+        cursor: pointer;
+        padding: 0;
+        flex-shrink: 0;
+        transition: border-color 0.12s;
+      }
+      .bg-swatch.active {
+        border-color: var(--accent-hi);
+      }
+
+      /* ── Drag-select rubberband overlay ── */
+      #drag-select-rect {
+        position: absolute;
+        border: 2px dashed #facc15;
+        background: rgba(250, 204, 21, 0.12);
+        pointer-events: none;
+        display: none;
+        z-index: 30;
+      }
+
+      /* ── Playback extras strip ── */
+      .playback-extras {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
+        padding: 6px 10px;
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+        font-size: 11px;
+      }
+      .playback-extras label {
+        color: var(--muted);
+        white-space: nowrap;
+      }
+      .playback-extras select,
+      .playback-extras input[type="number"] {
+        font-size: 11px;
+        padding: 2px 5px;
+      }
+      .playback-extras input[type="range"] {
+        accent-color: var(--accent);
+        width: 80px;
+        cursor: pointer;
+      }
+      #speed-display {
+        color: var(--accent-hi);
+        min-width: 28px;
+      }
+      #btn-onion {
+        font-size: 11px;
+        padding: 3px 8px;
+      }
+      #btn-onion.active {
+        background: rgba(59, 130, 246, 0.3);
+        border-color: var(--accent-hi);
+        color: var(--accent-hi);
+      }
+
+      /* ── seq-actions ── */
+      .seq-actions {
+        flex-wrap: wrap;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>⚗ Animation Lab</h1>
+      <div class="tab-bar">
+        <button class="tab active" data-tab="viewer">Pet Viewer</button>
+        <button class="tab" data-tab="builder">Animation Builder</button>
+      </div>
+      <label
+        style="
+          margin-left: 8px;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          color: var(--muted);
+        "
+      >
+        Pet:
+        <select id="pet-select">
+          <option value="sphynx-cat">Sphynx Cat</option>
+          <option value="jack-russell">Jack Russell</option>
+          <option value="pidgeon">Pidgeon</option>
+          <option value="red-panda">Red Panda</option>
+          <option value="beaver">Beaver</option>
+          <option value="chameleon">Chameleon</option>
+          <option value="ferret">Ferret</option>
+          <option value="fish">Fish</option>
+          <option value="koala">Koala</option>
+          <option value="raccoon">Raccoon</option>
+          <option value="seagull">Seagull</option>
+          <option value="wolf">Wolf</option>
+          <option value="crow">Crow</option>
+          <option value="fox">Fox</option>
+        </select>
+      </label>
+    </header>
+
+    <main>
+      <!-- ══ TAB: VIEWER ══ -->
+      <div id="tab-viewer" class="viewer-wrap">
+        <div class="viewer-toolbar">
+          <span style="color: var(--muted)"
+            >Pet Viewer — live pet with debug panel</span
+          >
+        </div>
+        <div id="pet-frame-wrap">
+          <iframe
+            id="pet-iframe"
+            src="../agent-pet/index.html?debug=1&lab=1"
+            title="Pet preview"
+          ></iframe>
+        </div>
+      </div>
+
+      <!-- ══ TAB: BUILDER ══ -->
+      <div id="tab-builder">
+        <!-- LEFT: sprite sheet -->
+        <div class="panel" id="panel-sheet">
+          <div class="panel-header">
+            Sprite Sheet
+            <span
+              class="sheet-header-right"
+              style="
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin-left: auto;
+              "
+            >
+              <span
+                id="sheet-status"
+                style="
+                  color: var(--muted);
+                  font-size: 11px;
+                  font-weight: 400;
+                  text-transform: none;
+                "
+                >— select a pet to load</span
+              >
+              <button id="btn-collapse-sheet" title="Collapse sprite sheet">
+                ◀
+              </button>
+            </span>
+          </div>
+          <div class="sheet-meta">
+            <div class="sheet-meta-row">
+              <label>Frame W</label>
+              <input
+                type="number"
+                id="frame-w"
+                value="32"
+                min="1"
+                max="512"
+                style="width: 60px"
+              />
+              <label>Frame H</label>
+              <input
+                type="number"
+                id="frame-h"
+                value="32"
+                min="1"
+                max="512"
+                style="width: 60px"
+              />
+              <label>Scale</label>
+              <input
+                type="number"
+                id="sheet-scale"
+                value="2"
+                min="1"
+                max="8"
+                style="width: 46px"
+              />
+            </div>
+            <div class="sheet-meta-row">
+              <label>Offset X</label>
+              <input
+                type="number"
+                id="offset-x"
+                value="0"
+                min="0"
+                max="512"
+                style="width: 52px"
+              />
+              <label>Offset Y</label>
+              <input
+                type="number"
+                id="offset-y"
+                value="0"
+                min="0"
+                max="512"
+                style="width: 52px"
+              />
+              <label>Gutter X</label>
+              <input
+                type="number"
+                id="gutter-x"
+                value="0"
+                min="0"
+                max="256"
+                style="width: 52px"
+              />
+              <label>Gutter Y</label>
+              <input
+                type="number"
+                id="gutter-y"
+                value="0"
+                min="0"
+                max="256"
+                style="width: 52px"
+              />
+            </div>
+            <div
+              class="sheet-meta-row"
+              style="font-size: 11px; color: var(--muted)"
+            >
+              Click a cell to add it to the sequence. Hover to preview.
+            </div>
+          </div>
+          <div class="panel-body">
+            <div id="sheet-canvas-wrap" style="position: relative">
+              <canvas id="sheet-canvas"></canvas>
+              <canvas id="sheet-overlay"></canvas>
+              <div id="drag-select-rect"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MIDDLE: preview + output -->
+        <div class="panel" id="panel-preview">
+          <div class="col-resizer" id="resizer-preview"></div>
+          <div class="panel-header">Preview</div>
+          <div class="preview-canvas-wrap">
+            <canvas id="preview-canvas" width="280" height="280"></canvas>
+          </div>
+          <div class="preview-info" id="preview-info">
+            No frames in sequence
+          </div>
+          <div id="preview-scrub">
+            <input
+              type="range"
+              id="scrub-slider"
+              min="0"
+              max="0"
+              step="1"
+              value="0"
+            />
+          </div>
+          <div class="playback-extras">
+            <label>BG:</label>
+            <div class="bg-swatches">
+              <button
+                class="bg-swatch active"
+                data-bg="checker"
+                title="Checkerboard"
+                style="
+                  background: linear-gradient(
+                    45deg,
+                    #333340 25%,
+                    #2a2a35 25%,
+                    #2a2a35 50%,
+                    #333340 50%,
+                    #333340 75%,
+                    #2a2a35 75%
+                  );
+                "
+              ></button>
+              <button
+                class="bg-swatch"
+                data-bg="black"
+                title="Black"
+                style="background: #000"
+              ></button>
+              <button
+                class="bg-swatch"
+                data-bg="white"
+                title="White"
+                style="background: #fff"
+              ></button>
+              <button
+                class="bg-swatch"
+                data-bg="#1a1a24"
+                title="Dark (app bg)"
+                style="background: #1a1a24"
+              ></button>
+            </div>
+            <label style="margin-left: 6px">Speed:</label>
+            <input
+              type="range"
+              id="speed-mult"
+              min="0.25"
+              max="4"
+              step="0.25"
+              value="1"
+            />
+            <span id="speed-display">1.0×</span>
+            <span style="color: var(--muted); font-size: 10px; margin-left: 2px"
+              >(preview only)</span
+            >
+            <label style="margin-left: 6px">Mode:</label>
+            <select id="play-mode">
+              <option value="loop">Loop</option>
+              <option value="pingpong">Ping-pong</option>
+              <option value="once">Play once</option>
+            </select>
+            <button
+              id="btn-onion"
+              title="Toggle onion skin (show prev frame at 30%)"
+            >
+              🧅 Onion
+            </button>
+          </div>
+          <div class="preview-controls">
+            <button id="btn-preview-play" class="success">▶ Play</button>
+            <button id="btn-preview-pause">⏸ Pause</button>
+            <button id="btn-generate" class="primary">Generate JSON</button>
+            <button id="btn-copy" class="primary" disabled>Copy JSON</button>
+          </div>
+          <div id="output-strip">
+            <textarea
+              id="output-box"
+              readonly
+              placeholder="// Click Generate JSON to produce output"
+            ></textarea>
+            <div class="paste-hint">
+              Paste into <code>animations: { }</code> in<br />
+              <code>pets/{pet}/sprite.js</code>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: sequence builder -->
+        <div class="panel" id="panel-seq" style="border-right: none">
+          <div class="panel-header">
+            Sequence Builder
+            <span
+              id="frame-count-badge"
+              style="
+                color: var(--accent-hi);
+                font-weight: 400;
+                text-transform: none;
+                font-size: 11px;
+              "
+              >0 frames</span
+            >
+          </div>
+          <div class="anim-meta">
+            <div class="meta-field full">
+              <label>Import existing animation</label>
+              <div style="display: flex; gap: 6px; align-items: center">
+                <select id="import-anim-select" style="flex: 1">
+                  <option value="">— choose animation —</option>
+                </select>
+                <button id="btn-import-anim">Import</button>
+              </div>
+            </div>
+            <div class="meta-field full">
+              <label>Animation Key (camelCase, no spaces)</label>
+              <input
+                type="text"
+                id="anim-key"
+                placeholder="e.g. customSpin"
+                value=""
+              />
+            </div>
+            <div class="meta-field full">
+              <label>Title (display name)</label>
+              <input
+                type="text"
+                id="anim-title"
+                placeholder="e.g. Custom Spin"
+                value=""
+              />
+            </div>
+            <div class="meta-field">
+              <label>Category</label>
+              <select id="anim-category">
+                <option value="idle">idle</option>
+                <option value="movement">movement</option>
+                <option value="interaction" selected>interaction</option>
+                <option value="positive">positive</option>
+                <option value="negative">negative</option>
+                <option value="environment">environment</option>
+              </select>
+            </div>
+            <div class="meta-field">
+              <label>Playable</label>
+              <select id="anim-playable">
+                <option value="true" selected>true</option>
+                <option value="false">false</option>
+              </select>
+            </div>
+            <div class="meta-field">
+              <label>Ticks/frame (sets all)</label>
+              <input
+                type="number"
+                id="default-ticks"
+                value="6"
+                min="1"
+                max="120"
+                style="width: 60px"
+              />
+            </div>
+          </div>
+          <div class="panel-body">
+            <div id="sequence-list">
+              <div class="empty-seq">
+                No frames yet.<br />Click cells in the sprite sheet to add
+                frames.
+              </div>
+            </div>
+          </div>
+          <div class="seq-actions">
+            <button id="btn-clear" class="danger">Clear All</button>
+          </div>
+        </div>
+      </div>
+      <!-- /tab-builder -->
+    </main>
+
+    <script type="module">
+      // ─────────────────────────────────────────────────────────────
+      // Pet catalog — mirrors public/agent-pet/pets/sprites.js
+      // ─────────────────────────────────────────────────────────────
+      const PET_CATALOG = {
+        "sphynx-cat": {
+          name: "Sphynx Cat",
+          spriteUrl: "../agent-pet/pets/sphynx-cat/sprite.js",
+          sheetSrc: "../agent-pet/pets/sphynx-cat/media/sheet.png",
+        },
+        "jack-russell": {
+          name: "Jack Russell",
+          spriteUrl: "../agent-pet/pets/jack-russell/sprite.js",
+          sheetSrc: "../agent-pet/pets/jack-russell/media/sheet.png",
+        },
+        pidgeon: {
+          name: "Pidgeon",
+          spriteUrl: "../agent-pet/pets/pidgeon/sprite.js",
+          sheetSrc: "../agent-pet/pets/pidgeon/media/sheet.png",
+        },
+        "red-panda": {
+          name: "Red Panda",
+          spriteUrl: "../agent-pet/pets/red-panda/sprite.js",
+          sheetSrc: "../agent-pet/pets/red-panda/media/sheet.png",
+        },
+        beaver: {
+          name: "Beaver",
+          spriteUrl: "../agent-pet/pets/beaver/sprite.js",
+          sheetSrc: "../agent-pet/pets/beaver/media/sheet.png",
+        },
+        chameleon: {
+          name: "Chameleon",
+          spriteUrl: "../agent-pet/pets/chameleon/sprite.js",
+          sheetSrc: "../agent-pet/pets/chameleon/media/sheet.png",
+        },
+        ferret: {
+          name: "Ferret",
+          spriteUrl: "../agent-pet/pets/ferret/sprite.js",
+          sheetSrc: "../agent-pet/pets/ferret/media/sheet.png",
+        },
+        fish: {
+          name: "Fish",
+          spriteUrl: "../agent-pet/pets/fish/sprite.js",
+          sheetSrc: "../agent-pet/pets/fish/media/sheet.png",
+        },
+        koala: {
+          name: "Koala",
+          spriteUrl: "../agent-pet/pets/koala/sprite.js",
+          sheetSrc: "../agent-pet/pets/koala/media/sheet.png",
+        },
+        raccoon: {
+          name: "Raccoon",
+          spriteUrl: "../agent-pet/pets/raccoon/sprite.js",
+          sheetSrc: "../agent-pet/pets/raccoon/media/sheet.png",
+        },
+        seagull: {
+          name: "Seagull",
+          spriteUrl: "../agent-pet/pets/seagull/sprite.js",
+          sheetSrc: "../agent-pet/pets/seagull/media/sheet.png",
+        },
+        wolf: {
+          name: "Wolf",
+          spriteUrl: "../agent-pet/pets/wolf/sprite.js",
+          sheetSrc: "../agent-pet/pets/wolf/media/sheet.png",
+        },
+        crow: {
+          name: "Crow",
+          spriteUrl: "../agent-pet/pets/crow/sprite.js",
+          sheetSrc: "../agent-pet/pets/crow/media/sheet.png",
+        },
+        fox: {
+          name: "Fox",
+          spriteUrl: "../agent-pet/pets/fox/sprite.js",
+          sheetSrc: "../agent-pet/pets/fox/media/sheet.png",
+        },
+      };
+
+      // ─────────────────────────────────────────────────────────────
+      // State
+      // ─────────────────────────────────────────────────────────────
+      const STORAGE_KEY_PROFILE = "azdes.pet.v1.agent.agent-default.profile";
+      const STORAGE_KEY_LAB = "azdes.animlab.builder.v1";
+
+      let currentPetId = "beaver";
+      let spriteData = null; // loaded sprite.js export
+      let sheetImage = null; // HTMLImageElement
+      let frameW = 32;
+      let frameH = 32;
+      let offsetX = 0; // px margin from left edge before first column
+      let offsetY = 0; // px margin from top edge before first row
+      let gutterX = 0; // px gap between columns
+      let gutterY = 0; // px gap between rows
+      let displayScale = 2;
+      let sequence = []; // [{ x, y, w, h, ticks, col, row }]
+      let previewRunning = true;
+      let previewTick = 0;
+      let previewFrame = 0;
+      let lastTs = null;
+      let rafId = null;
+      let hoveredCell = null; // { col, row }
+      let activeFrameIdx = -1; // currently displayed frame index
+      let scrubbing = false; // true while user drags the slider
+      // feature: preview bg
+      let previewBg = "checker"; // 'checker' | 'black' | 'white' | '#1a1a24'
+      // feature: speed multiplier
+      let speedMult = 1.0;
+      // feature: ping-pong / play-once
+      let playMode = "loop"; // 'loop' | 'pingpong' | 'once'
+      let pingPongDir = 1; // +1 forward, -1 backward
+      let loopDone = false; // play-once finished flag
+      // feature: onion skin
+      let onionSkin = false;
+      // feature: drag-select on sheet
+      let dragSelecting = false;
+      let dragStart = null; // { col, row } cell coords
+      let dragEnd = null; // { col, row } cell coords
+
+      // ─────────────────────────────────────────────────────────────
+      // DOM refs
+      // ─────────────────────────────────────────────────────────────
+      const petSelect = document.getElementById("pet-select");
+      const frameWInput = document.getElementById("frame-w");
+      const frameHInput = document.getElementById("frame-h");
+      const offsetXInput = document.getElementById("offset-x");
+      const offsetYInput = document.getElementById("offset-y");
+      const gutterXInput = document.getElementById("gutter-x");
+      const gutterYInput = document.getElementById("gutter-y");
+      const scaleInput = document.getElementById("sheet-scale");
+      const sheetCanvas = document.getElementById("sheet-canvas");
+      const sheetOverlay = document.getElementById("sheet-overlay");
+      const sheetStatus = document.getElementById("sheet-status");
+      const seqList = document.getElementById("sequence-list");
+      const frameCountBadge = document.getElementById("frame-count-badge");
+      const animKeyInput = document.getElementById("anim-key");
+      const animTitleInput = document.getElementById("anim-title");
+      const animCategory = document.getElementById("anim-category");
+      const animPlayable = document.getElementById("anim-playable");
+      const defaultTicks = document.getElementById("default-ticks");
+      const previewCanvas = document.getElementById("preview-canvas");
+      const previewInfo = document.getElementById("preview-info");
+      const outputBox = document.getElementById("output-box");
+      const btnClear = document.getElementById("btn-clear");
+      const btnGenerate = document.getElementById("btn-generate");
+      const btnCopy = document.getElementById("btn-copy");
+      const btnPlay = document.getElementById("btn-preview-play");
+      const btnPause = document.getElementById("btn-preview-pause");
+      const scrubSlider = document.getElementById("scrub-slider");
+      const petIframe = document.getElementById("pet-iframe");
+      // new feature refs
+      const importAnimSelect = document.getElementById("import-anim-select");
+      const btnImportAnim = document.getElementById("btn-import-anim");
+      const speedMultInput = document.getElementById("speed-mult");
+      const speedDisplay = document.getElementById("speed-display");
+      const playModeSelect = document.getElementById("play-mode");
+      const btnOnion = document.getElementById("btn-onion");
+      const dragSelectRect = document.getElementById("drag-select-rect");
+      document.querySelectorAll(".bg-swatch").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document
+            .querySelectorAll(".bg-swatch")
+            .forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          previewBg = btn.dataset.bg;
+          if (!previewRunning) drawPreviewEmpty();
+        });
+      });
+
+      // ─────────────────────────────────────────────────────────────
+      // Tab switching
+      // ─────────────────────────────────────────────────────────────
+      document.querySelectorAll(".tab").forEach((tab) => {
+        tab.addEventListener("click", () => {
+          document
+            .querySelectorAll(".tab")
+            .forEach((t) => t.classList.remove("active"));
+          tab.classList.add("active");
+          const id = tab.dataset.tab;
+          document.getElementById("tab-viewer").style.display =
+            id === "viewer" ? "" : "none";
+          const builder = document.getElementById("tab-builder");
+          builder.style.display = id === "builder" ? "" : "none";
+          if (id === "builder") builder.classList.add("active");
+          else builder.classList.remove("active");
+          if (id === "builder" && sheetImage === null) loadPet(currentPetId);
+          if (id === "builder") startPreviewLoop();
+          else stopPreviewLoop();
+        });
+      });
+
+      // ─────────────────────────────────────────────────────────────
+      // Pet viewer tab: mirror localStorage selection to iframe
+      // ─────────────────────────────────────────────────────────────
+      function initViewerPetSelect() {
+        try {
+          const profile = JSON.parse(
+            localStorage.getItem(STORAGE_KEY_PROFILE) || "{}",
+          );
+          const storedId = profile.selectedPetId;
+          if (
+            storedId &&
+            [...petSelect.options].some((o) => o.value === storedId)
+          ) {
+            petSelect.value = storedId;
+            currentPetId = storedId;
+          }
+        } catch {
+          /* ignore */
+        }
+      }
+
+      function setViewerPet(id) {
+        try {
+          const existing = JSON.parse(
+            localStorage.getItem(STORAGE_KEY_PROFILE) || "{}",
+          );
+          localStorage.setItem(
+            STORAGE_KEY_PROFILE,
+            JSON.stringify({ ...existing, selectedPetId: id }),
+          );
+        } catch {
+          /* ignore */
+        }
+        petIframe.src = "../agent-pet/index.html?debug=1&lab=1";
+      }
+
+      petSelect.addEventListener("change", () => {
+        currentPetId = petSelect.value;
+        setViewerPet(currentPetId);
+        sheetImage = null; // force reload if builder is opened
+        if (
+          !document.getElementById("tab-builder").classList.contains("active")
+        )
+          return;
+        loadPet(currentPetId);
+      });
+
+      // ─────────────────────────────────────────────────────────────
+      // Load pet sprite data + sheet image
+      // ─────────────────────────────────────────────────────────────
+      async function loadPet(petId) {
+        const meta = PET_CATALOG[petId];
+        if (!meta) return;
+        sheetStatus.textContent = "Loading…";
+        sheetImage = null;
+        spriteData = null;
+
+        try {
+          const mod = await import(meta.spriteUrl);
+          // sprite.js exports a named export like beaverSprite, jackRussellSprite, etc.
+          spriteData = Object.values(mod)[0];
+          frameW = spriteData?.animations
+            ? Object.values(spriteData.animations)[0]?.frames?.[0]?.w || 32
+            : 32;
+          frameH = spriteData?.animations
+            ? Object.values(spriteData.animations)[0]?.frames?.[0]?.h || 32
+            : 32;
+          frameWInput.value = frameW;
+          frameHInput.value = frameH;
+        } catch (e) {
+          sheetStatus.textContent = "⚠ Could not load sprite data";
+          console.warn("sprite.js load failed", e);
+        }
+
+        // Populate import animation select
+        importAnimSelect.innerHTML =
+          '<option value="">— choose animation —</option>';
+        if (spriteData?.animations) {
+          for (const key of Object.keys(spriteData.animations)) {
+            const opt = document.createElement("option");
+            opt.value = key;
+            opt.textContent = `${key} (${spriteData.animations[key].frames?.length ?? "?"} frames)`;
+            importAnimSelect.appendChild(opt);
+          }
+        }
+
+        const img = new Image();
+        img.onload = () => {
+          sheetImage = img;
+          sheetStatus.textContent = `${img.naturalWidth}×${img.naturalHeight}px — ${Math.floor(img.naturalWidth / frameW)}×${Math.floor(img.naturalHeight / frameH)} cells`;
+          drawSheet();
+        };
+        img.onerror = () => {
+          sheetStatus.textContent = "⚠ Could not load sheet.png";
+        };
+        img.src = meta.sheetSrc;
+      }
+
+      // ─────────────────────────────────────────────────────────────
+      // Sheet rendering
+      // ─────────────────────────────────────────────────────────────
+      function drawSheet() {
+        if (!sheetImage) return;
+        const scale = displayScale;
+        const cols = Math.floor(
+          (sheetImage.naturalWidth - offsetX + gutterX) / (frameW + gutterX),
+        );
+        const rows = Math.floor(
+          (sheetImage.naturalHeight - offsetY + gutterY) / (frameH + gutterY),
+        );
+        const cw = sheetImage.naturalWidth * scale;
+        const ch = sheetImage.naturalHeight * scale;
+
+        sheetCanvas.width = cw;
+        sheetCanvas.height = ch;
+        sheetOverlay.width = cw;
+        sheetOverlay.height = ch;
+
+        sheetCanvas.style.width = cw + "px";
+        sheetCanvas.style.height = ch + "px";
+        sheetOverlay.style.width = cw + "px";
+        sheetOverlay.style.height = ch + "px";
+        sheetOverlay.style.position = "absolute";
+        sheetOverlay.style.top = "0";
+        sheetOverlay.style.left = "0";
+        sheetOverlay.style.pointerEvents = "none";
+
+        const ctx = sheetCanvas.getContext("2d");
+        ctx.imageSmoothingEnabled = false;
+        ctx.clearRect(0, 0, cw, ch);
+        ctx.drawImage(sheetImage, 0, 0, cw, ch);
+
+        // Grid lines
+        ctx.strokeStyle = "rgba(99,179,237,0.25)";
+        ctx.lineWidth = 1;
+        for (let c = 0; c <= cols; c++) {
+          const x = (offsetX + c * (frameW + gutterX)) * scale;
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, ch);
+          ctx.stroke();
+          if (gutterX > 0 && c < cols) {
+            const xg = (offsetX + c * (frameW + gutterX) + frameW) * scale;
+            ctx.beginPath();
+            ctx.moveTo(xg, 0);
+            ctx.lineTo(xg, ch);
+            ctx.stroke();
+          }
+        }
+        for (let r = 0; r <= rows; r++) {
+          const y = (offsetY + r * (frameH + gutterY)) * scale;
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(cw, y);
+          ctx.stroke();
+          if (gutterY > 0 && r < rows) {
+            const yg = (offsetY + r * (frameH + gutterY) + frameH) * scale;
+            ctx.beginPath();
+            ctx.moveTo(0, yg);
+            ctx.lineTo(cw, yg);
+            ctx.stroke();
+          }
+        }
+
+        drawOverlay(cols, rows, scale);
+      }
+
+      function drawOverlay(cols, rows, scale) {
+        if (!sheetImage) return;
+        const oc = sheetOverlay.getContext("2d");
+        oc.clearRect(0, 0, sheetOverlay.width, sheetOverlay.height);
+
+        // Count how many times each cell appears in sequence
+        const cellCount = {};
+        for (const f of sequence) {
+          const key = `${f.col},${f.row}`;
+          cellCount[key] = (cellCount[key] || 0) + 1;
+        }
+
+        for (const [key, count] of Object.entries(cellCount)) {
+          const [col, row] = key.split(",").map(Number);
+          const px = (offsetX + col * (frameW + gutterX)) * scale;
+          const py = (offsetY + row * (frameH + gutterY)) * scale;
+          const pw = frameW * scale;
+          const ph = frameH * scale;
+          oc.fillStyle = "rgba(59,130,246,0.35)";
+          oc.fillRect(px, py, pw, ph);
+          oc.strokeStyle = "#3b82f6";
+          oc.lineWidth = 2;
+          oc.strokeRect(px + 1, py + 1, pw - 2, ph - 2);
+          // Count badge
+          oc.fillStyle = "#3b82f6";
+          oc.beginPath();
+          oc.arc(px + pw - 9, py + 9, 9, 0, Math.PI * 2);
+          oc.fill();
+          oc.fillStyle = "#fff";
+          oc.font = `bold ${count > 9 ? 8 : 10}px system-ui`;
+          oc.textAlign = "center";
+          oc.textBaseline = "middle";
+          oc.fillText(String(count), px + pw - 9, py + 9);
+        }
+
+        // Hover highlight
+        if (hoveredCell) {
+          const { col, row } = hoveredCell;
+          const px = (offsetX + col * (frameW + gutterX)) * scale;
+          const py = (offsetY + row * (frameH + gutterY)) * scale;
+          const pw = frameW * scale;
+          const ph = frameH * scale;
+          oc.strokeStyle = "#facc15";
+          oc.lineWidth = 2;
+          oc.strokeRect(px + 1, py + 1, pw - 2, ph - 2);
+        }
+      }
+
+      // ─────────────────────────────────────────────────────────────
+      // Sheet interaction
+      // ─────────────────────────────────────────────────────────────
+      function cellFromEvent(e) {
+        const rect = sheetCanvas.getBoundingClientRect();
+        const scale = displayScale;
+        const mx = e.clientX - rect.left;
+        const my = e.clientY - rect.top;
+        // Subtract offset, then divide by cell stride (frame + gutter)
+        const col = Math.floor((mx / scale - offsetX) / (frameW + gutterX));
+        const row = Math.floor((my / scale - offsetY) / (frameH + gutterY));
+        // Reject clicks that land in a gutter
+        const localX = (mx / scale - offsetX) % (frameW + gutterX);
+        const localY = (my / scale - offsetY) % (frameH + gutterY);
+        if (localX < 0 || localX >= frameW || localY < 0 || localY >= frameH)
+          return null;
+        return { col, row };
+      }
+
+      sheetOverlay.style.pointerEvents = "auto"; // overlay captures mouse, not the canvas
+
+      // We need to set pointer events on the wrap itself actually — overlay is on top
+      document
+        .getElementById("sheet-canvas-wrap")
+        .addEventListener("click", (e) => {
+          if (!sheetImage) return;
+          const cell = cellFromEvent(e);
+          if (!cell) return;
+          const { col, row } = cell;
+          const cols = Math.floor(
+            (sheetImage.naturalWidth - offsetX + gutterX) / (frameW + gutterX),
+          );
+          const rows = Math.floor(
+            (sheetImage.naturalHeight - offsetY + gutterY) / (frameH + gutterY),
+          );
+          if (col < 0 || col >= cols || row < 0 || row >= rows) return;
+          const ticks = parseInt(defaultTicks.value) || 6;
+          sequence.push({
+            col,
+            row,
+            x: offsetX + col * (frameW + gutterX),
+            y: offsetY + row * (frameH + gutterY),
+            w: frameW,
+            h: frameH,
+            ticks,
+          });
+          saveLabState();
+          renderSequenceList();
+          refreshOverlay();
+        });
+
+      document
+        .getElementById("sheet-canvas-wrap")
+        .addEventListener("contextmenu", (e) => {
+          e.preventDefault();
+          if (!sheetImage || !sequence.length) return;
+          const cell = cellFromEvent(e);
+          if (!cell) return;
+          const { col, row } = cell;
+          // Remove last occurrence of this cell
+          for (let i = sequence.length - 1; i >= 0; i--) {
+            if (sequence[i].col === col && sequence[i].row === row) {
+              sequence.splice(i, 1);
+              break;
+            }
+          }
+          saveLabState();
+          renderSequenceList();
+          refreshOverlay();
+        });
+
+      document
+        .getElementById("sheet-canvas-wrap")
+        .addEventListener("mousemove", (e) => {
+          if (!sheetImage) return;
+          const cell = cellFromEvent(e);
+          const cols = Math.floor(
+            (sheetImage.naturalWidth - offsetX + gutterX) / (frameW + gutterX),
+          );
+          const rows = Math.floor(
+            (sheetImage.naturalHeight - offsetY + gutterY) / (frameH + gutterY),
+          );
+          if (
+            !cell ||
+            cell.col < 0 ||
+            cell.col >= cols ||
+            cell.row < 0 ||
+            cell.row >= rows
+          ) {
+            hoveredCell = null;
+          } else {
+            hoveredCell = { col: cell.col, row: cell.row };
+          }
+          refreshOverlay();
+        });
+
+      document
+        .getElementById("sheet-canvas-wrap")
+        .addEventListener("mouseleave", () => {
+          hoveredCell = null;
+          refreshOverlay();
+        });
+
+      // ─────────────────────────────────────────────────────────────
+      // Drag-select cells on sheet
+      // ─────────────────────────────────────────────────────────────
+      const sheetWrap = document.getElementById("sheet-canvas-wrap");
+
+      sheetWrap.addEventListener("mousedown", (e) => {
+        if (!sheetImage || e.button !== 0) return;
+        const cell = cellFromEvent(e);
+        if (!cell) return;
+        dragSelecting = true;
+        dragStart = cell;
+        dragEnd = cell;
+        updateDragRect();
+        e.preventDefault();
+      });
+      window.addEventListener("mousemove", (e) => {
+        if (!dragSelecting) return;
+        const cell = cellFromEvent(e);
+        if (cell) {
+          dragEnd = cell;
+          updateDragRect();
+        }
+      });
+
+      window.addEventListener("mouseup", (e) => {
+        if (!dragSelecting) return;
+        dragSelecting = false;
+        dragSelectRect.style.display = "none";
+        if (!dragStart || !dragEnd) return;
+        // If the mouse barely moved (same cell start→end), the click handler will add it — skip here
+        const isMulti =
+          dragStart.col !== dragEnd.col || dragStart.row !== dragEnd.row;
+        if (isMulti) {
+          // Commit all cells in selection rectangle
+          const c0 = Math.min(dragStart.col, dragEnd.col);
+          const c1 = Math.max(dragStart.col, dragEnd.col);
+          const r0 = Math.min(dragStart.row, dragEnd.row);
+          const r1 = Math.max(dragStart.row, dragEnd.row);
+          const ticks = parseInt(defaultTicks.value) || 6;
+          const cols = Math.floor(
+            (sheetImage.naturalWidth - offsetX + gutterX) / (frameW + gutterX),
+          );
+          const rows = Math.floor(
+            (sheetImage.naturalHeight - offsetY + gutterY) / (frameH + gutterY),
+          );
+          for (let r = r0; r <= r1; r++) {
+            for (let c = c0; c <= c1; c++) {
+              if (c < 0 || c >= cols || r < 0 || r >= rows) continue;
+              sequence.push({
+                col: c,
+                row: r,
+                x: offsetX + c * (frameW + gutterX),
+                y: offsetY + r * (frameH + gutterY),
+                w: frameW,
+                h: frameH,
+                ticks,
+              });
+            }
+          }
+          saveLabState();
+          renderSequenceList();
+          refreshOverlay();
+        }
+        dragStart = null;
+        dragEnd = null;
+      });
+
+      function updateDragRect() {
+        if (!dragStart || !dragEnd || !sheetImage) return;
+        const scale = displayScale;
+        const c0 = Math.min(dragStart.col, dragEnd.col);
+        const c1 = Math.max(dragStart.col, dragEnd.col);
+        const r0 = Math.min(dragStart.row, dragEnd.row);
+        const r1 = Math.max(dragStart.row, dragEnd.row);
+        const px = (offsetX + c0 * (frameW + gutterX)) * scale;
+        const py = (offsetY + r0 * (frameH + gutterY)) * scale;
+        const pw = ((c1 - c0 + 1) * (frameW + gutterX) - gutterX) * scale;
+        const ph = ((r1 - r0 + 1) * (frameH + gutterY) - gutterY) * scale;
+        dragSelectRect.style.display = "block";
+        dragSelectRect.style.left = px + "px";
+        dragSelectRect.style.top = py + "px";
+        dragSelectRect.style.width = pw + "px";
+        dragSelectRect.style.height = ph + "px";
+      }
+
+      function refreshOverlay() {
+        if (!sheetImage) return;
+        const cols = Math.floor(sheetImage.naturalWidth / frameW);
+        const rows = Math.floor(sheetImage.naturalHeight / frameH);
+        drawOverlay(cols, rows, displayScale);
+      }
+
+      // ─────────────────────────────────────────────────────────────
+      // Import existing animation
+      // ─────────────────────────────────────────────────────────────
+      btnImportAnim.addEventListener("click", () => {
+        const key = importAnimSelect.value;
+        if (!key || !spriteData?.animations?.[key]) return;
+        const anim = spriteData.animations[key];
+        if (!anim.frames?.length) return;
+        if (
+          sequence.length &&
+          !confirm(`Replace current sequence with "${key}"?`)
+        )
+          return;
+
+        sequence = anim.frames.map((f) => {
+          // Derive col/row from x/y to keep display consistent
+          const fw = f.w || frameW;
+          const fh = f.h || frameH;
+          const col = Math.round((f.x - offsetX) / (fw + gutterX));
+          const row = Math.round((f.y - offsetY) / (fh + gutterY));
+          return {
+            x: f.x,
+            y: f.y,
+            w: fw,
+            h: fh,
+            ticks: f.ticks || parseInt(defaultTicks.value) || 6,
+            col: Math.max(0, col),
+            row: Math.max(0, row),
+          };
+        });
+
+        // Populate meta fields from animation data
+        animKeyInput.value = key;
+        animTitleInput.value = anim.title || key;
+        if (anim.category) animCategory.value = anim.category;
+        if (anim.playable != null) animPlayable.value = String(anim.playable);
+
+        previewTick = 0;
+        pingPongDir = 1;
+        loopDone = false;
+        saveLabState();
+        renderSequenceList();
+        refreshOverlay();
+        importAnimSelect.value = "";
+      });
+
+      // Frame size / scale inputs
+      [
+        frameWInput,
+        frameHInput,
+        offsetXInput,
+        offsetYInput,
+        gutterXInput,
+        gutterYInput,
+        scaleInput,
+      ].forEach((inp) => {
+        inp.addEventListener("change", () => {
+          frameW = parseInt(frameWInput.value) || 32;
+          frameH = parseInt(frameHInput.value) || 32;
+          offsetX = parseInt(offsetXInput.value) || 0;
+          offsetY = parseInt(offsetYInput.value) || 0;
+          gutterX = parseInt(gutterXInput.value) || 0;
+          gutterY = parseInt(gutterYInput.value) || 0;
+          displayScale = parseInt(scaleInput.value) || 2;
+          drawSheet();
+          saveLabState();
+        });
+      });
+
+      // ─────────────────────────────────────────────────────────────
+      // Ticks/frame — live-updates all frames in sequence
+      // ─────────────────────────────────────────────────────────────
+      defaultTicks.addEventListener("change", () => {
+        const t = Math.max(1, parseInt(defaultTicks.value) || 6);
+        sequence.forEach((f) => (f.ticks = t));
+        saveLabState();
+        renderSequenceList();
+      });
+
+      // ─────────────────────────────────────────────────────────────
+      // Speed multiplier
+      // ─────────────────────────────────────────────────────────────
+      speedMultInput.addEventListener("input", () => {
+        speedMult = parseFloat(speedMultInput.value) || 1;
+        speedDisplay.textContent =
+          speedMult.toFixed(2).replace(/\.?0+$/, "") + "×";
+      });
+
+      // ─────────────────────────────────────────────────────────────
+      // Play mode (ping-pong / once)
+      // ─────────────────────────────────────────────────────────────
+      playModeSelect.addEventListener("change", () => {
+        playMode = playModeSelect.value;
+        pingPongDir = 1;
+        loopDone = false;
+        previewTick = 0;
+        lastTs = null;
+      });
+
+      // ─────────────────────────────────────────────────────────────
+      // Onion skin toggle
+      // ─────────────────────────────────────────────────────────────
+      btnOnion.addEventListener("click", () => {
+        onionSkin = !onionSkin;
+        btnOnion.classList.toggle("active", onionSkin);
+      });
+
+      // ─────────────────────────────────────────────────────────────
+      function renderSequenceList() {
+        frameCountBadge.textContent = `${sequence.length} frame${sequence.length !== 1 ? "s" : ""}`;
+        scrubSlider.max = Math.max(0, sequence.length - 1);
+        scrubSlider.value = Math.min(scrubSlider.value, scrubSlider.max);
+        activeFrameIdx = -1; // force re-highlight on next draw
+        if (!sequence.length) {
+          seqList.innerHTML = `<div class="empty-seq">No frames yet.<br>Click cells in the sprite sheet to add frames.</div>`;
+          return;
+        }
+        seqList.innerHTML = "";
+        sequence.forEach((f, i) => {
+          const row = document.createElement("div");
+          row.className = "seq-frame";
+
+          // Thumbnail canvas
+          const thumb = document.createElement("canvas");
+          thumb.width = 32;
+          thumb.height = 32;
+          thumb.style.width = "32px";
+          thumb.style.height = "32px";
+          if (sheetImage) {
+            const tc = thumb.getContext("2d");
+            tc.imageSmoothingEnabled = false;
+            tc.drawImage(
+              sheetImage,
+              f.x + (f.dx || 0),
+              f.y + (f.dy || 0),
+              f.w,
+              f.h,
+              0,
+              0,
+              32,
+              32,
+            );
+          }
+
+          const info = document.createElement("div");
+          info.className = "frame-info";
+          info.textContent = `#${i + 1} — cell (${f.col},${f.row})`;
+
+          // Per-frame offset nudge
+          const offsets = document.createElement("div");
+          offsets.className = "frame-offsets";
+          offsets.innerHTML = `<span>dx</span>`;
+          const dxInput = document.createElement("input");
+          dxInput.type = "number";
+          dxInput.min = -64;
+          dxInput.max = 64;
+          dxInput.step = 1;
+          dxInput.value = f.dx || 0;
+          dxInput.title = "Nudge this frame horizontally (pixels on sheet)";
+          const dyInput = document.createElement("input");
+          dyInput.type = "number";
+          dyInput.min = -64;
+          dyInput.max = 64;
+          dyInput.step = 1;
+          dyInput.value = f.dy || 0;
+          dyInput.title = "Nudge this frame vertically (pixels on sheet)";
+          const dyLabel = document.createElement("span");
+          dyLabel.textContent = "dy";
+          const updateOffset = () => {
+            f.dx = parseInt(dxInput.value) || 0;
+            f.dy = parseInt(dyInput.value) || 0;
+            // Re-colour inputs to flag non-zero values
+            dxInput.style.borderColor =
+              f.dx !== 0 ? "rgba(250,204,21,0.6)" : "";
+            dxInput.style.color = f.dx !== 0 ? "#facc15" : "";
+            dyInput.style.borderColor =
+              f.dy !== 0 ? "rgba(250,204,21,0.6)" : "";
+            dyInput.style.color = f.dy !== 0 ? "#facc15" : "";
+            // Redraw thumbnail
+            if (sheetImage) {
+              const tc = thumb.getContext("2d");
+              tc.clearRect(0, 0, 32, 32);
+              tc.imageSmoothingEnabled = false;
+              tc.drawImage(
+                sheetImage,
+                f.x + f.dx,
+                f.y + f.dy,
+                f.w,
+                f.h,
+                0,
+                0,
+                32,
+                32,
+              );
+            }
+            // Redraw preview if this is the active frame
+            if (i === activeFrameIdx) drawFrame(i);
+            saveLabState();
+          };
+          dxInput.addEventListener("change", updateOffset);
+          dyInput.addEventListener("change", updateOffset);
+          offsets.append(dxInput, dyLabel, dyInput);
+          // Apply highlight on load for non-zero saved values
+          if (f.dx) {
+            dxInput.style.borderColor = "rgba(250,204,21,0.6)";
+            dxInput.style.color = "#facc15";
+          }
+          if (f.dy) {
+            dyInput.style.borderColor = "rgba(250,204,21,0.6)";
+            dyInput.style.color = "#facc15";
+          }
+
+          const ticksWrap = document.createElement("div");
+          ticksWrap.className = "frame-ticks";
+          ticksWrap.innerHTML = `<label>ticks</label>`;
+          const ticksInput = document.createElement("input");
+          ticksInput.type = "number";
+          ticksInput.min = 1;
+          ticksInput.max = 120;
+          ticksInput.value = f.ticks;
+          ticksInput.addEventListener("change", () => {
+            f.ticks = Math.max(1, parseInt(ticksInput.value) || 6);
+            saveLabState();
+          });
+          ticksWrap.appendChild(ticksInput);
+
+          const btns = document.createElement("div");
+          btns.className = "seq-frame-btns";
+          const btnUp = document.createElement("button");
+          btnUp.textContent = "↑";
+          btnUp.title = "Move up";
+          btnUp.disabled = i === 0;
+          btnUp.addEventListener("click", () => {
+            [sequence[i - 1], sequence[i]] = [sequence[i], sequence[i - 1]];
+            saveLabState();
+            renderSequenceList();
+            refreshOverlay();
+          });
+          const btnDown = document.createElement("button");
+          btnDown.textContent = "↓";
+          btnDown.title = "Move down";
+          btnDown.disabled = i === sequence.length - 1;
+          btnDown.addEventListener("click", () => {
+            [sequence[i], sequence[i + 1]] = [sequence[i + 1], sequence[i]];
+            saveLabState();
+            renderSequenceList();
+            refreshOverlay();
+          });
+          const btnDel = document.createElement("button");
+          btnDel.textContent = "✕";
+          btnDel.title = "Remove frame";
+          btnDel.style.color = "var(--danger)";
+          btnDel.addEventListener("click", () => {
+            sequence.splice(i, 1);
+            saveLabState();
+            renderSequenceList();
+            refreshOverlay();
+          });
+
+          btns.append(btnUp, btnDown, btnDel);
+          row.append(thumb, info, offsets, ticksWrap, btns);
+          seqList.appendChild(row);
+        });
+      }
+
+      // ─────────────────────────────────────────────────────────────
+      // Preview rAF loop
+      // ─────────────────────────────────────────────────────────────
+      const pCtx = previewCanvas.getContext("2d");
+
+      function startPreviewLoop() {
+        if (rafId) return;
+        lastTs = null;
+        rafId = requestAnimationFrame(previewStep);
+      }
+      function stopPreviewLoop() {
+        if (rafId) {
+          cancelAnimationFrame(rafId);
+          rafId = null;
+        }
+      }
+
+      function drawFrame(fi) {
+        if (!sheetImage || !sequence.length) {
+          drawCheckerboard();
+          return;
+        }
+        const f = sequence[fi];
+        const size = previewCanvas.width;
+        pCtx.clearRect(0, 0, size, size);
+        drawCheckerboard();
+
+        // Onion skin: draw previous frame at 30% opacity
+        if (onionSkin && fi > 0) {
+          const prev = sequence[fi - 1];
+          pCtx.globalAlpha = 0.3;
+          pCtx.drawImage(
+            sheetImage,
+            prev.x + (prev.dx || 0),
+            prev.y + (prev.dy || 0),
+            prev.w,
+            prev.h,
+            0,
+            0,
+            size,
+            size,
+          );
+          pCtx.globalAlpha = 1;
+        }
+
+        pCtx.drawImage(
+          sheetImage,
+          f.x + (f.dx || 0),
+          f.y + (f.dy || 0),
+          f.w,
+          f.h,
+          0,
+          0,
+          size,
+          size,
+        );
+        previewInfo.textContent = `Frame ${fi + 1}/${sequence.length} — ticks: ${f.ticks} — cell (${f.col},${f.row})${f.dx || f.dy ? ` — nudge (${f.dx || 0},${f.dy || 0})` : ""}`;
+        // Update scrub slider position
+        scrubSlider.max = sequence.length - 1;
+        scrubSlider.value = fi;
+        // Highlight active row in sequence list
+        if (fi !== activeFrameIdx) {
+          document
+            .querySelectorAll("#sequence-list .seq-frame")
+            .forEach((el, i) => {
+              el.classList.toggle("active-frame", i === fi);
+            });
+          // Scroll into view if out of sight
+          const activeEl = seqList.querySelectorAll(".seq-frame")[fi];
+          if (activeEl) activeEl.scrollIntoView({ block: "nearest" });
+          activeFrameIdx = fi;
+        }
+      }
+
+      function drawCheckerboard() {
+        const size = previewCanvas.width;
+        if (previewBg === "checker") {
+          for (let r = 0; r < size / 8; r++)
+            for (let c = 0; c < size / 8; c++) {
+              pCtx.fillStyle = (r + c) % 2 === 0 ? "#333340" : "#2a2a35";
+              pCtx.fillRect(c * 8, r * 8, 8, 8);
+            }
+        } else {
+          pCtx.fillStyle = previewBg;
+          pCtx.fillRect(0, 0, size, size);
+        }
+      }
+
+      function previewStep(ts) {
+        rafId = requestAnimationFrame(previewStep);
+        if (!sequence.length || !sheetImage) {
+          drawPreviewEmpty();
+          return;
+        }
+        if (!previewRunning || scrubbing) return;
+        if (lastTs === null) lastTs = ts;
+        const delta = ts - lastTs;
+        lastTs = ts;
+
+        // Advance tick — apply speed multiplier
+        const ticksPerMs = 1 / (1000 / 60);
+        previewTick += delta * ticksPerMs * speedMult;
+
+        const totalTicks = sequence.reduce((s, f) => s + f.ticks, 0);
+        if (!totalTicks) return;
+
+        let fi = 0;
+
+        if (playMode === "loop") {
+          const pointer = previewTick % totalTicks;
+          let elapsed = 0;
+          for (let i = 0; i < sequence.length; i++) {
+            elapsed += sequence[i].ticks;
+            if (pointer < elapsed) {
+              fi = i;
+              break;
+            }
+          }
+        } else if (playMode === "pingpong") {
+          // Build expanded sequence (forward + backward, no duplicate endpoints)
+          const fwd = sequence.map((_, i) => i);
+          const bwd = sequence
+            .map((_, i) => sequence.length - 1 - i)
+            .slice(1, -1);
+          const ping = [...fwd, ...bwd];
+          const pingTotalTicks = ping.reduce(
+            (s, i) => s + sequence[i].ticks,
+            0,
+          );
+          const pointer = previewTick % pingTotalTicks;
+          let elapsed = 0;
+          for (let i = 0; i < ping.length; i++) {
+            elapsed += sequence[ping[i]].ticks;
+            if (pointer < elapsed) {
+              fi = ping[i];
+              break;
+            }
+          }
+        } else if (playMode === "once") {
+          if (loopDone) {
+            fi = sequence.length - 1;
+            drawFrame(fi);
+            return;
+          }
+          if (previewTick >= totalTicks) {
+            loopDone = true;
+            previewRunning = false;
+            fi = sequence.length - 1;
+          } else {
+            let elapsed = 0;
+            for (let i = 0; i < sequence.length; i++) {
+              elapsed += sequence[i].ticks;
+              if (previewTick < elapsed) {
+                fi = i;
+                break;
+              }
+            }
+          }
+        }
+
+        drawFrame(fi);
+      }
+
+      function drawPreviewEmpty() {
+        const size = previewCanvas.width;
+        pCtx.clearRect(0, 0, size, size);
+        drawCheckerboard();
+        previewInfo.textContent = sequence.length
+          ? "Paused"
+          : "No frames in sequence";
+      }
+
+      btnPlay.addEventListener("click", () => {
+        previewRunning = true;
+        previewTick = 0;
+        pingPongDir = 1;
+        loopDone = false;
+        lastTs = null;
+      });
+      btnPause.addEventListener("click", () => {
+        previewRunning = false;
+        lastTs = null;
+        // Hold current frame — drawFrame was already called, nothing to clear
+      });
+
+      // Scrub slider
+      scrubSlider.addEventListener("mousedown", () => {
+        scrubbing = true;
+        previewRunning = false;
+        lastTs = null;
+      });
+      scrubSlider.addEventListener("input", () => {
+        const fi = parseInt(scrubSlider.value);
+        // Reposition previewTick to start of this frame
+        let tick = 0;
+        for (let i = 0; i < fi; i++) tick += sequence[i]?.ticks ?? 6;
+        previewTick = tick;
+        drawFrame(fi);
+      });
+      window.addEventListener("mouseup", () => {
+        scrubbing = false;
+      });
+
+      // ── Collapse / expand sprite sheet panel ──────────────────────
+      const btnCollapse = document.getElementById("btn-collapse-sheet");
+      const panelSheet = document.getElementById("panel-sheet");
+      const builderEl = document.getElementById("tab-builder");
+
+      function toggleSheet() {
+        const collapsed = panelSheet.classList.toggle("collapsed");
+        builderEl.classList.toggle("sheet-collapsed", collapsed);
+        btnCollapse.textContent = collapsed ? "▶" : "◀";
+        btnCollapse.title = collapsed
+          ? "Expand sprite sheet"
+          : "Collapse sprite sheet";
+        // Wait for the CSS grid transition (200ms) then sync canvas to new panel width
+        setTimeout(syncPreviewCanvasSize, 220);
+      }
+
+      btnCollapse.addEventListener("click", toggleSheet);
+
+      // ── Resizable preview column ──────────────────────────────────
+      const resizerPreview = document.getElementById("resizer-preview");
+      let colResizing = false;
+      let colResizeStartX = 0;
+      let colResizeStartW = 0;
+
+      resizerPreview.addEventListener("mousedown", (e) => {
+        colResizing = true;
+        colResizeStartX = e.clientX;
+        colResizeStartW =
+          parseInt(
+            getComputedStyle(document.documentElement).getPropertyValue(
+              "--preview-w",
+            ) || "300",
+          ) || 300;
+        resizerPreview.classList.add("dragging");
+        builderEl.classList.add("resizing"); // disable CSS transition
+        document.body.style.cursor = "col-resize";
+        document.body.style.userSelect = "none";
+        e.preventDefault();
+      });
+
+      window.addEventListener("mousemove", (e) => {
+        if (!colResizing) return;
+        const dx = colResizeStartX - e.clientX; // drag left → preview grows
+        const newW = Math.max(220, Math.min(700, colResizeStartW + dx));
+        document.documentElement.style.setProperty("--preview-w", newW + "px");
+        syncPreviewCanvasSize(newW);
+      });
+
+      function syncPreviewCanvasSize(knownW) {
+        // If width not supplied, measure the panel directly (used after collapse/expand)
+        const w =
+          knownW ??
+          document.getElementById("panel-preview").getBoundingClientRect()
+            .width;
+        const csz = Math.max(180, Math.round(w) - 20);
+        document.documentElement.style.setProperty("--canvas-sz", csz + "px");
+        previewCanvas.width = csz;
+        previewCanvas.height = csz;
+        pCtx.imageSmoothingEnabled = false;
+        if (!previewRunning) drawPreviewEmpty();
+      }
+      window.addEventListener("mouseup", () => {
+        if (!colResizing) return;
+        colResizing = false;
+        resizerPreview.classList.remove("dragging");
+        builderEl.classList.remove("resizing");
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
+      });
+
+      // Also allow clicking anywhere on the header when collapsed to re-expand
+      panelSheet
+        .querySelector(".panel-header")
+        .addEventListener("click", (e) => {
+          if (
+            panelSheet.classList.contains("collapsed") &&
+            e.target !== btnCollapse
+          ) {
+            toggleSheet();
+          }
+        });
+
+      // ─────────────────────────────────────────────────────────────
+      // JSON generation
+      // ─────────────────────────────────────────────────────────────
+      btnGenerate.addEventListener("click", () => {
+        if (!sequence.length) {
+          outputBox.value = "// Add at least one frame first.";
+          return;
+        }
+        const key = animKeyInput.value.trim() || "customAnimation";
+        const title = animTitleInput.value.trim() || key;
+        const category = animCategory.value;
+        const playable = animPlayable.value === "true";
+        const totalTicks = sequence.reduce((s, f) => s + f.ticks, 0);
+        const avgTicks = +(totalTicks / sequence.length).toFixed(2);
+
+        const frames = sequence.map((f) => ({
+          x: f.x + (f.dx || 0),
+          y: f.y + (f.dy || 0),
+          w: f.w,
+          h: f.h,
+          ticks: f.ticks,
+          action: title,
+          actionKey: key,
+          category,
+        }));
+
+        const obj = {
+          [key]: {
+            title,
+            category,
+            playable,
+            frameCount: sequence.length,
+            totalTicks,
+            averageTicks: avgTicks,
+            frames,
+          },
+        };
+
+        // Pretty-print as JS object literal (not JSON) matching sprite.js style
+        const json = JSON.stringify(obj, null, 2)
+          // Remove outer braces so user pastes just the property
+          .replace(/^\{\n/, "")
+          .replace(/\n\}$/, "");
+
+        outputBox.value = json;
+        btnCopy.disabled = false;
+      });
+
+      btnCopy.addEventListener("click", () => {
+        navigator.clipboard.writeText(outputBox.value).then(() => {
+          const orig = btnCopy.textContent;
+          btnCopy.textContent = "✓ Copied!";
+          btnCopy.classList.add("success");
+          btnCopy.classList.remove("primary");
+          setTimeout(() => {
+            btnCopy.textContent = orig;
+            btnCopy.classList.remove("success");
+            btnCopy.classList.add("primary");
+          }, 2000);
+        });
+      });
+
+      btnClear.addEventListener("click", () => {
+        if (!sequence.length || confirm("Clear all frames?")) {
+          sequence = [];
+          outputBox.value = "";
+          btnCopy.disabled = true;
+          previewTick = 0;
+          saveLabState();
+          renderSequenceList();
+          refreshOverlay();
+        }
+      });
+
+      // ─────────────────────────────────────────────────────────────
+      // Persist builder state in localStorage
+      // ─────────────────────────────────────────────────────────────
+      function saveLabState() {
+        try {
+          localStorage.setItem(
+            STORAGE_KEY_LAB,
+            JSON.stringify({
+              petId: currentPetId,
+              sequence,
+              animKey: animKeyInput.value,
+              animTitle: animTitleInput.value,
+              animCategory: animCategory.value,
+              animPlayable: animPlayable.value,
+              defaultTicks: defaultTicks.value,
+              frameW,
+              frameH,
+              offsetX,
+              offsetY,
+              gutterX,
+              gutterY,
+              displayScale,
+            }),
+          );
+        } catch {
+          /* ignore */
+        }
+      }
+
+      function loadLabState() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY_LAB);
+          if (!raw) return;
+          const s = JSON.parse(raw);
+          if (s.petId && PET_CATALOG[s.petId]) {
+            petSelect.value = s.petId;
+            currentPetId = s.petId;
+          }
+          if (Array.isArray(s.sequence)) sequence = s.sequence;
+          if (s.animKey) animKeyInput.value = s.animKey;
+          if (s.animTitle) animTitleInput.value = s.animTitle;
+          if (s.animCategory) animCategory.value = s.animCategory;
+          if (s.animPlayable) animPlayable.value = s.animPlayable;
+          if (s.defaultTicks) defaultTicks.value = s.defaultTicks;
+          if (s.frameW) {
+            frameW = s.frameW;
+            frameWInput.value = frameW;
+          }
+          if (s.frameH) {
+            frameH = s.frameH;
+            frameHInput.value = frameH;
+          }
+          if (s.offsetX != null) {
+            offsetX = s.offsetX;
+            offsetXInput.value = offsetX;
+          }
+          if (s.offsetY != null) {
+            offsetY = s.offsetY;
+            offsetYInput.value = offsetY;
+          }
+          if (s.gutterX != null) {
+            gutterX = s.gutterX;
+            gutterXInput.value = gutterX;
+          }
+          if (s.gutterY != null) {
+            gutterY = s.gutterY;
+            gutterYInput.value = gutterY;
+          }
+          if (s.displayScale) {
+            displayScale = s.displayScale;
+            scaleInput.value = displayScale;
+          }
+        } catch {
+          /* ignore */
+        }
+      }
+
+      // ─────────────────────────────────────────────────────────────
+      // Init
+      // ─────────────────────────────────────────────────────────────
+      // Canvas init — set buffer size and disable smoothing for pixel-art
+      previewCanvas.width = 280;
+      previewCanvas.height = 280;
+      pCtx.imageSmoothingEnabled = false;
+      drawPreviewEmpty();
+
+      initViewerPetSelect();
+      loadLabState();
+      renderSequenceList();
+      // Builder tab is hidden on load — sheet loads when user switches to it
+    </script>
+  </body>
+</html>
