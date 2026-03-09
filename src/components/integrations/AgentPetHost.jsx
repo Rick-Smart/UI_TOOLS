@@ -9,8 +9,9 @@ import {
 } from "../../utils/petBridge";
 import "./AgentPetHost.css";
 
-function AgentPetHost() {
-  const isPetSystemEnabled = import.meta.env.VITE_PET_SYSTEM_ENABLED === true;
+function AgentPetHost({ enabled = true }) {
+  const isPetSystemEnabled =
+    enabled && import.meta.env.VITE_PET_SYSTEM_ENABLED === true;
   const [petState, setPetState] = useState(getPetStateForCurrentAgent);
   const [checklistProgress, setChecklistProgress] = useState({
     completed: 0,

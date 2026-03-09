@@ -2,8 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import DocumentReferencesPanel from "./components/DocumentReferencesPanel";
 import PageTemplate from "./components/layout/PageTemplate/PageTemplate";
-import HomePage from "./pages/HomePage";
-import { documentReferences } from "./data/documentReferences";
+import CBCHomePage from "./pages/cbc/CBCHomePage";
 import {
   callGuideMeta,
   contactInfo,
@@ -11,84 +10,58 @@ import {
   noteRequirements,
   orderedCallChecklist,
   supportResources,
-} from "./data/callHandlingGuideData";
-import { trendsTips } from "./data/trendsTips";
-import { topActions } from "./data/topActions";
+} from "./data/cbc/callHandlingGuideData";
+import { topActions } from "./data/cbc/topActions";
 import {
-  buildHomeCards,
-  buildNavItems,
-  sidebarSections,
-  toolRegistry,
-} from "./data/toolRegistry";
-import { uiTerms } from "./data/uiTerms";
+  buildCBCHomeCards,
+  buildCBCNavItems,
+  cbcSidebarSections,
+  cbcToolRegistry,
+} from "./data/cbc/toolRegistry";
 import {
   buildAutoIndexedDataItems,
   buildFocusedDocuments,
   buildSearchResults,
 } from "./utils/smartSearch";
 import { readManagedLinks, subscribeManagedLinks } from "./utils/linksStore";
-import kbArticlesData from "../kb/data/articles.json";
 
-const TOOLTIP_LEGEND_DISMISSED_KEY = "azdes.tooltipLegendDismissed";
-// Auto-index only UI KB data files (not cbc/ subdirectory)
-const dataModules = import.meta.glob("./data/[^/]*.js", { eager: true });
+const BASE_PATH = "/cbc-kb";
+const TOOLTIP_LEGEND_DISMISSED_KEY = "azdes.cbc.tooltipLegendDismissed";
+
+// Auto-index only CBC-scoped data files
+const dataModules = import.meta.glob("./data/cbc/*.js", { eager: true });
 const autoIndexedDataItems = buildAutoIndexedDataItems(dataModules);
-const kbEntries = kbArticlesData?.entries ?? [];
+
+// CBC has no separate KB articles pipeline yet — empty until wired
+const kbEntries = [];
+
+// CBC has no document references yet — empty stub
+const documentReferences = [];
 
 function getTooltipLegendDismissed() {
-  if (typeof window === "undefined") {
-    return false;
-  }
-
+  if (typeof window === "undefined") return false;
   return window.localStorage.getItem(TOOLTIP_LEGEND_DISMISSED_KEY) === "true";
 }
 
 function ToolScreen({ tool }) {
   const Component = tool.component;
-  const componentProps =
-    tool.path === "/quick-reference"
-      ? {
-          tools: toolRegistry.filter(
-            (item) => item.path !== "/quick-reference",
-          ),
-        }
-      : {};
-
   return (
     <>
       <section className="card guide-card">
         <h3>Quick guide</h3>
         <p className="muted">{tool.microGuide || tool.description}</p>
       </section>
-      <Component {...componentProps} />
+      <Component />
     </>
   );
 }
 
-function App({ basePath = "/ui-kb" }) {
+function CBCApp() {
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [managedLinks, setManagedLinks] = useState(readManagedLinks);
   const [isTooltipLegendDismissed, setIsTooltipLegendDismissed] = useState(
     getTooltipLegendDismissed,
-  );
-
-  const navItems = useMemo(() => buildNavItems(basePath), [basePath]);
-  const homeCards = useMemo(() => buildHomeCards(basePath), [basePath]);
-
-  // Strip the basePath prefix so smartSearch path matching works against toolRegistry
-  const strippedPathname = location.pathname.startsWith(basePath)
-    ? location.pathname.slice(basePath.length) || "/"
-    : location.pathname;
-
-  // Prefix topAction routes with basePath for correct navigation
-  const prefixedTopActions = useMemo(
-    () =>
-      topActions.map((action) => ({
-        ...action,
-        to: `${basePath}${action.to}`,
-      })),
-    [basePath],
   );
 
   useEffect(() => {
@@ -109,19 +82,32 @@ function App({ basePath = "/ui-kb" }) {
     }
   };
 
+  // Strip the /cbc-kb prefix so smartSearch path matching works
+  const strippedPathname = location.pathname.startsWith(BASE_PATH)
+    ? location.pathname.slice(BASE_PATH.length) || "/"
+    : location.pathname;
+
+  // Prefix topAction routes with basePath for correct navigation
+  const prefixedTopActions = topActions.map((action) => ({
+    ...action,
+    to: `${BASE_PATH}${action.to}`,
+  }));
+
+  const navItems = useMemo(() => buildCBCNavItems(BASE_PATH), []);
+  const homeCards = useMemo(() => buildCBCHomeCards(BASE_PATH), []);
+
   const searchResults = useMemo(() => {
     return buildSearchResults({
       query: searchQuery,
       maxResults: 24,
-      // Prefix paths so search result navigation works under basePath
-      toolRegistry: toolRegistry.map((tool) => ({
+      toolRegistry: cbcToolRegistry.map((tool) => ({
         ...tool,
-        path: `${basePath}${tool.path}`,
+        path: `${BASE_PATH}${tool.path}`,
       })),
       documentReferences,
       defaultLinks: managedLinks,
-      trendsTips,
-      uiTerms,
+      trendsTips: [],
+      uiTerms: [],
       topActions: prefixedTopActions,
       kbEntries,
       autoIndexedDataItems,
@@ -130,14 +116,18 @@ function App({ basePath = "/ui-kb" }) {
       orderedCallChecklist,
       noteRequirements,
       supportResources,
-      contactInfo,
+      contactInfo: {
+        unemploymentPhones: contactInfo.phones ?? [],
+        emails: contactInfo.emails ?? [],
+        website: contactInfo.website,
+      },
     });
-  }, [managedLinks, searchQuery, basePath, prefixedTopActions]);
+  }, [managedLinks, searchQuery, prefixedTopActions]);
 
   const focusedDocuments = useMemo(() => {
     return buildFocusedDocuments({
       documentReferences,
-      toolRegistry,
+      toolRegistry: cbcToolRegistry,
       pathname: strippedPathname,
       searchQuery,
     });
@@ -151,9 +141,10 @@ function App({ basePath = "/ui-kb" }) {
       onShowTips={handleShowTooltipLegend}
       onDismissTips={handleDismissTooltipLegend}
       navItems={navItems}
-      sidebarSections={sidebarSections}
-      brandName="AZDES UI Knowledge Base"
-      brandSubtitle="Agent workspace and quick tools"
+      sidebarSections={cbcSidebarSections}
+      brandName="AZDES CBC Knowledge Base"
+      brandSubtitle="Centralized Background Checks agent workspace"
+      showPetSystem={false}
     >
       {searchQuery.trim() ? (
         <section className="card stack" aria-live="polite">
@@ -204,20 +195,20 @@ function App({ basePath = "/ui-kb" }) {
         <Route
           path="/"
           element={
-            <HomePage
+            <CBCHomePage
               homeCards={homeCards}
               topActionsItems={prefixedTopActions}
             />
           }
         />
-        {toolRegistry.map((tool) => (
+        {cbcToolRegistry.map((tool) => (
           <Route
             key={tool.path}
             path={tool.path}
             element={<ToolScreen tool={tool} />}
           />
         ))}
-        <Route path="*" element={<Navigate to={`${basePath}/`} replace />} />
+        <Route path="*" element={<Navigate to={`${BASE_PATH}/`} replace />} />
       </Routes>
 
       <DocumentReferencesPanel
@@ -226,11 +217,11 @@ function App({ basePath = "/ui-kb" }) {
       />
 
       <footer>
-        Informational tool only. Validate determinations against current AZDES
-        UI policy and system guidance.
+        Informational tool only. Validate actions against current AZDES CBC
+        policy and system guidance.
       </footer>
     </PageTemplate>
   );
 }
 
-export default App;
+export default CBCApp;

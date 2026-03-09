@@ -205,23 +205,31 @@ export const toolRegistry = [
   },
 ];
 
-export const navItems = [
-  { to: "/", label: "Home", end: true },
-  ...toolRegistry.map((tool) => ({
-    to: tool.path,
-    label: tool.navLabel,
-    audience: tool.audience,
-  })),
-];
-
 export const sidebarSections = [
   { key: "agent", title: "Agent Tool", audience: "agent" },
   { key: "claimant", title: "Claimant Support", audience: "claimant" },
 ];
 
-export const homeCards = toolRegistry.map((tool) => ({
-  to: tool.path,
-  title: tool.title,
-  description: tool.description,
-  audience: tool.audience,
-}));
+export function buildNavItems(basePath) {
+  return [
+    { to: `${basePath}/`, label: "Home", end: true, home: true },
+    ...toolRegistry.map((tool) => ({
+      to: `${basePath}${tool.path}`,
+      label: tool.navLabel,
+      audience: tool.audience,
+    })),
+  ];
+}
+
+export function buildHomeCards(basePath) {
+  return toolRegistry.map((tool) => ({
+    to: `${basePath}${tool.path}`,
+    title: tool.title,
+    description: tool.description,
+    audience: tool.audience,
+  }));
+}
+
+// Legacy flat exports kept for backward-compat during migration
+export const navItems = buildNavItems("/ui-kb");
+export const homeCards = buildHomeCards("/ui-kb");

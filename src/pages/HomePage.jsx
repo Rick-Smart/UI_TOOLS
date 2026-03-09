@@ -1,9 +1,12 @@
 import PageSection from "../components/layout/PageSection";
 import ToolCard from "../components/ui/ToolCard";
-import { topActions } from "../data/topActions";
-import { homeCards } from "../data/toolRegistry";
+import { topActions as defaultTopActions } from "../data/topActions";
+import { homeCards as defaultHomeCards } from "../data/toolRegistry";
 
-function HomePage() {
+function HomePage({ homeCards, topActionsItems }) {
+  const resolvedHomeCards = homeCards ?? defaultHomeCards;
+  const resolvedTopActions = topActionsItems ?? defaultTopActions;
+
   return (
     <PageSection
       title="AZDES UI Tools"
@@ -12,7 +15,7 @@ function HomePage() {
       <div className="result stack">
         <h3>Today&apos;s Top Actions</h3>
         <div className="tools-grid home-top-actions-grid">
-          {topActions.map((item) => (
+          {resolvedTopActions.map((item) => (
             <ToolCard
               key={item.title}
               title={item.title}
@@ -26,11 +29,11 @@ function HomePage() {
 
       <div className="title-row">
         <h3>All tools</h3>
-        <span className="pill">{homeCards.length} cards</span>
+        <span className="pill">{resolvedHomeCards.length} cards</span>
       </div>
 
       <div className="tools-grid home-tools-grid">
-        {homeCards.map((card) => (
+        {resolvedHomeCards.map((card) => (
           <ToolCard
             key={card.to}
             title={card.title}
