@@ -1,9 +1,10 @@
 import { useMemo, useState } from "react";
 import PageSection from "../../components/layout/PageSection";
 import Tooltip from "../../components/Tooltip";
-import { copyText } from "../../utils/copyText";
+import AppButton from "../../components/ui/AppButton/AppButton";
+import AppSearchBar from "../../components/ui/AppSearchBar/AppSearchBar";
+import CopyButton from "../../components/ui/CopyButton/CopyButton";
 import { documentReferences } from "../../data/cbc/documentReferences";
-import { addInteractionMemory } from "../../utils/interactionMemory";
 
 function normalizeDocNumber(value) {
   return value.trim().toUpperCase();
@@ -15,7 +16,6 @@ function buildDesDocumentSearchUrl(value) {
 
 function CBCDocumentSearchPage() {
   const [query, setQuery] = useState("");
-  const [copyStatus, setCopyStatus] = useState("");
   const normalizedQuery = normalizeDocNumber(query);
 
   const matchingDocs = useMemo(() => {
@@ -36,22 +36,16 @@ function CBCDocumentSearchPage() {
     ? buildDesDocumentSearchUrl(normalizedQuery)
     : "https://des.az.gov/documents-center";
 
-  async function handleCopySummary() {
+  function buildSummary() {
     const topMatches = matchingDocs
       .slice(0, 5)
       .map((doc) => `- ${doc.number}: ${doc.title}`);
-    const summary = [
+    return [
       `Document search query: ${normalizedQuery || "(none)"}`,
       `Matches: ${matchingDocs.length}`,
       "Top matches:",
       ...(topMatches.length ? topMatches : ["- No matches found"]),
     ].join("\n");
-
-    const copied = await copyText(summary);
-    if (copied) {
-      addInteractionMemory("CBC Document Search", summary);
-    }
-    setCopyStatus(copied ? "Summary copied." : "Copy unavailable.");
   }
 
   return (
@@ -68,39 +62,20 @@ function CBCDocumentSearchPage() {
         <span className="pill">{matchingDocs.length} matches</span>
       }
     >
-      <div className="input-row compact-grid">
-        <div>
-          <label htmlFor="cbc-doc-number">
-            Document number or keyword
-            <Tooltip text="Search by form number (e.g. DCS-1083A) or keyword (e.g. central registry, clearance)." />
-          </label>
-          <input
-            id="cbc-doc-number"
-            type="text"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="DCS-1083A, CSO-1083C, clearance"
-          />
-        </div>
-      </div>
+      <AppSearchBar
+        id="cbc-doc-number"
+        label="Document number or keyword"
+        tooltip="Search by form number (e.g. DCS-1083A) or keyword (e.g. central registry, clearance)."
+        value={query}
+        onChange={setQuery}
+        placeholder="DCS-1083A, CSO-1083C, clearance"
+      />
 
       <div className="actions-row">
-        <a
-          href={searchUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="button-link"
-        >
+        <AppButton href={searchUrl} target="_blank" rel="noopener noreferrer">
           Search DES Documents Center
-        </a>
-        <button
-          type="button"
-          className="button-secondary"
-          onClick={handleCopySummary}
-        >
-          Copy summary
-        </button>
-        {copyStatus ? <span className="muted">{copyStatus}</span> : null}
+        </AppButton>
+        <CopyButton getSummary={buildSummary} memoryKey="CBC Document Search" />
       </div>
 
       <div className="stack" aria-live="polite">
@@ -120,14 +95,13 @@ function CBCDocumentSearchPage() {
                 {doc.notes ? <p className="muted">{doc.notes}</p> : null}
               </div>
               <div className="actions-row">
-                <a
+                <AppButton
                   href={doc.sourceUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="button-link"
                 >
                   Open
-                </a>
+                </AppButton>
               </div>
             </article>
           ))

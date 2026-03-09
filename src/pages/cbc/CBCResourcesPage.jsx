@@ -1,4 +1,5 @@
 import PageSection from "../../components/layout/PageSection";
+import AppButton from "../../components/ui/AppButton/AppButton";
 import {
   cbcResourcesMeta,
   quickShareLinks,
@@ -35,30 +36,29 @@ function CBCResourcesPage() {
           and CSO-2040.
         </p>
         <div className="actions-row">
-          <a
+          <AppButton
             href={cbcResourcesMeta.portalUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="button-link"
           >
             Open CBC Portal
-          </a>
-          <a
+          </AppButton>
+          <AppButton
             href={cbcResourcesMeta.desPageUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="button-link"
+            variant="secondary"
           >
             DES CBC Resources Page
-          </a>
-          <a
+          </AppButton>
+          <AppButton
             href={cbcResourcesMeta.technicalSupportUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="button-link"
+            variant="secondary"
           >
             Technical Support
-          </a>
+          </AppButton>
         </div>
       </section>
 
@@ -69,21 +69,20 @@ function CBCResourcesPage() {
         </p>
         <div className="stack">
           {quickShareLinks.map((link) => (
-            <article key={link.url} className="result">
+            <article key={link.url} className="result search-item">
               <div>
                 <p>
                   <strong>{link.label}</strong>
                 </p>
                 <p className="muted">{link.topic}</p>
               </div>
-              <a
+              <AppButton
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="button-link"
               >
                 Open
-              </a>
+              </AppButton>
             </article>
           ))}
         </div>
@@ -104,7 +103,7 @@ function CBCResourcesPage() {
         </p>
         <div className="stack">
           {userGuides.map((guide) => (
-            <article key={guide.id} className="result">
+            <article key={guide.id} className="result search-item">
               <div>
                 <p>
                   <strong>{guide.title}</strong>{" "}
@@ -116,14 +115,13 @@ function CBCResourcesPage() {
                   <em>Role: {guide.role}</em>
                 </p>
               </div>
-              <a
+              <AppButton
                 href={guide.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="button-link"
               >
                 Open
-              </a>
+              </AppButton>
             </article>
           ))}
         </div>
@@ -141,7 +139,7 @@ function CBCResourcesPage() {
                     Step {s.step}: {s.title}
                   </strong>
                 </p>
-                <ul className="muted">
+                <ul className="list muted">
                   {s.details.map((d, i) => (
                     <li key={i}>{d}</li>
                   ))}
@@ -166,7 +164,7 @@ function CBCResourcesPage() {
                     Step {s.step}: {s.title}
                   </strong>
                 </p>
-                <ul className="muted">
+                <ul className="list muted">
                   {s.details.map((d, i) => (
                     <li key={i}>{d}</li>
                   ))}

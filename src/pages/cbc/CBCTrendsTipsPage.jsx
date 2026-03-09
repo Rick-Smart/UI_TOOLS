@@ -1,8 +1,7 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import PageSection from "../../components/layout/PageSection";
+import CopyButton from "../../components/ui/CopyButton/CopyButton";
 import { trendsTips } from "../../data/cbc/trendsTips";
-import { copyText } from "../../utils/copyText";
-import { addInteractionMemory } from "../../utils/interactionMemory";
 
 const priorityRank = {
   high: 0,
@@ -20,8 +19,6 @@ function isActive(item) {
 }
 
 function CBCTrendsTipsPage() {
-  const [copyStatus, setCopyStatus] = useState("");
-
   const activeItems = useMemo(() => {
     return [...trendsTips].filter(isActive).sort((a, b) => {
       const priorityCompare =
@@ -34,24 +31,18 @@ function CBCTrendsTipsPage() {
     });
   }, []);
 
-  async function handleCopySummary() {
+  function buildSummary() {
     const summaryLines = activeItems
       .slice(0, 5)
       .map(
         (item) =>
           `- ${item.title} (${item.priority}) | ${item.type} | ${item.message}`,
       );
-    const summary = [
+    return [
       `Active trends/tips: ${activeItems.length}`,
       "Top active items:",
       ...(summaryLines.length ? summaryLines : ["- No active items"]),
     ].join("\n");
-
-    const copied = await copyText(summary);
-    if (copied) {
-      addInteractionMemory("CBC Trends, Tips & Suggestions", summary);
-    }
-    setCopyStatus(copied ? "Summary copied." : "Copy unavailable.");
   }
 
   return (
@@ -70,14 +61,10 @@ function CBCTrendsTipsPage() {
     >
       <div className="stack" aria-live="polite">
         <div className="actions-row">
-          <button
-            type="button"
-            className="button-secondary"
-            onClick={handleCopySummary}
-          >
-            Copy summary
-          </button>
-          {copyStatus ? <span className="muted">{copyStatus}</span> : null}
+          <CopyButton
+            getSummary={buildSummary}
+            memoryKey="CBC Trends, Tips & Suggestions"
+          />
         </div>
 
         {activeItems.length ? (

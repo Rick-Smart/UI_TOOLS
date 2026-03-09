@@ -1,5 +1,6 @@
 import CBCCallHandlingPage from "../../pages/cbc/CBCCallHandlingPage";
 import CBCDocumentSearchPage from "../../pages/cbc/CBCDocumentSearchPage";
+import CBCFAQPage from "../../pages/cbc/CBCFAQPage";
 import CBCLinksPage from "../../pages/cbc/CBCLinksPage";
 import CBCResourcesPage from "../../pages/cbc/CBCResourcesPage";
 import CBCTermsPage from "../../pages/cbc/CBCTermsPage";
@@ -37,6 +38,17 @@ export const cbcToolRegistry = [
     microGuide:
       "Use this page to find setup guides and links to share with callers.",
     component: CBCResourcesPage,
+    audience: "reference",
+  },
+  {
+    path: "/faq",
+    navLabel: "FAQ",
+    title: "CBC Frequently Asked Questions",
+    description:
+      "Searchable FAQ from the CBC portal, organized by category: General, Individual, Employer, Agency, and DES.",
+    microGuide:
+      "Search or filter by category to quickly find answers to common caller questions.",
+    component: CBCFAQPage,
     audience: "reference",
   },
   {

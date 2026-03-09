@@ -1,12 +1,10 @@
 import { useMemo, useState } from "react";
 import PageSection from "../components/layout/PageSection";
-import { copyText } from "../utils/copyText";
-import { addInteractionMemory } from "../utils/interactionMemory";
+import CopyButton from "../components/ui/CopyButton/CopyButton";
 
 function WeeklyPayablePage() {
   const [weeklyBenefitAmount, setWeeklyBenefitAmount] = useState(320);
   const [weeklyEarnings, setWeeklyEarnings] = useState(0);
-  const [copyStatus, setCopyStatus] = useState("");
 
   const calculation = useMemo(() => {
     const wba = Number(weeklyBenefitAmount);
@@ -37,24 +35,18 @@ function WeeklyPayablePage() {
     };
   }, [weeklyBenefitAmount, weeklyEarnings]);
 
-  async function handleCopySummary() {
+  function buildSummary() {
     if (!calculation) {
-      return;
+      return "";
     }
 
-    const summary = [
+    return [
       "Weekly Payable Summary",
       `WBA: $${calculation.wba.toFixed(2)}`,
       `Weekly earnings: $${calculation.earnings.toFixed(2)}`,
       `Reduction: $${calculation.reduction.toFixed(2)}`,
       `Estimated payable: $${calculation.payable.toFixed(0)}`,
     ].join("\n");
-
-    const copied = await copyText(summary);
-    if (copied) {
-      addInteractionMemory("Weekly Payable Estimator", summary);
-    }
-    setCopyStatus(copied ? "Summary copied." : "Copy unavailable.");
   }
 
   return (
@@ -130,14 +122,10 @@ function WeeklyPayablePage() {
             </p>
           ) : null}
           <div className="actions-row">
-            <button
-              type="button"
-              className="button-secondary"
-              onClick={handleCopySummary}
-            >
-              Copy summary
-            </button>
-            {copyStatus ? <span className="muted">{copyStatus}</span> : null}
+            <CopyButton
+              getSummary={buildSummary}
+              memoryKey="Weekly Payable Estimator"
+            />
           </div>
         </div>
       )}

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import PageSection from "../../components/layout/PageSection";
 import Tooltip from "../../components/Tooltip";
+import AppButton from "../../components/ui/AppButton/AppButton";
 import {
   readManagedLinks,
   resetManagedLinks,
@@ -128,21 +129,16 @@ function CBCLinksPage() {
           </div>
         </div>
         <div className="actions-row">
-          <button
+          <AppButton
             type="button"
-            className="button-secondary"
             onClick={addLink}
             disabled={!name.trim() || !url.trim()}
           >
             Add link
-          </button>
-          <button
-            type="button"
-            className="button-secondary"
-            onClick={resetLinks}
-          >
+          </AppButton>
+          <AppButton type="button" variant="secondary" onClick={resetLinks}>
             Reset to defaults
-          </button>
+          </AppButton>
         </div>
       </section>
 
@@ -159,21 +155,20 @@ function CBCLinksPage() {
                   <p className="muted">{link.url}</p>
                 </div>
                 <div className="actions-row">
-                  <a
+                  <AppButton
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="button-link"
                   >
                     Open
-                  </a>
-                  <button
+                  </AppButton>
+                  <AppButton
                     type="button"
-                    className="button-secondary"
+                    variant="secondary"
                     onClick={() => removeLink(link)}
                   >
                     Remove
-                  </button>
+                  </AppButton>
                 </div>
               </article>
             ))}

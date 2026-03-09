@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import PageSection from "../components/layout/PageSection";
 import Tooltip from "../components/Tooltip";
-import { copyText } from "../utils/copyText";
-import { addInteractionMemory } from "../utils/interactionMemory";
+import AppSearchBar from "../components/ui/AppSearchBar/AppSearchBar";
+import CopyButton from "../components/ui/CopyButton/CopyButton";
 
 const cards = [
   {
@@ -89,7 +89,6 @@ const cards = [
 
 function AgentResponseCardsPage() {
   const [query, setQuery] = useState("");
-  const [copyStatus, setCopyStatus] = useState("");
 
   const filtered = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -104,22 +103,16 @@ function AgentResponseCardsPage() {
     );
   }, [query]);
 
-  async function handleCopySummary() {
+  function buildSummary() {
     const topCards = filtered
       .slice(0, 5)
       .map((card) => `- ${card.title}: ${card.response}`);
-    const summary = [
+    return [
       `Agent card query: ${query.trim() || "(none)"}`,
       `Matched cards: ${filtered.length}`,
       "Top response cards:",
       ...(topCards.length ? topCards : ["- No matching cards"]),
     ].join("\n");
-
-    const copied = await copyText(summary);
-    if (copied) {
-      addInteractionMemory("Agent Response Cards", summary);
-    }
-    setCopyStatus(copied ? "Summary copied." : "Copy unavailable.");
   }
 
   return (
@@ -133,29 +126,20 @@ function AgentResponseCardsPage() {
         </>
       }
     >
-      <div className="compact-grid">
-        <label htmlFor="card-search">
-          Search response cards
-          <Tooltip text="Search by claimant question topic (for example: appeal, earnings, waiting week, overpayment)." />
-        </label>
-        <input
-          id="card-search"
-          type="text"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search topic or keyword"
-        />
-      </div>
+      <AppSearchBar
+        id="card-search"
+        label="Search response cards"
+        tooltip="Search by claimant question topic (for example: appeal, earnings, waiting week, overpayment)."
+        value={query}
+        onChange={setQuery}
+        placeholder="Search topic or keyword"
+      />
 
       <div className="actions-row">
-        <button
-          type="button"
-          className="button-secondary"
-          onClick={handleCopySummary}
-        >
-          Copy summary
-        </button>
-        {copyStatus ? <span className="muted">{copyStatus}</span> : null}
+        <CopyButton
+          getSummary={buildSummary}
+          memoryKey="Agent Response Cards"
+        />
       </div>
 
       <div className="tools-grid" aria-live="polite">
