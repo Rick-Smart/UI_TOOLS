@@ -6,32 +6,48 @@ function KBLandingPage() {
   return (
     <div className="kb-landing">
       <header className="kb-landing-header">
-        <h1 className="kb-landing-title">AZDES Knowledge Base Portal</h1>
+        <p className="kb-landing-eyebrow">Knowledge Base Management</p>
+        <h1 className="kb-landing-title">Select Your Workspace</h1>
         <p className="kb-landing-subtitle">
-          Arizona Department of Economic Security · Select your workspace below
+          Choose the department workspace below to open its tools and resources
         </p>
       </header>
 
       <main className="kb-landing-grid">
         {kbRegistry.map((kb) => (
-          <article key={kb.id} className="kb-card">
+          <Link
+            key={kb.id}
+            to={`${kb.basePath}/`}
+            className="kb-card"
+            style={{
+              "--kb-accent": kb.accentColor,
+              "--kb-accent-bg": kb.accentBg,
+            }}
+            aria-label={`Open ${kb.name} — ${kb.department}`}
+          >
+            <div className="kb-card-hero">
+              <span className="kb-card-code" aria-hidden="true">
+                {kb.code}
+              </span>
+              <h2 className="kb-card-dept">{kb.department}</h2>
+              <p className="kb-card-for">{kb.forLine}</p>
+            </div>
+
             <div className="kb-card-body">
-              <span className="kb-card-dept">{kb.department}</span>
-              <h2 className="kb-card-name">{kb.name}</h2>
+              <p className="kb-card-name">{kb.name}</p>
               <p className="kb-card-description">{kb.description}</p>
             </div>
-            <div className="kb-card-footer">
-              <Link to={`${kb.basePath}/`} className="kb-card-link">
-                Open workspace
-              </Link>
+
+            <div className="kb-card-cta">
+              <span className="kb-card-cta-btn">Open Workspace</span>
             </div>
-          </article>
+          </Link>
         ))}
       </main>
 
       <footer className="kb-landing-footer">
-        Informational tool only. Validate actions against current AZDES policy
-        and system guidance.
+        Informational tool only &middot; Validate all actions against current
+        policy and system guidance
       </footer>
     </div>
   );

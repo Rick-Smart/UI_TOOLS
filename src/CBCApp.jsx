@@ -23,7 +23,10 @@ import {
   buildFocusedDocuments,
   buildSearchResults,
 } from "./utils/smartSearch";
-import { readManagedLinks, subscribeManagedLinks } from "./utils/linksStore";
+import { readManagedLinks, subscribeManagedLinks } from "./utils/cbcLinksStore";
+import { documentReferences } from "./data/cbc/documentReferences";
+import { cbcTerms } from "./data/cbc/cbcTerms";
+import { trendsTips } from "./data/cbc/trendsTips";
 
 const BASE_PATH = "/cbc-kb";
 const TOOLTIP_LEGEND_DISMISSED_KEY = "azdes.cbc.tooltipLegendDismissed";
@@ -34,9 +37,6 @@ const autoIndexedDataItems = buildAutoIndexedDataItems(dataModules);
 
 // CBC has no separate KB articles pipeline yet — empty until wired
 const kbEntries = [];
-
-// CBC has no document references yet — empty stub
-const documentReferences = [];
 
 function getTooltipLegendDismissed() {
   if (typeof window === "undefined") return false;
@@ -106,8 +106,8 @@ function CBCApp() {
       })),
       documentReferences,
       defaultLinks: managedLinks,
-      trendsTips: [],
-      uiTerms: [],
+      trendsTips,
+      uiTerms: cbcTerms,
       topActions: prefixedTopActions,
       kbEntries,
       autoIndexedDataItems,
@@ -116,11 +116,7 @@ function CBCApp() {
       orderedCallChecklist,
       noteRequirements,
       supportResources,
-      contactInfo: {
-        unemploymentPhones: contactInfo.phones ?? [],
-        emails: contactInfo.emails ?? [],
-        website: contactInfo.website,
-      },
+      contactInfo,
     });
   }, [managedLinks, searchQuery, prefixedTopActions]);
 

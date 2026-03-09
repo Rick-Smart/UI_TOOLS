@@ -1,4 +1,9 @@
 import CBCCallHandlingPage from "../../pages/cbc/CBCCallHandlingPage";
+import CBCDocumentSearchPage from "../../pages/cbc/CBCDocumentSearchPage";
+import CBCLinksPage from "../../pages/cbc/CBCLinksPage";
+import CBCResourcesPage from "../../pages/cbc/CBCResourcesPage";
+import CBCTermsPage from "../../pages/cbc/CBCTermsPage";
+import CBCTrendsTipsPage from "../../pages/cbc/CBCTrendsTipsPage";
 
 export const cbcToolRegistry = [
   {
@@ -12,10 +17,66 @@ export const cbcToolRegistry = [
     component: CBCCallHandlingPage,
     audience: "agent",
   },
+  {
+    path: "/trends-tips",
+    navLabel: "Trends & Tips",
+    title: "CBC Trends, Tips & Suggestions",
+    description:
+      "Leader-updated guidance, tips, and active campaign notes for CBC agents.",
+    microGuide:
+      "Check here for current guidance from leadership before or during calls.",
+    component: CBCTrendsTipsPage,
+    audience: "agent",
+  },
+  {
+    path: "/resources",
+    navLabel: "CBC Resources",
+    title: "CBC Portal Resources",
+    description:
+      "Setup guides by account role and quick-share links for the Arizona CBC portal.",
+    microGuide:
+      "Use this page to find setup guides and links to share with callers.",
+    component: CBCResourcesPage,
+    audience: "reference",
+  },
+  {
+    path: "/document-search",
+    navLabel: "Document Search",
+    title: "CBC Document Search",
+    description:
+      "Search known CBC-related forms and legacy documents replaced by the CBC portal.",
+    microGuide:
+      "Search by form number (e.g. DCS-1083A) or keyword. Legacy forms are now handled via cbc.az.gov.",
+    component: CBCDocumentSearchPage,
+    audience: "reference",
+  },
+  {
+    path: "/terms",
+    navLabel: "Terms & Acronyms",
+    title: "CBC Terms & Acronyms",
+    description:
+      "Searchable glossary of CBC-specific terminology, acronyms, and program definitions.",
+    microGuide:
+      "Search terms to support clear, consistent communication with callers.",
+    component: CBCTermsPage,
+    audience: "reference",
+  },
+  {
+    path: "/links",
+    navLabel: "Quick Links",
+    title: "CBC Quick Links",
+    description:
+      "Save and manage frequently used CBC links in your local browser storage.",
+    microGuide:
+      "Add and organize links to CBC portal, DES pages, and other resources you use regularly.",
+    component: CBCLinksPage,
+    audience: "reference",
+  },
 ];
 
 export const cbcSidebarSections = [
   { key: "agent", title: "Agent Tools", audience: "agent" },
+  { key: "reference", title: "Reference", audience: "reference" },
 ];
 
 export function buildCBCNavItems(basePath) {
