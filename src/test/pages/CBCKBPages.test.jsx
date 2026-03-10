@@ -9,6 +9,10 @@ import { describe, it, expect } from "vitest";
 import { screen, fireEvent } from "@testing-library/react";
 import { renderWithRouter } from "../renderWithRouter";
 
+import CBCCallHandlingPage from "../../pages/cbc/CBCCallHandlingPage";
+import CBCMillisPage from "../../pages/cbc/CBCMillisPage";
+import CBCTroubleshootingPage from "../../pages/cbc/CBCTroubleshootingPage";
+
 import CBCDocumentSearchPage from "../../pages/cbc/CBCDocumentSearchPage";
 import CBCTermsPage from "../../pages/cbc/CBCTermsPage";
 import CBCTrendsTipsPage from "../../pages/cbc/CBCTrendsTipsPage";
@@ -292,5 +296,209 @@ describe("CBCFAQPage", () => {
     // Result count element (e.g. "5 questions") rendered alongside the FAQ items
     const articles = container.querySelectorAll("article");
     expect(articles.length).toBeGreaterThan(0);
+  });
+});
+
+// ─── CBCTroubleshootingPage ───────────────────────────────────────────────────
+describe("CBCTroubleshootingPage", () => {
+  it("renders without crashing", () => {
+    renderWithRouter(<CBCTroubleshootingPage />);
+    expect(
+      screen.getByRole("heading", { name: /troubleshooting/i }),
+    ).toBeInTheDocument();
+  });
+
+  it("search input is labeled (AppSearchBar)", () => {
+    renderWithRouter(<CBCTroubleshootingPage />);
+    expect(
+      screen.getByRole("textbox", { name: /search issues and steps/i }),
+    ).toBeInTheDocument();
+  });
+
+  it("category filter tabs use AppButton", () => {
+    renderWithRouter(<CBCTroubleshootingPage />);
+    const allTab = screen.getByRole("tab", { name: /^all$/i });
+    expect(allTab).toHaveClass("app-button");
+  });
+
+  it("'All' category is selected by default", () => {
+    renderWithRouter(<CBCTroubleshootingPage />);
+    const allTab = screen.getByRole("tab", { name: /^all$/i });
+    expect(allTab).toHaveAttribute("aria-selected", "true");
+  });
+
+  it("accordion triggers use AppButton", () => {
+    renderWithRouter(<CBCTroubleshootingPage />);
+    const allBtns = screen.queryAllByRole("button");
+    const accordionTriggers = allBtns.filter((b) =>
+      b.classList.contains("accordion-trigger"),
+    );
+    expect(accordionTriggers.length).toBeGreaterThan(0);
+    accordionTriggers.forEach((btn) => expect(btn).toHaveClass("app-button"));
+  });
+
+  it("clicking an accordion item opens its steps", () => {
+    renderWithRouter(<CBCTroubleshootingPage />);
+    const allBtns = screen.queryAllByRole("button");
+    const firstAccordion = allBtns.find((b) =>
+      b.classList.contains("accordion-trigger"),
+    );
+    expect(firstAccordion).toBeInTheDocument();
+    expect(firstAccordion).toHaveAttribute("aria-expanded", "false");
+    fireEvent.click(firstAccordion);
+    expect(firstAccordion).toHaveAttribute("aria-expanded", "true");
+  });
+
+  it("filtering with no match shows empty state", () => {
+    renderWithRouter(<CBCTroubleshootingPage />);
+    const input = screen.getByRole("textbox", {
+      name: /search issues and steps/i,
+    });
+    fireEvent.change(input, { target: { value: "ZZZNOMATCH99" } });
+    expect(screen.getByText(/no matching issues found/i)).toBeInTheDocument();
+  });
+
+  it("clicking a category tab filters results", () => {
+    renderWithRouter(<CBCTroubleshootingPage />);
+    const tabs = screen.getAllByRole("tab");
+    const nonAllTab = tabs.find((t) => t.textContent !== "All");
+    if (nonAllTab) {
+      const allBefore = screen
+        .queryAllByRole("button")
+        .filter((b) => b.classList.contains("accordion-trigger")).length;
+      fireEvent.click(nonAllTab);
+      const afterCount = screen
+        .queryAllByRole("button")
+        .filter((b) => b.classList.contains("accordion-trigger")).length;
+      expect(afterCount).toBeLessThanOrEqual(allBefore);
+    }
+  });
+});
+
+// ─── CBCCallHandlingPage / CBCCallFlowNavigator ───────────────────────────────
+describe("CBCCallHandlingPage", () => {
+  it("renders without crashing", () => {
+    renderWithRouter(<CBCCallHandlingPage />);
+    expect(
+      screen.getByRole("heading", { name: /call handling/i }),
+    ).toBeInTheDocument();
+  });
+
+  it("call triage navigator is present with a question node", () => {
+    renderWithRouter(<CBCCallHandlingPage />);
+    // The navigator's first step label is a <p class="muted"> inside an article.result.stack
+    const muteEls = document.querySelectorAll("article.result.stack p.muted");
+    const stepLabel = Array.from(muteEls).find((el) =>
+      /step 1/i.test(el.textContent),
+    );
+    expect(stepLabel).toBeTruthy();
+  });
+
+  it("triage option buttons use AppButton accordion-trigger style", () => {
+    renderWithRouter(<CBCCallHandlingPage />);
+    const allBtns = screen.queryAllByRole("button");
+    const triageBtns = allBtns.filter((b) =>
+      b.classList.contains("accordion-trigger"),
+    );
+    expect(triageBtns.length).toBeGreaterThan(0);
+    triageBtns.forEach((btn) => expect(btn).toHaveClass("app-button"));
+  });
+
+  it("clicking a triage option advances the flow", () => {
+    renderWithRouter(<CBCCallHandlingPage />);
+    const allBtns = screen.queryAllByRole("button");
+    const firstOption = allBtns.find((b) =>
+      b.classList.contains("accordion-trigger"),
+    );
+    expect(firstOption).toBeInTheDocument();
+    fireEvent.click(firstOption);
+    // After navigating, Back and Start Over type-chip controls appear in the navigator
+    const backBtns = screen
+      .queryAllByRole("button")
+      .filter(
+        (b) => b.classList.contains("type-chip") && /back/i.test(b.textContent),
+      );
+    expect(backBtns.length).toBeGreaterThan(0);
+  });
+
+  it("Back button returns to previous step", () => {
+    renderWithRouter(<CBCCallHandlingPage />);
+    const allBtns = screen.queryAllByRole("button");
+    const firstOption = allBtns.find((b) =>
+      b.classList.contains("accordion-trigger"),
+    );
+    fireEvent.click(firstOption);
+    const backBtn = screen
+      .queryAllByRole("button")
+      .find(
+        (b) => b.classList.contains("type-chip") && /back/i.test(b.textContent),
+      );
+    fireEvent.click(backBtn);
+    // Back at step 1 — no Back/Start Over chips remain
+    const backBtnsAfter = screen
+      .queryAllByRole("button")
+      .filter(
+        (b) => b.classList.contains("type-chip") && /back/i.test(b.textContent),
+      );
+    expect(backBtnsAfter.length).toBe(0);
+  });
+});
+
+// ─── CBCMillisPage ────────────────────────────────────────────────────────────
+describe("CBCMillisPage", () => {
+  it("renders without crashing", () => {
+    renderWithRouter(<CBCMillisPage />);
+    expect(
+      screen.getByRole("heading", { level: 2, name: /milliseconds/i }),
+    ).toBeInTheDocument();
+  });
+
+  it("shows a live current timestamp", () => {
+    renderWithRouter(<CBCMillisPage />);
+    // The live ms value is a large number — check it's present in the output
+    const result = screen.getByLabelText(/current unix timestamp/i);
+    expect(result).toBeInTheDocument();
+    const ms = Number(
+      result.querySelector("span").textContent.replace(/,/g, ""),
+    );
+    expect(ms).toBeGreaterThan(1_000_000_000_000);
+  });
+
+  it("datetime-local input is labeled", () => {
+    renderWithRouter(<CBCMillisPage />);
+    expect(screen.getByLabelText(/date and time/i)).toBeInTheDocument();
+  });
+
+  it("milliseconds input is labeled", () => {
+    renderWithRouter(<CBCMillisPage />);
+    expect(screen.getByLabelText(/milliseconds value/i)).toBeInTheDocument();
+  });
+
+  it("entering a valid ms value shows a readable date", () => {
+    renderWithRouter(<CBCMillisPage />);
+    const input = screen.getByLabelText(/milliseconds value/i);
+    fireEvent.change(input, { target: { value: "1741651200000" } });
+    // The ms→date result panel shows a bold readable date string
+    const resultsPanel = input.closest("section");
+    expect(
+      resultsPanel.querySelector("span[style*='font-weight: 600']"),
+    ).toBeTruthy();
+  });
+
+  it("entering an invalid ms value shows an error hint", () => {
+    renderWithRouter(<CBCMillisPage />);
+    const input = screen.getByLabelText(/milliseconds value/i);
+    fireEvent.change(input, { target: { value: "not-a-number" } });
+    expect(screen.getByText(/valid positive number/i)).toBeInTheDocument();
+  });
+
+  it("copy buttons use AppButton secondary", () => {
+    renderWithRouter(<CBCMillisPage />);
+    const copyBtns = screen.getAllByRole("button", { name: /copy/i });
+    expect(copyBtns.length).toBeGreaterThan(0);
+    copyBtns.forEach((btn) => {
+      expect(btn).toHaveClass("app-button");
+      expect(btn).toHaveClass("button-secondary");
+    });
   });
 });

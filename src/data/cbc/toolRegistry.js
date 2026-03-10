@@ -2,6 +2,7 @@ import CBCCallHandlingPage from "../../pages/cbc/CBCCallHandlingPage";
 import CBCDocumentSearchPage from "../../pages/cbc/CBCDocumentSearchPage";
 import CBCFAQPage from "../../pages/cbc/CBCFAQPage";
 import CBCLinksPage from "../../pages/cbc/CBCLinksPage";
+import CBCMillisPage from "../../pages/cbc/CBCMillisPage";
 import CBCResourcesPage from "../../pages/cbc/CBCResourcesPage";
 import CBCTermsPage from "../../pages/cbc/CBCTermsPage";
 import CBCTrendsTipsPage from "../../pages/cbc/CBCTrendsTipsPage";
@@ -94,6 +95,17 @@ export const cbcToolRegistry = [
     microGuide:
       "Add and organize links to CBC portal, DES pages, and other resources you use regularly.",
     component: CBCLinksPage,
+    audience: "reference",
+  },
+  {
+    path: "/millis",
+    navLabel: "Timestamp Tool",
+    title: "Milliseconds / Timestamp Tool",
+    description:
+      "Convert between human-readable dates and Unix timestamps in milliseconds. Use when setting or verifying backend password expiry values.",
+    microGuide:
+      "Paste a milliseconds value to see the date, or pick a date to get its milliseconds — no need to leave the tool.",
+    component: CBCMillisPage,
     audience: "reference",
   },
 ];
