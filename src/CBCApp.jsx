@@ -27,6 +27,7 @@ import { readManagedLinks, subscribeManagedLinks } from "./utils/cbcLinksStore";
 import { documentReferences } from "./data/cbc/documentReferences";
 import { cbcTerms } from "./data/cbc/cbcTerms";
 import { trendsTips } from "./data/cbc/trendsTips";
+import { cbcKBEntries } from "./data/cbc/cbcKBEntries";
 
 const BASE_PATH = "/cbc-kb";
 const TOOLTIP_LEGEND_DISMISSED_KEY = "azdes.cbc.tooltipLegendDismissed";
@@ -35,8 +36,7 @@ const TOOLTIP_LEGEND_DISMISSED_KEY = "azdes.cbc.tooltipLegendDismissed";
 const dataModules = import.meta.glob("./data/cbc/*.js", { eager: true });
 const autoIndexedDataItems = buildAutoIndexedDataItems(dataModules);
 
-// CBC has no separate KB articles pipeline yet — empty until wired
-const kbEntries = [];
+const kbEntries = cbcKBEntries;
 
 function getTooltipLegendDismissed() {
   if (typeof window === "undefined") return false;
