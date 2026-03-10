@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import PageSection from "../components/layout/PageSection";
+import AppButton from "../components/ui/AppButton/AppButton";
+import CopyButton from "../components/ui/CopyButton/CopyButton";
 import { documentReferences } from "../data/documentReferences";
 import { topActions } from "../data/topActions";
 import { trendsTips } from "../data/trendsTips";
 import { readManagedLinks, subscribeManagedLinks } from "../utils/linksStore";
-import { copyText } from "../utils/copyText";
-import { addInteractionMemory } from "../utils/interactionMemory";
 
 function isActive(item) {
   if (!item.expiresOn) {
@@ -17,15 +17,14 @@ function isActive(item) {
 }
 
 function QuickReferencePage({ tools = [] }) {
-  const [copyStatus, setCopyStatus] = useState("");
   const [managedLinks, setManagedLinks] = useState(readManagedLinks);
 
   useEffect(() => {
     return subscribeManagedLinks(setManagedLinks);
   }, []);
 
-  async function handleCopySummary() {
-    const summary = [
+  function buildSummary() {
+    return [
       `Top actions: ${topActions.length}`,
       `Tool directory entries: ${tools.length}`,
       `Document references: ${documentReferences.length}`,
@@ -34,12 +33,6 @@ function QuickReferencePage({ tools = [] }) {
       "",
       "Quick reference snapshot generated.",
     ].join("\n");
-
-    const copied = await copyText(summary);
-    if (copied) {
-      addInteractionMemory("Printable Quick Reference", summary);
-    }
-    setCopyStatus(copied ? "Summary copied." : "Copy unavailable.");
   }
 
   return (
@@ -49,17 +42,13 @@ function QuickReferencePage({ tools = [] }) {
       className="print-friendly"
       headerContent={
         <div className="actions-row">
-          <button type="button" onClick={() => window.print()}>
+          <AppButton type="button" onClick={() => window.print()}>
             Print view
-          </button>
-          <button
-            type="button"
-            className="button-secondary"
-            onClick={handleCopySummary}
-          >
-            Copy summary
-          </button>
-          {copyStatus ? <span className="muted">{copyStatus}</span> : null}
+          </AppButton>
+          <CopyButton
+            getSummary={buildSummary}
+            memoryKey="Printable Quick Reference"
+          />
         </div>
       }
     >

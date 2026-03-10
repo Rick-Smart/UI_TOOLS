@@ -23,6 +23,9 @@ function PageTemplate({
   onDismissTips,
   navItems,
   sidebarSections,
+  brandName,
+  brandSubtitle,
+  showPetSystem = true,
   children,
 }) {
   const [isSidebarVisible, setIsSidebarVisible] = useState(getSidebarVisible);
@@ -73,13 +76,16 @@ function PageTemplate({
         onDismissTips={onDismissTips}
         isSidebarVisible={isSidebarVisible}
         onToggleSidebar={handleToggleSidebar}
+        brandName={brandName}
+        brandSubtitle={brandSubtitle}
+        showPetSystem={showPetSystem}
       />
 
       <div className="app-shell">
         <section className="app-content stack">{children}</section>
       </div>
 
-      <AgentPetHost />
+      <AgentPetHost enabled={showPetSystem} />
 
       <div
         className={`sidebar-overlay ${isSidebarVisible ? "sidebar-overlay-open" : ""}`}

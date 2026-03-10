@@ -14,4 +14,15 @@ export default defineConfig({
   define: {
     "import.meta.env.VITE_PET_SYSTEM_ENABLED": JSON.stringify(petSystemEnabled),
   },
+  test: {
+    environment: "happy-dom",
+    globals: true,
+    setupFiles: ["./src/test/setup.js"],
+    css: false,
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "html"],
+      include: ["src/components/ui/**", "src/pages/**", "src/utils/**"],
+    },
+  },
 });

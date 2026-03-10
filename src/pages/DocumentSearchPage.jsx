@@ -1,9 +1,10 @@
 import { useMemo, useState } from "react";
 import PageSection from "../components/layout/PageSection";
 import Tooltip from "../components/Tooltip";
-import { copyText } from "../utils/copyText";
+import AppButton from "../components/ui/AppButton/AppButton";
+import AppSearchBar from "../components/ui/AppSearchBar/AppSearchBar";
+import CopyButton from "../components/ui/CopyButton/CopyButton";
 import { documentReferences } from "../data/documentReferences";
-import { addInteractionMemory } from "../utils/interactionMemory";
 
 function normalizeDocNumber(value) {
   return value.trim().toUpperCase();
@@ -15,7 +16,6 @@ function buildAzdesSearchUrl(value) {
 
 function DocumentSearchPage() {
   const [query, setQuery] = useState("");
-  const [copyStatus, setCopyStatus] = useState("");
   const normalizedQuery = normalizeDocNumber(query);
 
   const matchingDocs = useMemo(() => {
@@ -35,22 +35,16 @@ function DocumentSearchPage() {
     ? buildAzdesSearchUrl(normalizedQuery)
     : "https://des.az.gov/documents-center";
 
-  async function handleCopySummary() {
+  function buildSummary() {
     const topMatches = matchingDocs
       .slice(0, 5)
       .map((doc) => `- ${doc.number}: ${doc.title}`);
-    const summary = [
+    return [
       `Document search query: ${normalizedQuery || "(none)"}`,
       `Matches: ${matchingDocs.length}`,
       "Top matches:",
       ...(topMatches.length ? topMatches : ["- No matches found"]),
     ].join("\n");
-
-    const copied = await copyText(summary);
-    if (copied) {
-      addInteractionMemory("Document Search", summary);
-    }
-    setCopyStatus(copied ? "Summary copied." : "Copy unavailable.");
   }
 
   return (
@@ -66,44 +60,27 @@ function DocumentSearchPage() {
         <span className="pill">{matchingDocs.length} matches</span>
       }
     >
-      <div className="input-row compact-grid">
-        <div>
-          <label htmlFor="doc-number">Document number</label>
-          <input
-            id="doc-number"
-            type="text"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="UIB-1240A, UB-217C, UIB-1091A"
-          />
-        </div>
-      </div>
+      <AppSearchBar
+        id="doc-number"
+        label="Document number"
+        value={query}
+        onChange={setQuery}
+        placeholder="UIB-1240A, UB-217C, UIB-1091A"
+      />
 
       <div className="actions-row">
-        <a
-          className="button-link"
-          href={searchUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <AppButton href={searchUrl} target="_blank" rel="noopener noreferrer">
           Search AZDES
-        </a>
-        <a
-          className="button-secondary button-link"
+        </AppButton>
+        <AppButton
           href="https://des.az.gov/documents-center"
+          variant="secondary"
           target="_blank"
           rel="noopener noreferrer"
         >
           Open Documents Center
-        </a>
-        <button
-          type="button"
-          className="button-secondary"
-          onClick={handleCopySummary}
-        >
-          Copy summary
-        </button>
-        {copyStatus ? <span className="muted">{copyStatus}</span> : null}
+        </AppButton>
+        <CopyButton getSummary={buildSummary} memoryKey="Document Search" />
       </div>
 
       <div className="docs-grid" aria-live="polite">
@@ -118,22 +95,21 @@ function DocumentSearchPage() {
               <p className="muted">{doc.notes}</p>
             </div>
             <div className="actions-row">
-              <a
-                className="button-link"
+              <AppButton
                 href={doc.sourceUrl}
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 Open source
-              </a>
-              <a
-                className="button-secondary button-link"
+              </AppButton>
+              <AppButton
                 href={doc.searchUrl}
+                variant="secondary"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 Search by number
-              </a>
+              </AppButton>
               <span className="muted">
                 <Tooltip text="Open source goes to the known official page. Search by number helps when direct source pages move or change." />
               </span>

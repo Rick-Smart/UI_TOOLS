@@ -14,7 +14,12 @@ import {
 } from "./data/callHandlingGuideData";
 import { trendsTips } from "./data/trendsTips";
 import { topActions } from "./data/topActions";
-import { navItems, sidebarSections, toolRegistry } from "./data/toolRegistry";
+import {
+  buildHomeCards,
+  buildNavItems,
+  sidebarSections,
+  toolRegistry,
+} from "./data/toolRegistry";
 import { uiTerms } from "./data/uiTerms";
 import {
   buildAutoIndexedDataItems,
@@ -25,7 +30,8 @@ import { readManagedLinks, subscribeManagedLinks } from "./utils/linksStore";
 import kbArticlesData from "../kb/data/articles.json";
 
 const TOOLTIP_LEGEND_DISMISSED_KEY = "azdes.tooltipLegendDismissed";
-const dataModules = import.meta.glob("./data/*.js", { eager: true });
+// Auto-index only UI KB data files (not cbc/ subdirectory)
+const dataModules = import.meta.glob("./data/[^/]*.js", { eager: true });
 const autoIndexedDataItems = buildAutoIndexedDataItems(dataModules);
 const kbEntries = kbArticlesData?.entries ?? [];
 
@@ -59,12 +65,30 @@ function ToolScreen({ tool }) {
   );
 }
 
-function App() {
+function App({ basePath = "/ui-kb" }) {
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [managedLinks, setManagedLinks] = useState(readManagedLinks);
   const [isTooltipLegendDismissed, setIsTooltipLegendDismissed] = useState(
     getTooltipLegendDismissed,
+  );
+
+  const navItems = useMemo(() => buildNavItems(basePath), [basePath]);
+  const homeCards = useMemo(() => buildHomeCards(basePath), [basePath]);
+
+  // Strip the basePath prefix so smartSearch path matching works against toolRegistry
+  const strippedPathname = location.pathname.startsWith(basePath)
+    ? location.pathname.slice(basePath.length) || "/"
+    : location.pathname;
+
+  // Prefix topAction routes with basePath for correct navigation
+  const prefixedTopActions = useMemo(
+    () =>
+      topActions.map((action) => ({
+        ...action,
+        to: `${basePath}${action.to}`,
+      })),
+    [basePath],
   );
 
   useEffect(() => {
@@ -89,12 +113,16 @@ function App() {
     return buildSearchResults({
       query: searchQuery,
       maxResults: 24,
-      toolRegistry,
+      // Prefix paths so search result navigation works under basePath
+      toolRegistry: toolRegistry.map((tool) => ({
+        ...tool,
+        path: `${basePath}${tool.path}`,
+      })),
       documentReferences,
       defaultLinks: managedLinks,
       trendsTips,
       uiTerms,
-      topActions,
+      topActions: prefixedTopActions,
       kbEntries,
       autoIndexedDataItems,
       callGuideMeta,
@@ -104,16 +132,16 @@ function App() {
       supportResources,
       contactInfo,
     });
-  }, [managedLinks, searchQuery]);
+  }, [managedLinks, searchQuery, basePath, prefixedTopActions]);
 
   const focusedDocuments = useMemo(() => {
     return buildFocusedDocuments({
       documentReferences,
       toolRegistry,
-      pathname: location.pathname,
+      pathname: strippedPathname,
       searchQuery,
     });
-  }, [location.pathname, searchQuery]);
+  }, [strippedPathname, searchQuery]);
 
   return (
     <PageTemplate
@@ -124,6 +152,8 @@ function App() {
       onDismissTips={handleDismissTooltipLegend}
       navItems={navItems}
       sidebarSections={sidebarSections}
+      brandName="AZDES UI Knowledge Base"
+      brandSubtitle="Agent workspace and quick tools"
     >
       {searchQuery.trim() ? (
         <section className="card stack" aria-live="polite">
@@ -171,7 +201,15 @@ function App() {
       ) : null}
 
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        <Route
+          path="/"
+          element={
+            <HomePage
+              homeCards={homeCards}
+              topActionsItems={prefixedTopActions}
+            />
+          }
+        />
         {toolRegistry.map((tool) => (
           <Route
             key={tool.path}
@@ -179,7 +217,7 @@ function App() {
             element={<ToolScreen tool={tool} />}
           />
         ))}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to={`${basePath}/`} replace />} />
       </Routes>
 
       <DocumentReferencesPanel

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import PageSection from "../components/layout/PageSection";
 import Tooltip from "../components/Tooltip";
+import AppButton from "../components/ui/AppButton/AppButton";
 import {
   readManagedLinks,
   resetManagedLinks,
@@ -119,12 +120,12 @@ function LinksPage() {
       </div>
 
       <div className="actions-row">
-        <button type="button" onClick={addLink}>
+        <AppButton type="button" onClick={addLink}>
           Add link
-        </button>
-        <button type="button" className="button-secondary" onClick={resetLinks}>
+        </AppButton>
+        <AppButton type="button" variant="secondary" onClick={resetLinks}>
           Reset defaults
-        </button>
+        </AppButton>
       </div>
 
       <div className="links-grid" aria-live="polite">
@@ -138,21 +139,22 @@ function LinksPage() {
               </div>
             </div>
             <div className="link-actions">
-              <a
-                className="button-link link-action-button"
+              <AppButton
                 href={link.url}
+                className="link-action-button"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 Open
-              </a>
-              <button
+              </AppButton>
+              <AppButton
                 type="button"
-                className="button-secondary link-action-button"
+                variant="secondary"
+                className="link-action-button"
                 onClick={() => removeLink(link)}
               >
                 Remove
-              </button>
+              </AppButton>
             </div>
           </article>
         ))}

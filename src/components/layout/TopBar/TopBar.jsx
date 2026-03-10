@@ -19,17 +19,26 @@ function TopBar({
   onDismissTips,
   isSidebarVisible,
   onToggleSidebar,
+  brandName = "AZDES UI Knowledge Base",
+  brandSubtitle = "Agent workspace and quick tools",
+  showPetSystem = true,
 }) {
-  const [petState, setPetState] = useState(getPetStateForCurrentAgent);
-  const petCatalog = useMemo(() => getPetCatalog(), []);
+  const [petState, setPetState] = useState(() =>
+    showPetSystem ? getPetStateForCurrentAgent() : null,
+  );
+  const petCatalog = useMemo(
+    () => (showPetSystem ? getPetCatalog() : []),
+    [showPetSystem],
+  );
 
   useEffect(() => {
+    if (!showPetSystem) return undefined;
     return subscribePetState((nextState) => {
       setPetState(nextState);
     });
-  }, []);
+  }, [showPetSystem]);
 
-  const showPetControls = Boolean(petState?.profile?.unlocked);
+  const showPetControls = showPetSystem && Boolean(petState?.profile?.unlocked);
   const isPetVisible = Boolean(petState?.profile?.enabled);
   const selectedPetId = petState?.profile?.selectedPetId || "";
   const toggleCompanionVisibility = () => {
@@ -60,8 +69,8 @@ function TopBar({
           </span>
         </AppButton>
         <div className="top-bar-brand-block">
-          <p className="top-bar-brand">AZDES UI Knowledge Base</p>
-          <p className="top-bar-subtitle">Agent workspace and quick tools</p>
+          <p className="top-bar-brand">{brandName}</p>
+          <p className="top-bar-subtitle">{brandSubtitle}</p>
         </div>
       </div>
 

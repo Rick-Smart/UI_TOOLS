@@ -1,8 +1,7 @@
 import { useMemo, useState } from "react";
 import PageSection from "../components/layout/PageSection";
 import Tooltip from "../components/Tooltip";
-import { copyText } from "../utils/copyText";
-import { addInteractionMemory } from "../utils/interactionMemory";
+import CopyButton from "../components/ui/CopyButton/CopyButton";
 
 function MonetaryEligibilityPage() {
   const [minimumWage, setMinimumWage] = useState(0);
@@ -10,7 +9,6 @@ function MonetaryEligibilityPage() {
   const [q2, setQ2] = useState(0);
   const [q3, setQ3] = useState(0);
   const [q4, setQ4] = useState(0);
-  const [copyStatus, setCopyStatus] = useState("");
 
   const summary = useMemo(() => {
     const wages = [q1, q2, q3, q4].map(Number);
@@ -48,12 +46,12 @@ function MonetaryEligibilityPage() {
     };
   }, [minimumWage, q1, q2, q3, q4]);
 
-  async function handleCopySummary() {
+  function buildSummary() {
     if (!summary) {
-      return;
+      return "";
     }
 
-    const text = [
+    return [
       "Monetary Eligibility Summary",
       `Eligible: ${summary.eligible ? "Yes" : "No"}`,
       `Pathway A: ${summary.pathwayA ? "Pass" : "Fail"}`,
@@ -61,12 +59,6 @@ function MonetaryEligibilityPage() {
       `Total wages: $${summary.total.toFixed(2)}`,
       `Highest quarter: $${summary.highestQuarter.toFixed(2)}`,
     ].join("\n");
-
-    const copied = await copyText(text);
-    if (copied) {
-      addInteractionMemory("Monetary Eligibility", text);
-    }
-    setCopyStatus(copied ? "Summary copied." : "Copy unavailable.");
   }
 
   return (
@@ -168,14 +160,10 @@ function MonetaryEligibilityPage() {
             </li>
           </ul>
           <div className="actions-row">
-            <button
-              type="button"
-              className="button-secondary"
-              onClick={handleCopySummary}
-            >
-              Copy summary
-            </button>
-            {copyStatus ? <span className="muted">{copyStatus}</span> : null}
+            <CopyButton
+              getSummary={buildSummary}
+              memoryKey="Monetary Eligibility"
+            />
           </div>
         </div>
       )}

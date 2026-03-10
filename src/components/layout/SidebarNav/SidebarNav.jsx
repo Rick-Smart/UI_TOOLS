@@ -44,7 +44,11 @@ function SidebarNav({
   onNavigate,
 }) {
   const homeItem = useMemo(() => {
-    return navItems.find((item) => item.to === "/") || null;
+    return (
+      navItems.find((item) => item.home === true) ||
+      navItems.find((item) => item.to === "/") ||
+      null
+    );
   }, [navItems]);
 
   const groupedSections = useMemo(() => {

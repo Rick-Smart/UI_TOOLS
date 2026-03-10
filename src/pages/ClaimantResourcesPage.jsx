@@ -3,7 +3,7 @@ import {
   claimantResourcesContent,
 } from "../data/selfHelpResources";
 import PageSection from "../components/layout/PageSection";
-import { copyText } from "../utils/copyText";
+import CopyButton from "../components/ui/CopyButton/CopyButton";
 import { useMemo, useState } from "react";
 import ResourceSearchBar from "../components/resources/ResourceSearchBar/ResourceSearchBar";
 import ResourceTypeChips from "../components/resources/ResourceTypeChips/ResourceTypeChips";
@@ -56,7 +56,6 @@ function getResourceTopic(resource) {
 }
 
 function ClaimantResourcesPage() {
-  const [copyStatus, setCopyStatus] = useState("");
   const [findQuery, setFindQuery] = useState("");
   const [activeType, setActiveType] = useState("all");
   const [expandedTopic, setExpandedTopic] = useState(DEFAULT_TOPIC);
@@ -155,15 +154,12 @@ function ClaimantResourcesPage() {
   const totalMatches =
     filteredQuickShareLinks.length + filteredMediaResources.length;
 
-  async function handleCopyQuickShare() {
+  function buildQuickShareSummary() {
     const lines = ["Claimant Resources", ""];
-
     filteredQuickShareLinks.forEach((link) => {
       lines.push(`- ${link.label}: ${toShareUrl(link)}`);
     });
-
-    const copied = await copyText(lines.join("\n"));
-    setCopyStatus(copied ? "Share links copied." : "Copy unavailable.");
+    return lines.join("\n");
   }
 
   /*
@@ -213,14 +209,9 @@ function ClaimantResourcesPage() {
           <p className="muted">No share links match this search.</p>
         )}
         <div className="actions-row">
-          <button
-            type="button"
-            className="button-secondary"
-            onClick={handleCopyQuickShare}
-          >
+          <CopyButton getSummary={buildQuickShareSummary}>
             Copy share links
-          </button>
-          {copyStatus ? <span className="muted">{copyStatus}</span> : null}
+          </CopyButton>
         </div>
       </div>
 
