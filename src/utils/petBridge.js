@@ -224,10 +224,13 @@ function sanitizeProgress(progress) {
   merged.processedInteractionIds = Array.isArray(merged.processedInteractionIds)
     ? merged.processedInteractionIds.filter((item) => typeof item === "string")
     : [];
+  const now = Date.now();
   merged.toolRewardCooldownByKey = Object.fromEntries(
     Object.entries(merged.toolRewardCooldownByKey || {}).filter(
       ([key, value]) =>
-        typeof key === "string" && Number.isFinite(Number(value)),
+        typeof key === "string" &&
+        Number.isFinite(Number(value)) &&
+        Number(value) > now,
     ),
   );
   merged.rewardHistory = Array.isArray(merged.rewardHistory)

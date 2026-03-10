@@ -6,8 +6,8 @@ function KBLandingPage() {
   return (
     <div className="kb-landing">
       <header className="kb-landing-header">
-        <p className="kb-landing-eyebrow">Knowledge Base Management</p>
-        <h1 className="kb-landing-title">Select Your Workspace</h1>
+        <h1 className="kb-landing-eyebrow">Knowledge Base Management</h1>
+        <p className="kb-landing-title">Select Your Workspace</p>
         <p className="kb-landing-subtitle">
           Choose the department workspace below to open its tools and resources
         </p>

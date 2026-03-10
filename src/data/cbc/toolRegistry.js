@@ -5,6 +5,7 @@ import CBCLinksPage from "../../pages/cbc/CBCLinksPage";
 import CBCResourcesPage from "../../pages/cbc/CBCResourcesPage";
 import CBCTermsPage from "../../pages/cbc/CBCTermsPage";
 import CBCTrendsTipsPage from "../../pages/cbc/CBCTrendsTipsPage";
+import CBCTroubleshootingPage from "../../pages/cbc/CBCTroubleshootingPage";
 
 export const cbcToolRegistry = [
   {
@@ -16,6 +17,17 @@ export const cbcToolRegistry = [
     microGuide:
       "Use this page during live calls for scripts, note standards, and checklist completion.",
     component: CBCCallHandlingPage,
+    audience: "agent",
+  },
+  {
+    path: "/troubleshooting",
+    navLabel: "Troubleshooting",
+    title: "CBC Help Desk Troubleshooting Guide",
+    description:
+      "Step-by-step troubleshooting for common CBC caller issues: account creation, login, linking, background check submission, and more.",
+    microGuide:
+      "Use this page during calls to quickly find troubleshooting steps by category or keyword search.",
+    component: CBCTroubleshootingPage,
     audience: "agent",
   },
   {

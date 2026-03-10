@@ -9,7 +9,9 @@ export const managingCallSteps = [
   "Greet the caller",
   "Verify the caller",
   "Identify the reason for calling (RFC)",
-  "General account review",
+  "Triage the issue",
+  "Investigate and resolve or escalate",
+  "Confirm resolution and next steps",
   "Notate the case",
   "Close the call",
 ];
@@ -20,8 +22,9 @@ export const orderedCallChecklist = [
   "Verify caller identity.",
   "Confirm callback number.",
   "Capture and paraphrase reason for calling (RFC).",
-  "Set hold expectation and complete account review.",
-  "Provide status update and next steps in plain language.",
+  "Use Call Triage Flow to identify issue type and resolution path.",
+  "Set hold expectation; investigate and follow triage resolution path.",
+  "Confirm resolution or next steps with caller in plain language.",
   "Add complete case note fields.",
   "Close call with closing script.",
 ];

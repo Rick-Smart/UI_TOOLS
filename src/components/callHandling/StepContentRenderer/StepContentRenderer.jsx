@@ -119,18 +119,29 @@ function StepContentRenderer({
       return (
         <div className="step-content-renderer">
           <p>
-            <strong>Initial hold:</strong> {rfcPrompts.holdInitial}
+            Use the <strong>Call Triage Flow</strong> at the top of this page to
+            identify the issue type and determine the correct resolution path.
           </p>
           <p>
-            <strong>Hold check-in:</strong> {rfcPrompts.holdCheckIn}
-          </p>
-          <p>
-            <strong>General claim review</strong>
+            <strong>Issue types:</strong>
           </p>
           <ul className="list">
-            {generalReviewChecklist.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
+            <li>
+              <strong>Error</strong> — assess type: FCC error, request
+              submission error, system error, or user error.
+            </li>
+            <li>
+              <strong>Locked out / password reset</strong> — determine if the
+              account is locked and follow the appropriate reset flow.
+            </li>
+            <li>
+              <strong>Functionality question</strong> — provide information and
+              refer to CBC user guides at des.az.gov/cbc.
+            </li>
+            <li>
+              <strong>Status request or explanation</strong> — provide status
+              information; escalate to OLR if manual review is pending.
+            </li>
           </ul>
         </div>
       );
@@ -138,11 +149,16 @@ function StepContentRenderer({
       return (
         <div className="step-content-renderer">
           <p>
-            Provide status update and next steps in plain language before moving
-            to close.
+            <strong>Initial hold:</strong> {rfcPrompts.holdInitial}
+          </p>
+          <p>
+            <strong>Hold check-in:</strong> {rfcPrompts.holdCheckIn}
+          </p>
+          <p>
+            <strong>General account review</strong>
           </p>
           <ul className="list">
-            {customerServiceHighlights.slice(0, 4).map((item) => (
+            {generalReviewChecklist.map((item) => (
               <li key={item}>{item}</li>
             ))}
           </ul>
@@ -152,18 +168,13 @@ function StepContentRenderer({
       return (
         <div className="step-content-renderer">
           <p>
-            Reinforce weekly certification requirement when claim remains
-            active.
+            Confirm the resolution or next steps with the caller in plain
+            language before moving to close.
           </p>
           <ul className="list">
-            <li>
-              If No Valid Certifications, advise claimant that weekly
-              certifications are required.
-            </li>
-            <li>
-              Paper weekly claims should be escalated through supervisor support
-              to add certifications in system.
-            </li>
+            {customerServiceHighlights.slice(0, 4).map((item) => (
+              <li key={item}>{item}</li>
+            ))}
           </ul>
         </div>
       );

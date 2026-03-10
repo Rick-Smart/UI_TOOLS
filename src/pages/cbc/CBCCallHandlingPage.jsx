@@ -40,6 +40,7 @@ import {
 import PageSection from "../../components/layout/PageSection";
 import AppButton from "../../components/ui/AppButton/AppButton";
 import AppModal from "../../components/ui/AppModal/AppModal";
+import CBCCallFlowNavigator from "../../components/CBCCallFlowNavigator";
 
 const CASE_NOTE_DRAFT_KEY = "azdes.cbc.callHandling.caseNoteDraft";
 const CUSTOM_SCRIPTS_KEY = "azdes.cbc.callHandling.customScripts";
@@ -676,6 +677,16 @@ function CBCCallHandlingPage() {
         </p>
       }
     >
+      <section className="card stack">
+        <h3>Call Triage Flow</h3>
+        <p className="muted">
+          Use this interactive guide to determine the correct resolution path
+          for the caller&apos;s issue. Click an option at each step to navigate
+          the flow.
+        </p>
+        <CBCCallFlowNavigator />
+      </section>
+
       <section className="call-workspace">
         <CallChecklistPanel
           orderedCallChecklist={orderedCallChecklist}
