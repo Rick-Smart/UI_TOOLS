@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import PageSection from "../../components/layout/PageSection";
 import AppButton from "../../components/ui/AppButton/AppButton";
 import { copyText } from "../../utils/copyText";
@@ -30,14 +30,14 @@ function formatReadable(date) {
 // ── Component ─────────────────────────────────────────────────────────────────
 
 function CBCMillisPage() {
-  // Live clock
-  const [nowMs, setNowMs] = useState(() => Date.now());
-  const tickRef = useRef(null);
+  // Captured timestamp (null until agent clicks Capture)
+  const [nowMs, setNowMs] = useState(null);
 
-  useEffect(() => {
-    tickRef.current = setInterval(() => setNowMs(Date.now()), 1000);
-    return () => clearInterval(tickRef.current);
-  }, []);
+  function captureNow() {
+    const ms = Date.now();
+    setNowMs(ms);
+    handleCopy("now", ms, "Current Timestamp (ms)");
+  }
 
   // Date → ms converter
   const [dateInput, setDateInput] = useState(() =>
@@ -74,38 +74,54 @@ function CBCMillisPage() {
       title="Milliseconds / Timestamp Tool"
       description="Convert between human-readable dates and Unix timestamps in milliseconds. Use this to set or verify backend password expiry timestamps."
     >
-      {/* ── Live clock ─────────────────────────────────────────────────────── */}
+      {/* ── Capture now ────────────────────────────────────────────────────── */}
       <section className="card stack">
         <h3>Current Timestamp</h3>
+        <p className="muted">
+          Click <strong>Capture &amp; Copy</strong> at the exact moment you
+          complete the action (e.g. password reset). The millisecond value is
+          captured and copied to your clipboard instantly.
+        </p>
         <div
           className="result"
           aria-live="polite"
           aria-label="Current Unix timestamp in milliseconds"
         >
-          <span
-            style={{
-              fontVariantNumeric: "tabular-nums",
-              fontSize: "1.5em",
-              fontWeight: 700,
-            }}
-          >
-            {nowMs}
-          </span>
-          <span
-            className="muted"
-            style={{ fontSize: "0.82em", display: "block", marginTop: 4 }}
-          >
-            {formatReadable(new Date(nowMs))}
-          </span>
+          {nowMs !== null ? (
+            <>
+              <span
+                style={{
+                  fontVariantNumeric: "tabular-nums",
+                  fontSize: "1.5em",
+                  fontWeight: 700,
+                }}
+              >
+                {nowMs}
+              </span>
+              <span
+                className="muted"
+                style={{ fontSize: "0.82em", display: "block", marginTop: 4 }}
+              >
+                {formatReadable(new Date(nowMs))}
+              </span>
+            </>
+          ) : (
+            <span className="muted">No timestamp captured yet.</span>
+          )}
         </div>
         <div className="actions-row">
-          <AppButton
-            type="button"
-            variant="secondary"
-            onClick={() => handleCopy("now", nowMs, "Current Timestamp (ms)")}
-          >
-            Copy milliseconds
+          <AppButton type="button" onClick={captureNow}>
+            Capture &amp; Copy
           </AppButton>
+          {nowMs !== null && (
+            <AppButton
+              type="button"
+              variant="secondary"
+              onClick={() => handleCopy("now", nowMs, "Current Timestamp (ms)")}
+            >
+              Copy again
+            </AppButton>
+          )}
           {copyStatus.now && <span className="muted">{copyStatus.now}</span>}
         </div>
       </section>

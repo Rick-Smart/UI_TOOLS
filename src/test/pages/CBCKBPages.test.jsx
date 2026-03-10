@@ -453,11 +453,15 @@ describe("CBCMillisPage", () => {
     ).toBeInTheDocument();
   });
 
-  it("shows a live current timestamp", () => {
+  it("shows no timestamp until Capture is clicked", () => {
     renderWithRouter(<CBCMillisPage />);
-    // The live ms value is a large number — check it's present in the output
+    expect(screen.getByText(/no timestamp captured yet/i)).toBeInTheDocument();
+  });
+
+  it("Capture & Copy button captures a valid ms timestamp", () => {
+    renderWithRouter(<CBCMillisPage />);
+    fireEvent.click(screen.getByRole("button", { name: /capture/i }));
     const result = screen.getByLabelText(/current unix timestamp/i);
-    expect(result).toBeInTheDocument();
     const ms = Number(
       result.querySelector("span").textContent.replace(/,/g, ""),
     );
@@ -494,7 +498,8 @@ describe("CBCMillisPage", () => {
 
   it("copy buttons use AppButton secondary", () => {
     renderWithRouter(<CBCMillisPage />);
-    const copyBtns = screen.getAllByRole("button", { name: /copy/i });
+    // Only match buttons whose label starts with "Copy" (excludes "Capture & Copy")
+    const copyBtns = screen.getAllByRole("button", { name: /^copy/i });
     expect(copyBtns.length).toBeGreaterThan(0);
     copyBtns.forEach((btn) => {
       expect(btn).toHaveClass("app-button");
