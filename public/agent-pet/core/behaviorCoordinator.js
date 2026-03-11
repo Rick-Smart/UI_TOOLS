@@ -687,6 +687,12 @@ export function createBehaviorCoordinator({ canvas, nextRandom, pickInRange }) {
     }
 
     // ── Sequence management ───────────────────────────────────────────────
+    // Petting interaction interrupts any in-progress sequence so the pet
+    // reacts immediately instead of waiting for the sequence to finish.
+    if (isPetting && sequenceState) {
+      abortSequenceWithCooldown(now, 800);
+    }
+
     if (!pluginResult?.phase) {
       maybeStartSequence({
         now,

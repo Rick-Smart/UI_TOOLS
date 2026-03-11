@@ -106,7 +106,7 @@ export const cbcToolRegistry = [
     microGuide:
       "Paste a milliseconds value to see the date, or pick a date to get its milliseconds — no need to leave the tool.",
     component: CBCMillisPage,
-    audience: "reference",
+    audience: "agent",
   },
 ];
 

@@ -1040,13 +1040,16 @@ export function createPetEngine(canvas, getState, getContext, options = {}) {
       return;
     }
 
+    const hitPad = 24;
     const insideX =
-      clickX >= lastBounds.x && clickX <= lastBounds.x + lastBounds.width;
+      clickX >= lastBounds.x - hitPad &&
+      clickX <= lastBounds.x + lastBounds.width + hitPad;
     const insideY =
-      clickY >= lastBounds.y && clickY <= lastBounds.y + lastBounds.height;
+      clickY >= lastBounds.y - hitPad &&
+      clickY <= lastBounds.y + lastBounds.height + hitPad;
 
     if (insideX && insideY) {
-      pettingUntil = Date.now() + 1400;
+      pettingUntil = Date.now() + 2400;
     }
   }
 
