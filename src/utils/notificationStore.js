@@ -1,41 +1,47 @@
 import { isSupabaseConfigured, supabase } from "./supabaseClient";
 
-const LAST_SEEN_KEY = "azdes.notifications.lastSeenAt";
 const TABLE = "manager_content";
 const NOTIFICATION_EVENT = "azdes-notifications-updated";
 
-/**
- * Read the timestamp the agent last acknowledged new content.
- * @returns {string|null} ISO timestamp string or null if never seen.
- */
-export function getLastSeenAt() {
-  if (typeof window === "undefined") return null;
-  return window.localStorage.getItem(LAST_SEEN_KEY);
+function getLastSeenKey(campaign) {
+  return `azdes.notifications.${campaign}.lastSeenAt`;
 }
 
 /**
- * Persist the current time as the agent's "last seen" timestamp and
- * broadcast to any active listeners in the same tab.
+ * Read the timestamp the agent last acknowledged new content for a campaign.
+ * @param {string} campaign
+ * @returns {string|null}
  */
-export function markSeen() {
+export function getLastSeenAt(campaign) {
+  if (typeof window === "undefined") return null;
+  return window.localStorage.getItem(getLastSeenKey(campaign));
+}
+
+/**
+ * Persist the current time as the agent's "last seen" timestamp for a
+ * campaign and broadcast to any active listeners in the same tab.
+ * @param {string} campaign
+ */
+export function markSeen(campaign) {
   if (typeof window === "undefined") return;
   const now = new Date().toISOString();
-  window.localStorage.setItem(LAST_SEEN_KEY, now);
+  window.localStorage.setItem(getLastSeenKey(campaign), now);
   window.dispatchEvent(new CustomEvent(NOTIFICATION_EVENT));
 }
 
 /**
- * Fetch the most recent published_at timestamp across all active entries.
- * Returns null when Supabase is not configured or the table is empty.
+ * Fetch the most recent published_at timestamp for a campaign.
+ * @param {string} campaign
  * @returns {Promise<string|null>}
  */
-export async function fetchLatestPublishedAt() {
+export async function fetchLatestPublishedAt(campaign) {
   if (!isSupabaseConfigured) return null;
 
   const { data, error } = await supabase
     .from(TABLE)
     .select("published_at")
     .eq("is_active", true)
+    .eq("campaign", campaign)
     .order("published_at", { ascending: false })
     .limit(1)
     .maybeSingle();
@@ -50,45 +56,45 @@ export async function fetchLatestPublishedAt() {
 
 /**
  * Check whether there is content published after the agent's last seen
- * timestamp.
+ * timestamp for a campaign.
+ * @param {string} campaign
  * @returns {Promise<boolean>}
  */
-export async function checkForNew() {
-  const latest = await fetchLatestPublishedAt();
+export async function checkForNew(campaign) {
+  const latest = await fetchLatestPublishedAt(campaign);
   if (!latest) return false;
 
-  const lastSeen = getLastSeenAt();
-  if (!lastSeen) return true; // never seen anything — treat as new
+  const lastSeen = getLastSeenAt(campaign);
+  if (!lastSeen) return true;
 
   return new Date(latest) > new Date(lastSeen);
 }
 
 /**
- * Subscribe to realtime inserts/updates on manager_content AND to the
- * local storage event so the badge clears immediately on dismiss.
+ * Subscribe to realtime inserts/updates on manager_content for a campaign
+ * AND to the local storage event so the badge clears immediately on dismiss.
  *
- * Calls onChange(hasNew: boolean) immediately and again on every change.
+ * Calls onChange(hasNew: boolean) immediately and on every change.
  *
  * @param {(hasNew: boolean) => void} onChange
+ * @param {string} campaign
  * @returns {() => void} Unsubscribe function
  */
-export function subscribeNotifications(onChange) {
+export function subscribeNotifications(onChange, campaign) {
   let mounted = true;
 
   async function refresh() {
     if (!mounted) return;
-    const hasNew = await checkForNew();
+    const hasNew = await checkForNew(campaign);
     if (mounted) onChange(hasNew);
   }
 
-  // Initial check
   refresh();
 
-  // Supabase realtime — notify on new/changed rows
   let channel = null;
   if (isSupabaseConfigured) {
     channel = supabase
-      .channel("notification_watcher")
+      .channel(`notification_watcher_${campaign}`)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: TABLE },
@@ -97,7 +103,6 @@ export function subscribeNotifications(onChange) {
       .subscribe();
   }
 
-  // Local event — fires when markSeen() is called in the same tab
   function handleLocalEvent() {
     refresh();
   }

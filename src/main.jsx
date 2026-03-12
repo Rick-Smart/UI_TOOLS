@@ -8,6 +8,7 @@ import KBLandingPage from "./pages/KBLandingPage.jsx";
 // when the user actually navigates to that section, not at initial page load.
 const App = lazy(() => import("./App.jsx"));
 const CBCApp = lazy(() => import("./CBCApp.jsx"));
+const ManagerPortalPage = lazy(() => import("./pages/ManagerPortalPage.jsx"));
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -17,6 +18,7 @@ createRoot(document.getElementById("root")).render(
           <Route path="/" element={<KBLandingPage />} />
           <Route path="/ui-kb/*" element={<App basePath="/ui-kb" />} />
           <Route path="/cbc-kb/*" element={<CBCApp />} />
+          <Route path="/manager" element={<ManagerPortalPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>

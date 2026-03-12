@@ -554,6 +554,50 @@ input:focus-visible,
   margin: 0;
 }
 
+/* ── Manager Portal standalone layout ─────────────────────────────────── */
+
+.manager-portal-shell {
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+}
+
+.manager-portal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 24px;
+  background: var(--sidebar-bg, #1e2736);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.manager-portal-brand {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin: 0 0 2px;
+}
+
+.manager-portal-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text);
+}
+
+.manager-portal-content {
+  flex: 1;
+  max-width: 860px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+}
+
 .list {
   margin: 8px 0 0;
   padding-left: 18px;

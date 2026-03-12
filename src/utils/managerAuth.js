@@ -38,6 +38,29 @@ export async function getCurrentUser() {
 }
 
 /**
+ * Fetch the list of campaign keys this manager is allowed to edit.
+ * Reads from the manager_profiles table. Returns [] if no profile found.
+ * @returns {Promise<string[]>}
+ */
+export async function getManagerCampaigns() {
+  if (!isSupabaseConfigured) return [];
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data, error } = await supabase
+    .from("manager_profiles")
+    .select("campaigns")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (error || !data) return [];
+  return Array.isArray(data.campaigns) ? data.campaigns : [];
+}
+
+/**
  * Subscribe to auth state changes.
  * Returns an unsubscribe function.
  *

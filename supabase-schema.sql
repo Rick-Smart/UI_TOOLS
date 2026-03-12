@@ -4,13 +4,35 @@
 -- ============================================================
 
 -- ------------------------------------------------------------
+-- Table: manager_profiles
+-- Maps authenticated manager users to the campaign(s) they are
+-- allowed to edit.  Populated manually by an admin.
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.manager_profiles (
+  user_id   UUID        PRIMARY KEY REFERENCES auth.users (id) ON DELETE CASCADE,
+  campaigns TEXT[]      NOT NULL DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT now() NOT NULL
+);
+
+ALTER TABLE public.manager_profiles ENABLE ROW LEVEL SECURITY;
+
+-- Managers can only read their own profile.
+CREATE POLICY "manager_read_own_profile"
+  ON public.manager_profiles
+  FOR SELECT
+  USING (auth.uid() = user_id);
+
+-- ------------------------------------------------------------
 -- Table: manager_content
 -- Stores all manager-authored content (trends, tips, agent
--- cards, top actions, suggestions).  Agents read it without
--- authentication; only authenticated managers write to it.
+-- cards, top actions, suggestions) scoped to a campaign.
+-- Agents read it without authentication; only authenticated
+-- managers write to it (and only for their assigned campaigns).
 -- ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS public.manager_content (
   id           UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  campaign     TEXT        NOT NULL
+                           CHECK (campaign IN ('ui-kb', 'cbc-kb')),
   section      TEXT        NOT NULL
                            CHECK (section IN (
                              'trend', 'tip', 'suggestion',
@@ -27,6 +49,9 @@ CREATE TABLE IF NOT EXISTS public.manager_content (
   created_at   TIMESTAMPTZ DEFAULT now() NOT NULL,
   updated_at   TIMESTAMPTZ DEFAULT now() NOT NULL
 );
+
+CREATE INDEX IF NOT EXISTS manager_content_campaign_idx
+  ON public.manager_content (campaign);
 
 -- Keep updated_at current automatically
 CREATE OR REPLACE FUNCTION public.set_updated_at()
@@ -56,11 +81,19 @@ CREATE POLICY "public_read_active"
     AND (expires_on IS NULL OR expires_on >= CURRENT_DATE)
   );
 
--- Managers can insert their own entries.
+-- Managers can insert entries only for campaigns assigned to them.
 CREATE POLICY "manager_insert"
   ON public.manager_content
   FOR INSERT
-  WITH CHECK (auth.uid() IS NOT NULL AND auth.uid() = author_id);
+  WITH CHECK (
+    auth.uid() IS NOT NULL
+    AND auth.uid() = author_id
+    AND campaign = ANY (
+      SELECT unnest(campaigns)
+      FROM public.manager_profiles
+      WHERE user_id = auth.uid()
+    )
+  );
 
 -- Managers can update only their own entries.
 CREATE POLICY "manager_update_own"
@@ -81,11 +114,19 @@ CREATE POLICY "manager_delete_own"
 ALTER PUBLICATION supabase_realtime ADD TABLE public.manager_content;
 
 -- ------------------------------------------------------------
+-- Example: assign a manager to campaigns (run as admin / service role)
+-- ------------------------------------------------------------
+-- INSERT INTO public.manager_profiles (user_id, campaigns)
+-- VALUES ('<manager-uuid>', ARRAY['ui-kb'])
+-- ON CONFLICT (user_id) DO UPDATE SET campaigns = EXCLUDED.campaigns;
+
+-- ------------------------------------------------------------
 -- Optional: seed a sample entry to validate setup
 -- (comment out before production use)
 -- ------------------------------------------------------------
--- INSERT INTO public.manager_content (section, title, body, priority, author_id)
+-- INSERT INTO public.manager_content (campaign, section, title, body, priority, author_id)
 -- VALUES (
+--   'ui-kb',
 --   'tip',
 --   'Manager portal live',
 --   'This entry was created via the manager portal schema seed.',

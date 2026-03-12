@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import PageSection from "../components/layout/PageSection";
 import AppButton from "../components/ui/AppButton/AppButton";
 import {
   getCurrentUser,
+  getManagerCampaigns,
   signIn,
   signOut,
   subscribeAuthState,
@@ -32,6 +32,11 @@ const PRIORITY_OPTIONS = [
 const SECTION_LABELS = Object.fromEntries(
   SECTION_OPTIONS.map((o) => [o.value, o.label]),
 );
+
+const CAMPAIGN_CONFIG = {
+  "ui-kb": { label: "AZDES UI Knowledge Base" },
+  "cbc-kb": { label: "CBC Knowledge Base" },
+};
 
 const EMPTY_FORM = {
   section: "trend",
@@ -256,6 +261,8 @@ function EntryRow({ entry, onEdit, onDeactivate }) {
 function ManagerPortalPage() {
   const [user, setUser] = useState(null);
   const [authChecked, setAuthChecked] = useState(false);
+  const [managerCampaigns, setManagerCampaigns] = useState([]);
+  const [activeCampaign, setActiveCampaign] = useState(null);
   const [entries, setEntries] = useState([]);
   const [loadingEntries, setLoadingEntries] = useState(false);
   const [activeSection, setActiveSection] = useState("all");
@@ -277,23 +284,38 @@ function ManagerPortalPage() {
     });
   }, []);
 
-  // Load entries when authenticated
+  // Load the manager's campaign assignments after login
   useEffect(() => {
     if (!user) {
-      setEntries([]);
+      setManagerCampaigns([]);
+      setActiveCampaign(null);
       return;
     }
-
-    setLoadingEntries(true);
-    fetchManagerContent().then((data) => {
-      setEntries(data);
-      setLoadingEntries(false);
+    getManagerCampaigns().then((campaigns) => {
+      setManagerCampaigns(campaigns);
+      setActiveCampaign(campaigns[0] ?? null);
     });
   }, [user]);
 
+  // Load entries when the active campaign changes
+  useEffect(() => {
+    if (!activeCampaign) {
+      setEntries([]);
+      return;
+    }
+    setLoadingEntries(true);
+    fetchManagerContent(activeCampaign).then((data) => {
+      setEntries(data);
+      setLoadingEntries(false);
+    });
+  }, [activeCampaign]);
+
   async function handleSaveNew(formData) {
     setSaving(true);
-    const { error } = await createEntry(formData);
+    const { error } = await createEntry({
+      ...formData,
+      campaign: activeCampaign,
+    });
     setSaving(false);
 
     if (error) {
@@ -303,7 +325,7 @@ function ManagerPortalPage() {
 
     setFeedback("Entry published.");
     setShowAddForm(false);
-    const refreshed = await fetchManagerContent();
+    const refreshed = await fetchManagerContent(activeCampaign);
     setEntries(refreshed);
     setTimeout(() => setFeedback(""), 3000);
   }
@@ -321,7 +343,7 @@ function ManagerPortalPage() {
 
     setFeedback("Entry updated.");
     setEditingEntry(null);
-    const refreshed = await fetchManagerContent();
+    const refreshed = await fetchManagerContent(activeCampaign);
     setEntries(refreshed);
     setTimeout(() => setFeedback(""), 3000);
   }
@@ -345,147 +367,190 @@ function ManagerPortalPage() {
     await signOut();
   }
 
-  if (!isSupabaseConfigured) {
-    return (
-      <PageSection title="Manager Portal">
-        <div className="result">
-          <p className="muted">
-            Supabase is not configured. Copy <strong>.env.local.example</strong>{" "}
-            to <strong>.env.local</strong> and add your project URL and anon
-            key, then restart the dev server.
-          </p>
-        </div>
-      </PageSection>
-    );
-  }
-
-  if (!authChecked) {
-    return (
-      <PageSection title="Manager Portal">
-        <p className="muted">Checking authentication…</p>
-      </PageSection>
-    );
-  }
-
-  if (!user) {
-    return (
-      <PageSection
-        title="Manager Portal"
-        description="OMs and coaches only. Sign in to manage content."
-      >
-        <LoginForm onLogin={setUser} />
-      </PageSection>
-    );
-  }
-
   const visibleEntries =
     activeSection === "all"
       ? entries
       : entries.filter((e) => e.section === activeSection);
 
   return (
-    <PageSection
-      title="Manager Portal"
-      description="Publish and manage content visible to all agents in real time."
-      headerContent={
-        <div className="actions-row">
-          <span className="muted" style={{ fontSize: "13px" }}>
-            {user.email}
-          </span>
-          <AppButton
-            type="button"
-            className="button-secondary"
-            onClick={handleSignOut}
-          >
-            Sign out
-          </AppButton>
+    <div className="manager-portal-shell">
+      <header className="manager-portal-header">
+        <div className="manager-portal-brand-block">
+          <p className="manager-portal-brand">AZDES UI Toolbox</p>
+          <h1 className="manager-portal-title">Manager Portal</h1>
         </div>
-      }
-    >
-      <div className="stack">
-        {feedback && (
-          <div className="result">
-            <p className="muted">{feedback}</p>
-          </div>
-        )}
-
-        {/* Section filter tabs */}
-        <div className="actions-row" style={{ flexWrap: "wrap" }}>
-          {[{ value: "all", label: "All" }, ...SECTION_OPTIONS].map((opt) => (
+        {user && (
+          <div className="actions-row">
+            <span className="muted" style={{ fontSize: "13px" }}>
+              {user.email}
+            </span>
             <AppButton
-              key={opt.value}
               type="button"
-              className={activeSection === opt.value ? "" : "button-secondary"}
-              onClick={() => setActiveSection(opt.value)}
+              className="button-secondary"
+              onClick={handleSignOut}
             >
-              {opt.label}
+              Sign out
             </AppButton>
-          ))}
-          <AppButton
-            type="button"
-            onClick={() => {
-              setShowAddForm((prev) => !prev);
-              setEditingEntry(null);
-            }}
-            style={{ marginLeft: "auto" }}
-          >
-            {showAddForm ? "Cancel" : "+ Add entry"}
-          </AppButton>
-        </div>
-
-        {/* Add form */}
-        {showAddForm && !editingEntry && (
-          <div className="card stack">
-            <h3>New entry</h3>
-            <EntryForm
-              onSave={handleSaveNew}
-              onCancel={() => setShowAddForm(false)}
-              loading={saving}
-            />
           </div>
         )}
+      </header>
 
-        {/* Edit form */}
-        {editingEntry && (
-          <div className="card stack">
-            <h3>Edit entry</h3>
-            <EntryForm
-              initial={{
-                section: editingEntry.section,
-                title: editingEntry.title,
-                body: editingEntry.body,
-                priority: editingEntry.priority,
-                expires_on: editingEntry.expires_on ?? "",
-              }}
-              onSave={handleSaveEdit}
-              onCancel={() => setEditingEntry(null)}
-              loading={saving}
-            />
+      <main className="manager-portal-content stack">
+        {!isSupabaseConfigured ? (
+          <div className="card">
+            <p className="muted">
+              Supabase is not configured. Copy{" "}
+              <strong>.env.local.example</strong> to <strong>.env.local</strong>{" "}
+              and add your project URL and anon key, then restart the dev
+              server.
+            </p>
           </div>
-        )}
-
-        {/* Entry list */}
-        {loadingEntries ? (
-          <p className="muted">Loading entries…</p>
-        ) : visibleEntries.length === 0 ? (
-          <p className="muted">No entries in this section yet.</p>
+        ) : !authChecked ? (
+          <p className="muted">Checking authentication…</p>
+        ) : !user ? (
+          <div className="card stack">
+            <h2>Sign in</h2>
+            <p className="muted">OMs and coaches only.</p>
+            <LoginForm onLogin={setUser} />
+          </div>
+        ) : managerCampaigns.length === 0 ? (
+          <div className="card">
+            <p className="muted">
+              Your account has not been assigned to any campaigns. Contact your
+              administrator.
+            </p>
+          </div>
         ) : (
           <div className="stack">
-            {visibleEntries.map((entry) => (
-              <EntryRow
-                key={entry.id}
-                entry={entry}
-                onEdit={(e) => {
-                  setEditingEntry(e);
-                  setShowAddForm(false);
-                }}
-                onDeactivate={handleDeactivate}
-              />
-            ))}
+            {/* Campaign tabs — only shown when manager has multiple campaigns */}
+            {managerCampaigns.length > 1 && (
+              <div className="card">
+                <p
+                  className="muted"
+                  style={{ fontSize: "12px", marginBottom: "8px" }}
+                >
+                  Campaign
+                </p>
+                <div className="actions-row">
+                  {managerCampaigns.map((key) => (
+                    <AppButton
+                      key={key}
+                      type="button"
+                      className={
+                        activeCampaign === key ? "" : "button-secondary"
+                      }
+                      onClick={() => {
+                        setActiveCampaign(key);
+                        setActiveSection("all");
+                        setShowAddForm(false);
+                        setEditingEntry(null);
+                      }}
+                    >
+                      {CAMPAIGN_CONFIG[key]?.label ?? key}
+                    </AppButton>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="card stack">
+              <div className="title-row">
+                <h2>
+                  {CAMPAIGN_CONFIG[activeCampaign]?.label ?? activeCampaign}
+                </h2>
+                <span className="pill">{entries.length} entries</span>
+              </div>
+
+              {feedback && (
+                <div className="result">
+                  <p className="muted">{feedback}</p>
+                </div>
+              )}
+
+              {/* Section filter tabs + add button */}
+              <div className="actions-row" style={{ flexWrap: "wrap" }}>
+                {[{ value: "all", label: "All" }, ...SECTION_OPTIONS].map(
+                  (opt) => (
+                    <AppButton
+                      key={opt.value}
+                      type="button"
+                      className={
+                        activeSection === opt.value ? "" : "button-secondary"
+                      }
+                      onClick={() => setActiveSection(opt.value)}
+                    >
+                      {opt.label}
+                    </AppButton>
+                  ),
+                )}
+                <AppButton
+                  type="button"
+                  onClick={() => {
+                    setShowAddForm((prev) => !prev);
+                    setEditingEntry(null);
+                  }}
+                  style={{ marginLeft: "auto" }}
+                >
+                  {showAddForm ? "Cancel" : "+ Add entry"}
+                </AppButton>
+              </div>
+
+              {/* Add form */}
+              {showAddForm && !editingEntry && (
+                <div className="card stack">
+                  <h3>New entry</h3>
+                  <EntryForm
+                    onSave={handleSaveNew}
+                    onCancel={() => setShowAddForm(false)}
+                    loading={saving}
+                  />
+                </div>
+              )}
+
+              {/* Edit form */}
+              {editingEntry && (
+                <div className="card stack">
+                  <h3>Edit entry</h3>
+                  <EntryForm
+                    initial={{
+                      section: editingEntry.section,
+                      title: editingEntry.title,
+                      body: editingEntry.body,
+                      priority: editingEntry.priority,
+                      expires_on: editingEntry.expires_on ?? "",
+                    }}
+                    onSave={handleSaveEdit}
+                    onCancel={() => setEditingEntry(null)}
+                    loading={saving}
+                  />
+                </div>
+              )}
+
+              {/* Entry list */}
+              {loadingEntries ? (
+                <p className="muted">Loading entries…</p>
+              ) : visibleEntries.length === 0 ? (
+                <p className="muted">No entries in this section yet.</p>
+              ) : (
+                <div className="stack">
+                  {visibleEntries.map((entry) => (
+                    <EntryRow
+                      key={entry.id}
+                      entry={entry}
+                      onEdit={(e) => {
+                        setEditingEntry(e);
+                        setShowAddForm(false);
+                      }}
+                      onDeactivate={handleDeactivate}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         )}
-      </div>
-    </PageSection>
+      </main>
+    </div>
   );
 }
 

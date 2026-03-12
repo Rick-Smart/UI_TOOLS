@@ -3,7 +3,6 @@ import { Link, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import DocumentReferencesPanel from "./components/DocumentReferencesPanel";
 import PageTemplate from "./components/layout/PageTemplate/PageTemplate";
 import HomePage from "./pages/HomePage";
-import ManagerPortalPage from "./pages/ManagerPortalPage";
 import { documentReferences } from "./data/documentReferences";
 import {
   callGuideMeta,
@@ -99,7 +98,7 @@ function App({ basePath = "/ui-kb" }) {
   }, []);
 
   useEffect(() => {
-    return subscribeNotifications(setHasNewNotifications);
+    return subscribeNotifications(setHasNewNotifications, "ui-kb");
   }, []);
 
   const handleDismissTooltipLegend = () => {
@@ -163,7 +162,7 @@ function App({ basePath = "/ui-kb" }) {
       brandSubtitle="Agent workspace and quick tools"
       hasNewNotifications={hasNewNotifications}
       onNotificationClick={() => {
-        markSeen();
+        markSeen("ui-kb");
         setSearchQuery("");
       }}
     >
@@ -229,7 +228,6 @@ function App({ basePath = "/ui-kb" }) {
             element={<ToolScreen tool={tool} />}
           />
         ))}
-        <Route path="/manager" element={<ManagerPortalPage />} />
         <Route path="*" element={<Navigate to={`${basePath}/`} replace />} />
       </Routes>
 

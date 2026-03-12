@@ -41,12 +41,14 @@ function TrendsTipsPage() {
   const [managerEntries, setManagerEntries] = useState([]);
 
   useEffect(() => {
-    return subscribeManagerContent((entries) =>
-      setManagerEntries(
-        entries
-          .filter((e) => TREND_SECTIONS.includes(e.section))
-          .map(normalizeManagerEntry),
-      ),
+    return subscribeManagerContent(
+      (entries) =>
+        setManagerEntries(
+          entries
+            .filter((e) => TREND_SECTIONS.includes(e.section))
+            .map(normalizeManagerEntry),
+        ),
+      "ui-kb",
     );
   }, []);
 

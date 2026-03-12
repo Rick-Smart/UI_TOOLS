@@ -3,19 +3,21 @@ import { isSupabaseConfigured, supabase } from "./supabaseClient";
 const TABLE = "manager_content";
 
 /**
- * Fetch all active, non-expired manager content entries.
+ * Fetch all active, non-expired manager content entries for a campaign.
  * Optionally filter by section.
  *
+ * @param {string} campaign - Campaign key (e.g. 'ui-kb', 'cbc-kb').
  * @param {string} [section] - Optional section filter.
  * @returns {Promise<Array>}
  */
-export async function fetchManagerContent(section) {
+export async function fetchManagerContent(campaign, section) {
   if (!isSupabaseConfigured) return [];
 
   let query = supabase
     .from(TABLE)
     .select("*")
     .eq("is_active", true)
+    .eq("campaign", campaign)
     .or(
       `expires_on.is.null,expires_on.gte.${new Date().toISOString().slice(0, 10)}`,
     )
@@ -35,28 +37,29 @@ export async function fetchManagerContent(section) {
 }
 
 /**
- * Subscribe to realtime changes on active manager content.
+ * Subscribe to realtime changes on active manager content for a campaign.
  * Calls onChange with the full refreshed list whenever a row is
  * inserted, updated, or deleted.
  *
  * @param {(entries: Array) => void} onChange
+ * @param {string} campaign - Campaign key (e.g. 'ui-kb', 'cbc-kb').
  * @param {string} [section]
  * @returns {() => void} Unsubscribe function
  */
-export function subscribeManagerContent(onChange, section) {
+export function subscribeManagerContent(onChange, campaign, section) {
   if (!isSupabaseConfigured) return () => {};
 
   // Fetch immediately so caller has initial data.
-  fetchManagerContent(section).then(onChange);
+  fetchManagerContent(campaign, section).then(onChange);
 
   const channel = supabase
-    .channel(`manager_content_changes_${section ?? "all"}`)
+    .channel(`manager_content_changes_${campaign}_${section ?? "all"}`)
     .on(
       "postgres_changes",
       { event: "*", schema: "public", table: TABLE },
       () => {
         // On any change, re-fetch the full filtered list.
-        fetchManagerContent(section).then(onChange);
+        fetchManagerContent(campaign, section).then(onChange);
       },
     )
     .subscribe();

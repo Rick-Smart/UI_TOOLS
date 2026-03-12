@@ -122,7 +122,7 @@ function AgentResponseCardsPage() {
           isManagerEntry: true,
         }));
       setManagerCards(normalized);
-    });
+    }, "ui-kb");
   }, []);
 
   const allCards = useMemo(() => [...managerCards, ...cards], [managerCards]);
