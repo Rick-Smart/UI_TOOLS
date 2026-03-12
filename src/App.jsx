@@ -3,6 +3,7 @@ import { Link, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import DocumentReferencesPanel from "./components/DocumentReferencesPanel";
 import PageTemplate from "./components/layout/PageTemplate/PageTemplate";
 import HomePage from "./pages/HomePage";
+import ManagerPortalPage from "./pages/ManagerPortalPage";
 import { documentReferences } from "./data/documentReferences";
 import {
   callGuideMeta,
@@ -27,6 +28,7 @@ import {
   buildSearchResults,
 } from "./utils/smartSearch";
 import { readManagedLinks, subscribeManagedLinks } from "./utils/linksStore";
+import { markSeen, subscribeNotifications } from "./utils/notificationStore";
 import kbArticlesData from "../kb/data/articles.json";
 
 const TOOLTIP_LEGEND_DISMISSED_KEY = "azdes.tooltipLegendDismissed";
@@ -72,6 +74,7 @@ function App({ basePath = "/ui-kb" }) {
   const [isTooltipLegendDismissed, setIsTooltipLegendDismissed] = useState(
     getTooltipLegendDismissed,
   );
+  const [hasNewNotifications, setHasNewNotifications] = useState(false);
 
   const navItems = useMemo(() => buildNavItems(basePath), [basePath]);
   const homeCards = useMemo(() => buildHomeCards(basePath), [basePath]);
@@ -93,6 +96,10 @@ function App({ basePath = "/ui-kb" }) {
 
   useEffect(() => {
     return subscribeManagedLinks(setManagedLinks);
+  }, []);
+
+  useEffect(() => {
+    return subscribeNotifications(setHasNewNotifications);
   }, []);
 
   const handleDismissTooltipLegend = () => {
@@ -154,6 +161,11 @@ function App({ basePath = "/ui-kb" }) {
       sidebarSections={sidebarSections}
       brandName="AZDES UI Knowledge Base"
       brandSubtitle="Agent workspace and quick tools"
+      hasNewNotifications={hasNewNotifications}
+      onNotificationClick={() => {
+        markSeen();
+        setSearchQuery("");
+      }}
     >
       {searchQuery.trim() ? (
         <section className="card stack" aria-live="polite">
@@ -217,6 +229,7 @@ function App({ basePath = "/ui-kb" }) {
             element={<ToolScreen tool={tool} />}
           />
         ))}
+        <Route path="/manager" element={<ManagerPortalPage />} />
         <Route path="*" element={<Navigate to={`${basePath}/`} replace />} />
       </Routes>
 

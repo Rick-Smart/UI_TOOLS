@@ -1,8 +1,9 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import PageSection from "../components/layout/PageSection";
 import Tooltip from "../components/Tooltip";
 import AppSearchBar from "../components/ui/AppSearchBar/AppSearchBar";
 import CopyButton from "../components/ui/CopyButton/CopyButton";
+import { subscribeManagerContent } from "../utils/managerStore";
 
 const cards = [
   {
@@ -109,19 +110,35 @@ const cards = [
 
 function AgentResponseCardsPage() {
   const [query, setQuery] = useState("");
+  const [managerCards, setManagerCards] = useState([]);
+
+  useEffect(() => {
+    return subscribeManagerContent((entries) => {
+      const normalized = entries
+        .filter((e) => e.section === "agent_card")
+        .map((e) => ({
+          title: e.title,
+          response: e.body,
+          isManagerEntry: true,
+        }));
+      setManagerCards(normalized);
+    });
+  }, []);
+
+  const allCards = useMemo(() => [...managerCards, ...cards], [managerCards]);
 
   const filtered = useMemo(() => {
     const normalized = query.trim().toLowerCase();
     if (!normalized) {
-      return cards;
+      return allCards;
     }
 
-    return cards.filter(
+    return allCards.filter(
       (card) =>
         card.title.toLowerCase().includes(normalized) ||
         card.response.toLowerCase().includes(normalized),
     );
-  }, [query]);
+  }, [query, allCards]);
 
   function buildSummary() {
     const topCards = filtered
@@ -167,7 +184,16 @@ function AgentResponseCardsPage() {
           <article key={card.title} className="tool-card">
             <h3>
               {card.title}
-              <Tooltip text="Deliver this message clearly, then confirm understanding and next step." />
+              {card.isManagerEntry ? (
+                <span
+                  className="badge badge--info"
+                  style={{ marginLeft: "8px" }}
+                >
+                  New
+                </span>
+              ) : (
+                <Tooltip text="Deliver this message clearly, then confirm understanding and next step." />
+              )}
             </h3>
             <p className="muted">{card.response}</p>
           </article>

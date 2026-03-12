@@ -1,7 +1,10 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import PageSection from "../components/layout/PageSection";
 import CopyButton from "../components/ui/CopyButton/CopyButton";
 import { trendsTips } from "../data/trendsTips";
+import { subscribeManagerContent } from "../utils/managerStore";
+
+const TREND_SECTIONS = ["trend", "tip", "suggestion"];
 
 const priorityRank = {
   high: 0,
@@ -10,17 +13,46 @@ const priorityRank = {
 };
 
 function isActive(item) {
-  if (!item.expiresOn) {
+  if (!item.expiresOn && !item.expires_on) {
     return true;
   }
 
-  const expires = new Date(`${item.expiresOn}T23:59:59`);
+  const expiry = item.expiresOn || item.expires_on;
+  const expires = new Date(`${expiry}T23:59:59`);
   return expires >= new Date();
 }
 
+/** Normalize a Supabase manager_content row to match the static shape. */
+function normalizeManagerEntry(entry) {
+  return {
+    id: `mgr-${entry.id}`,
+    title: entry.title,
+    type: entry.section,
+    priority: entry.priority || "medium",
+    message: entry.body,
+    owner: "Manager Portal",
+    effectiveDate: entry.published_at?.slice(0, 10) ?? "",
+    expiresOn: entry.expires_on ?? "",
+    isManagerEntry: true,
+  };
+}
+
 function TrendsTipsPage() {
+  const [managerEntries, setManagerEntries] = useState([]);
+
+  useEffect(() => {
+    return subscribeManagerContent((entries) =>
+      setManagerEntries(
+        entries
+          .filter((e) => TREND_SECTIONS.includes(e.section))
+          .map(normalizeManagerEntry),
+      ),
+    );
+  }, []);
+
   const activeItems = useMemo(() => {
-    return [...trendsTips].filter(isActive).sort((a, b) => {
+    const combined = [...managerEntries, ...trendsTips].filter(isActive);
+    return combined.sort((a, b) => {
       const priorityCompare =
         priorityRank[a.priority] - priorityRank[b.priority];
       if (priorityCompare !== 0) {
@@ -29,7 +61,7 @@ function TrendsTipsPage() {
 
       return new Date(b.effectiveDate) - new Date(a.effectiveDate);
     });
-  }, []);
+  }, [managerEntries]);
 
   function buildSummary() {
     const summaryLines = activeItems
@@ -48,13 +80,7 @@ function TrendsTipsPage() {
   return (
     <PageSection
       title="Trends, Tips & Suggestions"
-      description={
-        <>
-          Leader-updated campaign guidance. Edit data in
-          <strong> src/data/trendsTips.js</strong> and redeploy to publish
-          updates.
-        </>
-      }
+      description="Leader-updated campaign guidance, published in real time by your management team."
       headerContent={
         <span className="pill">{activeItems.length} active items</span>
       }
@@ -71,6 +97,9 @@ function TrendsTipsPage() {
             <div className="title-row">
               <h3>{item.title}</h3>
               <span className="pill">{item.priority.toUpperCase()}</span>
+              {item.isManagerEntry && (
+                <span className="badge badge--info">New</span>
+              )}
             </div>
             <p>{item.message}</p>
             <p className="muted">

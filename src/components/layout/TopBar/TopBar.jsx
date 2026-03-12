@@ -22,6 +22,8 @@ function TopBar({
   brandName = "AZDES UI Knowledge Base",
   brandSubtitle = "Agent workspace and quick tools",
   showPetSystem = true,
+  hasNewNotifications = false,
+  onNotificationClick = null,
 }) {
   const [petState, setPetState] = useState(() =>
     showPetSystem ? getPetStateForCurrentAgent() : null,
@@ -126,6 +128,18 @@ function TopBar({
               Companion
             </AppButton>
           </div>
+        ) : null}
+
+        {hasNewNotifications && onNotificationClick ? (
+          <button
+            type="button"
+            className="notification-bell"
+            onClick={onNotificationClick}
+            aria-label="New updates from your team — click to view"
+          >
+            <span aria-hidden="true">🔔</span>
+            <span className="notification-dot" aria-hidden="true" />
+          </button>
         ) : null}
 
         {isTooltipLegendDismissed ? (

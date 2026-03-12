@@ -26,6 +26,8 @@ function PageTemplate({
   brandName,
   brandSubtitle,
   showPetSystem = true,
+  hasNewNotifications = false,
+  onNotificationClick = null,
   children,
 }) {
   const [isSidebarVisible, setIsSidebarVisible] = useState(getSidebarVisible);
@@ -79,6 +81,8 @@ function PageTemplate({
         brandName={brandName}
         brandSubtitle={brandSubtitle}
         showPetSystem={showPetSystem}
+        hasNewNotifications={hasNewNotifications}
+        onNotificationClick={onNotificationClick}
       />
 
       <div className="app-shell">

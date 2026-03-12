@@ -1,5 +1,6 @@
 import AgentResponseCardsPage from "../pages/AgentResponseCardsPage";
 import AppealsHelperPage from "../pages/AppealsHelperPage";
+import ManagerPortalPage from "../pages/ManagerPortalPage";
 import Way2GOCardPage from "../pages/Way2GOCardPage";
 import BasePeriodPage from "../pages/BasePeriodPage";
 import BenefitAwardPage from "../pages/BenefitAwardPage";
@@ -215,11 +216,23 @@ export const toolRegistry = [
     component: QuickReferencePage,
     audience: "agent",
   },
+  {
+    path: "/manager",
+    navLabel: "Manager Portal",
+    title: "Manager Portal",
+    description:
+      "OMs and coaches: publish trends, tips, agent cards, and top actions visible to all agents in real time.",
+    microGuide:
+      "Sign in with your manager account to add, edit, or remove content across all agent-facing sections.",
+    component: ManagerPortalPage,
+    audience: "manager",
+  },
 ];
 
 export const sidebarSections = [
-  { key: "agent", title: "Agent Tool", audience: "agent" },
+  { key: "agent", title: "Agent Tools", audience: "agent" },
   { key: "claimant", title: "Claimant Support", audience: "claimant" },
+  { key: "manager", title: "Management", audience: "manager" },
 ];
 
 export function buildNavItems(basePath) {
