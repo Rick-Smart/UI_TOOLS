@@ -85,6 +85,26 @@ const cards = [
     response:
       "If a weekly claim was missed, claimants should review the weekly claim guidance page and complete required next steps as soon as possible to avoid delays.",
   },
+  {
+    title: "Way2GO card — not yet received (new claim)",
+    response:
+      "UI does not trigger the Way2GO card mailing until the FIRST payment has been issued. From that issue date, allow an additional 10–12 days for Comerica to mail the card. The card arrives in a plain white envelope and will not be forwarded by USPS. Review the First Payment Issue date in the Payment Register.",
+  },
+  {
+    title: "Way2GO card — address mismatch",
+    response:
+      "Review the claimant's Mailing Address in CACTUS. The claimant may have updated their Residence Address but not their Mailing Address. When Debit Card is the only payment option, CACTUS reports address changes to Comerica — allow at least two business days for changes to process.",
+  },
+  {
+    title: "Way2GO card — switched from Direct Deposit, address updated",
+    response:
+      "This scenario requires escalation. Ask the claimant for the date they switched from Direct Deposit to Debit Card and the date they updated their Mailing Address. If they don't know, note that in the Brief Description. It is unclear whether these changes are captured in the third-party reporting process.",
+  },
+  {
+    title: "Way2GO card — lost or stolen",
+    response:
+      "Lost or stolen card issues must be reported directly to Comerica – Way2GO. We are unable to assist with this. Advise the claimant to contact Comerica – Way2GO directly.",
+  },
 ];
 
 function AgentResponseCardsPage() {

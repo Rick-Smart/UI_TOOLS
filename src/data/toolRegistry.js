@@ -1,5 +1,6 @@
 import AgentResponseCardsPage from "../pages/AgentResponseCardsPage";
 import AppealsHelperPage from "../pages/AppealsHelperPage";
+import Way2GOCardPage from "../pages/Way2GOCardPage";
 import BasePeriodPage from "../pages/BasePeriodPage";
 import BenefitAwardPage from "../pages/BenefitAwardPage";
 import CallHandlingPage from "../pages/CallHandlingPage";
@@ -59,6 +60,17 @@ export const toolRegistry = [
     microGuide:
       "Search by topic and use the matching card language for consistent communication.",
     component: AgentResponseCardsPage,
+    audience: "agent",
+  },
+  {
+    path: "/way2go-card",
+    navLabel: "Way2GO Card",
+    title: "Way2GO Debit Card Issues",
+    description:
+      "Resolution guidance for claimants who have not received, lost, or have address issues with their Way2GO / EPC Debit Card.",
+    microGuide:
+      "Identify the claimant's scenario, then follow the step-by-step resolution or escalation path.",
+    component: Way2GOCardPage,
     audience: "agent",
   },
   {
