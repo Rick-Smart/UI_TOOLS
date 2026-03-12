@@ -1,5 +1,13 @@
 import { useEffect, useState } from "react";
 import AppButton from "../components/ui/AppButton/AppButton";
+
+// Bypass Supabase auth in local dev when VITE_DEV_PORTAL_BYPASS=true.
+// This flag is always false in production builds.
+const DEV_BYPASS =
+  import.meta.env.DEV && import.meta.env.VITE_DEV_PORTAL_BYPASS === "true";
+
+const DEV_USER = { id: "dev-user", email: "dev@bypass.local" };
+const DEV_CAMPAIGNS = ["ui-kb", "cbc-kb"];
 import {
   getCurrentUser,
   getManagerCampaigns,
@@ -104,6 +112,63 @@ function LoginForm({ onLogin }) {
   );
 }
 
+function EntryPreview({ form }) {
+  const today = new Date().toISOString().slice(0, 10);
+  const title = form.title.trim();
+  const body = form.body.trim();
+  const hasContent = title || body;
+
+  return (
+    <div className="manager-preview-pane">
+      <p className="manager-preview-label">Live preview</p>
+      {!hasContent ? (
+        <p className="muted" style={{ fontSize: "13px", fontStyle: "italic" }}>
+          Fill in a title and content to see how it will look on the page.
+        </p>
+      ) : form.section === "agent_card" ? (
+        // Matches AgentResponseCardsPage tool-card style
+        <article className="tool-card">
+          <h3 style={{ marginBottom: "8px" }}>
+            {title || <em className="muted">Untitled</em>}
+            <span className="badge badge--info" style={{ marginLeft: "8px" }}>
+              New
+            </span>
+          </h3>
+          <p className="muted">{body || "\u2026"}</p>
+        </article>
+      ) : form.section === "top_action" ? (
+        // Matches HomePage ToolCard style
+        <article className="tool-card">
+          <h3 style={{ marginBottom: "6px" }}>
+            {title || <em className="muted">Untitled</em>}
+          </h3>
+          <p className="muted" style={{ marginBottom: "10px" }}>
+            {body || "\u2026"}
+          </p>
+          <span className="pill" style={{ fontSize: "11px" }}>
+            Start action \u2192
+          </span>
+        </article>
+      ) : (
+        // Matches TrendsTipsPage result card style
+        <article className="result stack">
+          <div className="title-row">
+            <h3>{title || <em className="muted">Untitled</em>}</h3>
+            <span className="pill">{form.priority.toUpperCase()}</span>
+            <span className="badge badge--info">New</span>
+          </div>
+          <p>{body || <em className="muted">No content yet\u2026</em>}</p>
+          <p className="muted" style={{ fontSize: "12px" }}>
+            Type: {form.section} \u00b7 Owner: Manager Portal \u00b7 Effective:{" "}
+            {today}
+            {form.expires_on ? ` \u00b7 Expires: ${form.expires_on}` : ""}
+          </p>
+        </article>
+      )}
+    </div>
+  );
+}
+
 function EntryForm({ initial = EMPTY_FORM, onSave, onCancel, loading }) {
   const [form, setForm] = useState(initial);
 
@@ -123,88 +188,91 @@ function EntryForm({ initial = EMPTY_FORM, onSave, onCancel, loading }) {
   }
 
   return (
-    <form
-      className="stack"
-      onSubmit={handleSubmit}
-      aria-label="Content entry form"
-    >
-      <div className="form-row">
-        <div className="form-field">
-          <label htmlFor="entry-section">Section</label>
-          <select
-            id="entry-section"
-            value={form.section}
-            onChange={(e) => set("section", e.target.value)}
-          >
-            {SECTION_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>
-                {o.label}
-              </option>
-            ))}
-          </select>
+    <div className="manager-form-with-preview">
+      <form
+        className="stack"
+        onSubmit={handleSubmit}
+        aria-label="Content entry form"
+      >
+        <div className="form-row">
+          <div className="form-field">
+            <label htmlFor="entry-section">Section</label>
+            <select
+              id="entry-section"
+              value={form.section}
+              onChange={(e) => set("section", e.target.value)}
+            >
+              {SECTION_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="form-field">
+            <label htmlFor="entry-priority">Priority</label>
+            <select
+              id="entry-priority"
+              value={form.priority}
+              onChange={(e) => set("priority", e.target.value)}
+            >
+              {PRIORITY_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="form-field">
+            <label htmlFor="entry-expires">Expires on (optional)</label>
+            <input
+              id="entry-expires"
+              type="date"
+              value={form.expires_on ?? ""}
+              onChange={(e) => set("expires_on", e.target.value)}
+            />
+          </div>
         </div>
+
         <div className="form-field">
-          <label htmlFor="entry-priority">Priority</label>
-          <select
-            id="entry-priority"
-            value={form.priority}
-            onChange={(e) => set("priority", e.target.value)}
-          >
-            {PRIORITY_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>
-                {o.label}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="form-field">
-          <label htmlFor="entry-expires">Expires on (optional)</label>
+          <label htmlFor="entry-title">Title</label>
           <input
-            id="entry-expires"
-            type="date"
-            value={form.expires_on ?? ""}
-            onChange={(e) => set("expires_on", e.target.value)}
+            id="entry-title"
+            type="text"
+            value={form.title}
+            onChange={(e) => set("title", e.target.value)}
+            required
           />
         </div>
-      </div>
 
-      <div className="form-field">
-        <label htmlFor="entry-title">Title</label>
-        <input
-          id="entry-title"
-          type="text"
-          value={form.title}
-          onChange={(e) => set("title", e.target.value)}
-          required
-        />
-      </div>
+        <div className="form-field">
+          <label htmlFor="entry-body">Content / Message</label>
+          <textarea
+            id="entry-body"
+            rows={4}
+            value={form.body}
+            onChange={(e) => set("body", e.target.value)}
+            required
+          />
+        </div>
 
-      <div className="form-field">
-        <label htmlFor="entry-body">Content / Message</label>
-        <textarea
-          id="entry-body"
-          rows={4}
-          value={form.body}
-          onChange={(e) => set("body", e.target.value)}
-          required
-        />
-      </div>
-
-      <div className="actions-row">
-        <AppButton type="submit" disabled={loading}>
-          {loading ? "Saving…" : "Save"}
-        </AppButton>
-        {onCancel && (
-          <AppButton
-            type="button"
-            className="button-secondary"
-            onClick={onCancel}
-          >
-            Cancel
+        <div className="actions-row">
+          <AppButton type="submit" disabled={loading}>
+            {loading ? "Saving…" : "Save"}
           </AppButton>
-        )}
-      </div>
-    </form>
+          {onCancel && (
+            <AppButton
+              type="button"
+              className="button-secondary"
+              onClick={onCancel}
+            >
+              Cancel
+            </AppButton>
+          )}
+        </div>
+      </form>
+      <EntryPreview form={form} />
+    </div>
   );
 }
 
@@ -273,6 +341,12 @@ function ManagerPortalPage() {
 
   // Resolve initial auth state
   useEffect(() => {
+    if (DEV_BYPASS) {
+      setUser(DEV_USER);
+      setAuthChecked(true);
+      return;
+    }
+
     getCurrentUser().then((u) => {
       setUser(u);
       setAuthChecked(true);
@@ -291,6 +365,11 @@ function ManagerPortalPage() {
       setActiveCampaign(null);
       return;
     }
+    if (DEV_BYPASS) {
+      setManagerCampaigns(DEV_CAMPAIGNS);
+      setActiveCampaign(DEV_CAMPAIGNS[0]);
+      return;
+    }
     getManagerCampaigns().then((campaigns) => {
       setManagerCampaigns(campaigns);
       setActiveCampaign(campaigns[0] ?? null);
@@ -303,6 +382,11 @@ function ManagerPortalPage() {
       setEntries([]);
       return;
     }
+    if (DEV_BYPASS) {
+      // Dev mode: start with empty in-memory list; CRUD ops update local state.
+      setEntries([]);
+      return;
+    }
     setLoadingEntries(true);
     fetchManagerContent(activeCampaign).then((data) => {
       setEntries(data);
@@ -311,6 +395,26 @@ function ManagerPortalPage() {
   }, [activeCampaign]);
 
   async function handleSaveNew(formData) {
+    if (DEV_BYPASS) {
+      const devEntry = {
+        id: `dev-${Date.now()}`,
+        ...formData,
+        campaign: activeCampaign,
+        author_id: "dev-user",
+        published_at: new Date().toISOString(),
+        is_active: true,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      setEntries((prev) => [devEntry, ...prev]);
+      setShowAddForm(false);
+      setFeedback(
+        "[DEV] Entry added (in-memory only — not saved to database).",
+      );
+      setTimeout(() => setFeedback(""), 4000);
+      return;
+    }
+
     setSaving(true);
     const { error } = await createEntry({
       ...formData,
@@ -332,6 +436,21 @@ function ManagerPortalPage() {
 
   async function handleSaveEdit(formData) {
     if (!editingEntry) return;
+
+    if (DEV_BYPASS) {
+      setEntries((prev) =>
+        prev.map((e) =>
+          e.id === editingEntry.id
+            ? { ...e, ...formData, updated_at: new Date().toISOString() }
+            : e,
+        ),
+      );
+      setEditingEntry(null);
+      setFeedback("[DEV] Entry updated (in-memory only).");
+      setTimeout(() => setFeedback(""), 4000);
+      return;
+    }
+
     setSaving(true);
     const { error } = await updateEntry(editingEntry.id, formData);
     setSaving(false);
@@ -351,6 +470,14 @@ function ManagerPortalPage() {
   async function handleDeactivate(id) {
     if (!window.confirm("Remove this entry? Agents will no longer see it."))
       return;
+
+    if (DEV_BYPASS) {
+      setEntries((prev) => prev.filter((e) => e.id !== id));
+      setFeedback("[DEV] Entry removed (in-memory only).");
+      setTimeout(() => setFeedback(""), 4000);
+      return;
+    }
+
     const { error } = await deactivateEntry(id);
 
     if (error) {
@@ -364,6 +491,16 @@ function ManagerPortalPage() {
   }
 
   async function handleSignOut() {
+    if (DEV_BYPASS) {
+      // In dev bypass, sign out just resets to the login screen.
+      setUser(null);
+      setAuthChecked(false);
+      setTimeout(() => {
+        setUser(DEV_USER);
+        setAuthChecked(true);
+      }, 800);
+      return;
+    }
     await signOut();
   }
 
@@ -396,7 +533,24 @@ function ManagerPortalPage() {
       </header>
 
       <main className="manager-portal-content stack">
-        {!isSupabaseConfigured ? (
+        {DEV_BYPASS && (
+          <div
+            style={{
+              background: "#7c3a00",
+              color: "#fde68a",
+              padding: "8px 14px",
+              borderRadius: "6px",
+              fontSize: "13px",
+              fontWeight: 600,
+              letterSpacing: "0.03em",
+            }}
+          >
+            ⚠ DEV BYPASS — auth is disabled. Data is in-memory only and will not
+            persist. Remove VITE_DEV_PORTAL_BYPASS from .env.local before
+            connecting real Supabase credentials.
+          </div>
+        )}
+        {!DEV_BYPASS && !isSupabaseConfigured ? (
           <div className="card">
             <p className="muted">
               Supabase is not configured. Copy{" "}

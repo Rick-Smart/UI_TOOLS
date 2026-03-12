@@ -592,10 +592,46 @@ input:focus-visible,
 
 .manager-portal-content {
   flex: 1;
-  max-width: 860px;
+  max-width: 1160px;
   width: 100%;
   margin: 0 auto;
   padding: 24px 16px 48px;
+}
+
+/* ── Manager Portal: form + live preview side-by-side ───────────────────── */
+
+.manager-form-with-preview {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 720px) {
+  .manager-form-with-preview {
+    grid-template-columns: 1fr;
+  }
+}
+
+.manager-preview-pane {
+  position: sticky;
+  top: 16px;
+  background: var(--card-bg, #1a2235);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.manager-preview-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin: 0 0 4px;
+  font-weight: 600;
 }
 
 .list {
