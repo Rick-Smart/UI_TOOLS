@@ -42,6 +42,12 @@ export function buildAutoIndexedDataItems(dataModules) {
     const moduleName =
       modulePath.split("/").pop()?.replace(".js", "") || "data";
 
+    // Skip navigation-structure files — they are already indexed by toolMatches
+    // and their raw path values lack the basePath prefix, causing broken navigation.
+    if (moduleName === "toolRegistry") {
+      continue;
+    }
+
     for (const [exportName, exportedValue] of Object.entries(moduleExports)) {
       if (typeof exportedValue === "function") {
         continue;
