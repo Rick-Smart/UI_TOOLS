@@ -2,6 +2,20 @@ import PageSection from "../../components/layout/PageSection";
 import ToolCard from "../../components/ui/ToolCard";
 import { topActions } from "../../data/cbc/topActions";
 
+/**
+ * Editable section metadata for the Manager Portal.
+ * Update sections here when the page's editable regions change.
+ */
+export const pageMeta = {
+  id: "top-actions",
+  label: "Home — Top Actions",
+  description:
+    "Featured shortcut cards displayed at the top of the CBC home page.",
+  campaigns: ["cbc-kb"],
+  wireframe: "top-actions",
+  sections: [{ key: "top_action", label: "Top Action", region: "top-actions" }],
+};
+
 function CBCHomePage({ homeCards, topActionsItems }) {
   const resolvedTopActions = topActionsItems ?? topActions;
 

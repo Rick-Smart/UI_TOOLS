@@ -6,6 +6,24 @@ import { subscribeManagerContent } from "../utils/managerStore";
 
 const TREND_SECTIONS = ["trend", "tip", "suggestion"];
 
+/**
+ * Editable section metadata for the Manager Portal.
+ * Update sections here when the page's editable regions change.
+ */
+export const pageMeta = {
+  id: "trends-tips",
+  label: "Trends & Tips",
+  description:
+    "Broadcast trends, tips, and suggestions to agents. Entries appear inline with static content, sorted by priority.",
+  campaigns: ["ui-kb"],
+  wireframe: "single-col",
+  sections: [
+    { key: "trend", label: "Trend", region: "main" },
+    { key: "tip", label: "Tip", region: "main" },
+    { key: "suggestion", label: "Suggestion", region: "main" },
+  ],
+};
+
 const priorityRank = {
   high: 0,
   medium: 1,

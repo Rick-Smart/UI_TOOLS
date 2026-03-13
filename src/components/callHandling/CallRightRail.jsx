@@ -28,7 +28,6 @@ function CallRightRail({
   scriptCopyStatus,
   voicemailScripts,
   difficultCallerScripts,
-  unableToVerifyProtocol,
   contactInfo,
   supportResources,
 }) {
@@ -146,15 +145,6 @@ function CallRightRail({
 
       <div className="result stack">
         <h3>At-a-glance resources</h3>
-        <p>
-          <strong>If claimant cannot be verified</strong>
-        </p>
-        <ul className="list">
-          {unableToVerifyProtocol.map((line) => (
-            <li key={line}>{line}</li>
-          ))}
-        </ul>
-
         <p>
           <strong>Unemployment phones</strong>
         </p>

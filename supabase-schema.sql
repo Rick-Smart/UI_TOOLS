@@ -36,12 +36,15 @@ CREATE TABLE IF NOT EXISTS public.manager_content (
   section      TEXT        NOT NULL
                            CHECK (section IN (
                              'trend', 'tip', 'suggestion',
-                             'agent_card', 'top_action'
+                             'agent_card', 'top_action',
+                             'call_verify_item', 'call_phone',
+                             'call_transfer', 'call_support_resource'
                            )),
-  title        TEXT        NOT NULL,
+  title        TEXT        NOT NULL DEFAULT '',
   body         TEXT        NOT NULL,
   priority     TEXT        DEFAULT 'medium'
                            CHECK (priority IN ('high', 'medium', 'low')),
+  link_url     TEXT,
   expires_on   DATE,
   author_id    UUID        REFERENCES auth.users (id) ON DELETE SET NULL,
   published_at TIMESTAMPTZ DEFAULT now() NOT NULL,

@@ -3,6 +3,20 @@ import ToolCard from "../components/ui/ToolCard";
 import { topActions as defaultTopActions } from "../data/topActions";
 import { homeCards as defaultHomeCards } from "../data/toolRegistry";
 
+/**
+ * Editable section metadata for the Manager Portal.
+ * Update sections here when the page's editable regions change.
+ */
+export const pageMeta = {
+  id: "top-actions",
+  label: "Home — Top Actions",
+  description:
+    "Featured shortcut cards displayed prominently at the top of the home page.",
+  campaigns: ["ui-kb"],
+  wireframe: "top-actions",
+  sections: [{ key: "top_action", label: "Top Action", region: "top-actions" }],
+};
+
 function HomePage({ homeCards, topActionsItems }) {
   const resolvedHomeCards = homeCards ?? defaultHomeCards;
   const resolvedTopActions = topActionsItems ?? defaultTopActions;

@@ -3,6 +3,24 @@ import PageSection from "../../components/layout/PageSection";
 import CopyButton from "../../components/ui/CopyButton/CopyButton";
 import { trendsTips } from "../../data/cbc/trendsTips";
 
+/**
+ * Editable section metadata for the Manager Portal.
+ * Update sections here when the page's editable regions change.
+ */
+export const pageMeta = {
+  id: "trends-tips",
+  label: "Trends & Tips",
+  description:
+    "Broadcast trends, tips, and suggestions to CBC agents. Entries will appear inline with static content once wired up.",
+  campaigns: ["cbc-kb"],
+  wireframe: "single-col",
+  sections: [
+    { key: "trend", label: "Trend", region: "main" },
+    { key: "tip", label: "Tip", region: "main" },
+    { key: "suggestion", label: "Suggestion", region: "main" },
+  ],
+};
+
 const priorityRank = {
   high: 0,
   medium: 1,

@@ -8,6 +8,7 @@ function StepContentRenderer({
   currentStepScripts,
   greetingScripts,
   verificationGuides,
+  unableToVerifyProtocol,
   rfcPrompts,
   generalReviewChecklist,
   customerServiceHighlights,
@@ -74,6 +75,14 @@ function StepContentRenderer({
           </p>
           <ul className="list">
             {verificationGuides.employer.map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>
+          <p>
+            <strong>If claimant cannot be verified</strong>
+          </p>
+          <ul className="list">
+            {unableToVerifyProtocol.map((line) => (
               <li key={line}>{line}</li>
             ))}
           </ul>

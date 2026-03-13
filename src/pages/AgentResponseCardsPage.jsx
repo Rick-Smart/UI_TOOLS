@@ -5,6 +5,22 @@ import AppSearchBar from "../components/ui/AppSearchBar/AppSearchBar";
 import CopyButton from "../components/ui/CopyButton/CopyButton";
 import { subscribeManagerContent } from "../utils/managerStore";
 
+/**
+ * Editable section metadata for the Manager Portal.
+ * Update sections here when the page's editable regions change.
+ */
+export const pageMeta = {
+  id: "agent-cards",
+  label: "Agent Response Cards",
+  description:
+    "Custom quick-reference talking points added to the searchable response card grid.",
+  campaigns: ["ui-kb"],
+  wireframe: "card-grid",
+  sections: [
+    { key: "agent_card", label: "Agent Response Card", region: "grid" },
+  ],
+};
+
 const cards = [
   {
     title: "Waiting week",

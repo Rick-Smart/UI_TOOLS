@@ -38,6 +38,7 @@ import {
   subscribeInteractionMemory,
 } from "../utils/interactionMemory";
 import { resetToolUsageRewardCooldowns } from "../utils/petBridge";
+import { subscribeManagerContent } from "../utils/managerStore";
 import PageSection from "../components/layout/PageSection";
 import AppButton from "../components/ui/AppButton/AppButton";
 import AppModal from "../components/ui/AppModal/AppModal";
@@ -261,6 +262,36 @@ function syncCapturedDetailsSection(caseNoteDraft, memoryItems, checkState) {
   );
 }
 
+/**
+ * Editable section metadata for the Manager Portal.
+ * Update sections here when the page's editable regions change.
+ */
+export const pageMeta = {
+  id: "call-handling",
+  label: "Call Handling",
+  description:
+    "At-a-glance contact and resource lists displayed in the right panel of the call handling workflow.",
+  campaigns: ["ui-kb"],
+  wireframe: "call-handling",
+  sections: [
+    {
+      key: "call_phone",
+      label: "Unemployment Phone Number",
+      region: "right-rail",
+    },
+    {
+      key: "call_transfer",
+      label: "Internal Transfer Line",
+      region: "right-rail",
+    },
+    {
+      key: "call_support_resource",
+      label: "UI Assist Service",
+      region: "right-rail",
+    },
+  ],
+};
+
 function CallHandlingPage() {
   const [copyStatus, setCopyStatus] = useState("");
   const [noteCopyStatus, setNoteCopyStatus] = useState("");
@@ -289,6 +320,69 @@ function CallHandlingPage() {
     INITIAL_ASK_QUESTION_FORM,
   );
   const [askQuestionCopyStatus, setAskQuestionCopyStatus] = useState("");
+
+  // Manager-published at-a-glance additions for this campaign
+  const [managerCallItems, setManagerCallItems] = useState([]);
+
+  useEffect(() => {
+    return subscribeManagerContent(
+      (items) =>
+        setManagerCallItems(
+          items.filter((e) =>
+            [
+              "call_verify_item",
+              "call_phone",
+              "call_transfer",
+              "call_support_resource",
+            ].includes(e.section),
+          ),
+        ),
+      "ui-kb",
+    );
+  }, []);
+
+  const mergedUnableToVerify = useMemo(
+    () => [
+      ...unableToVerifyProtocol,
+      ...managerCallItems
+        .filter((e) => e.section === "call_verify_item")
+        .map((e) => e.body),
+    ],
+    [managerCallItems],
+  );
+
+  const mergedContactInfo = useMemo(
+    () => ({
+      ...contactInfo,
+      unemploymentPhones: [
+        ...contactInfo.unemploymentPhones,
+        ...managerCallItems
+          .filter((e) => e.section === "call_phone")
+          .map((e) => e.body),
+      ],
+      internalTransfers: [
+        ...contactInfo.internalTransfers,
+        ...managerCallItems
+          .filter((e) => e.section === "call_transfer")
+          .map((e) => e.body),
+      ],
+    }),
+    [managerCallItems],
+  );
+
+  const mergedSupportResources = useMemo(
+    () => [
+      ...supportResources,
+      ...managerCallItems
+        .filter((e) => e.section === "call_support_resource")
+        .map((e) => ({
+          name: e.title,
+          phone: e.body ?? "",
+          url: e.link_url ?? "",
+        })),
+    ],
+    [managerCallItems],
+  );
 
   const checklistCompletedCount = useMemo(
     () => checkState.filter(Boolean).length,
@@ -659,6 +753,7 @@ function CallHandlingPage() {
       currentStepScripts={currentStepScripts}
       greetingScripts={greetingScripts}
       verificationGuides={verificationGuides}
+      unableToVerifyProtocol={mergedUnableToVerify}
       rfcPrompts={rfcPrompts}
       generalReviewChecklist={generalReviewChecklist}
       customerServiceHighlights={customerServiceHighlights}
@@ -728,9 +823,8 @@ function CallHandlingPage() {
           scriptCopyStatus={scriptCopyStatus}
           voicemailScripts={voicemailScripts}
           difficultCallerScripts={difficultCallerScripts}
-          unableToVerifyProtocol={unableToVerifyProtocol}
-          contactInfo={contactInfo}
-          supportResources={supportResources}
+          contactInfo={mergedContactInfo}
+          supportResources={mergedSupportResources}
         />
       </section>
 
